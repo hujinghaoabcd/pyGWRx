@@ -1,0 +1,47 @@
+/* Final rectangular controls for pyGWRx documentation.
+   Loaded after all Material and project styles. */
+
+/* Buttons and interactive controls must remain fully rectangular. */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+.md-button,
+a.md-button,
+.md-typeset .md-button,
+.md-header__button,
+.md-content__button,
+.md-nav__button,
+.md-footer__button,
+.md-top,
+.md-search__form,
+.md-search__input,
+.md-search__output,
+.md-search-result__link,
+.md-select__inner,
+.md-select__list,
+.md-select__link,
+.md-tabs__link,
+.pygx-hero__actions .md-button,
+.pygx-cta .md-button {
+  border-radius: 0 !important;
+}
+
+/* Material uses pseudo-elements for hover and ripple surfaces. */
+button::before,
+button::after,
+.md-button::before,
+.md-button::after,
+.md-header__button::before,
+.md-header__button::after,
+.md-content__button::before,
+.md-content__button::after,
+.md-top::before,
+.md-top::after {
+  border-radius: 0 !important;
+}
+
+/* Remove the dark call-to-action block at the bottom of the homepage. */
+.pygx-cta {
+  display: none !important;
+}
