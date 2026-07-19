@@ -1,0 +1,48 @@
+name: Temporary PyPI Badge Fix
+
+on:
+  push:
+    branches:
+      - fix/pypi-badge
+
+permissions:
+  contents: write
+
+jobs:
+  update-readmes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/pypi-badge
+
+      - name: Replace the PyPI badge URL
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          old = "https://img.shields.io/pypi/v/pyGWRx.svg?color=139C5A"
+          new = "https://img.shields.io/pypi/v/pygwrx?label=PyPI&color=139C5A"
+          changed = False
+
+          for name in ("README.md", "README.zh.md"):
+              path = Path(name)
+              text = path.read_text(encoding="utf-8")
+              if old in text:
+                  path.write_text(text.replace(old, new), encoding="utf-8", newline="\n")
+                  changed = True
+
+          if not changed:
+              print("Badge URLs are already current.")
+          PY
+
+      - name: Commit the README update
+        run: |
+          if git diff --quiet -- README.md README.zh.md; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md README.zh.md
+          git commit -m "Fix PyPI version badge"
+          git push origin HEAD:fix/pypi-badge
