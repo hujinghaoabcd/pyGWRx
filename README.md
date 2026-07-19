@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/hujinghaoabcd/pyGWRx/main/docs/assets/images/logo.svg" alt="pyGWRx" width="460">
+  <img src="./docs/assets/images/logo.svg" alt="pyGWRx" width="460">
 </p>
 
 <p align="center">
