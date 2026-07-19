@@ -6,7 +6,8 @@ release. Source provenance and local file integrity are deliberately recorded as
 separate claims:
 
 - **Provenance pin** identifies an upstream package release or repository commit.
-- **Local integrity** uses `DATA_HASHES.sha256` to identify every redistributed file.
+- **Local integrity** uses `DATA_HASHES.sha256` to identify canonical LF content
+  for text files and exact bytes for binary files.
 - **Byte identity** is claimed only where it was directly verified. The three
   FastSGWR CSV files are stored with repository-standard LF line endings; restoring
   canonical CRLF line endings reproduces the exact Git blob SHA-1 at the pinned
@@ -91,6 +92,7 @@ python tools/update_data_hashes.py
 python tools/verify_data_provenance.py
 ```
 
-The first command regenerates `DATA_HASHES.sha256` deterministically. The second
+The first command regenerates `DATA_HASHES.sha256` deterministically after
+normalizing text-file line endings to LF; binary files remain byte-exact. The second
 checks every listed SHA-256 and the pinned FastSGWR Git blob identities without
 network access.

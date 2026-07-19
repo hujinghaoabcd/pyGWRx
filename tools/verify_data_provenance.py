@@ -3,8 +3,9 @@
 
 """Verify bundled-data hashes and pinned FastSGWR Git blob identities.
 
-The check is intentionally offline. It verifies local release bytes against the
-committed evidence record rather than downloading mutable upstream resources.
+The check is intentionally offline. It verifies local release content against the
+committed canonical-content record rather than downloading mutable upstream
+resources.
 
 Author:
     Jinghao Hu
@@ -17,12 +18,27 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "DATA_HASHES.sha256"
+_TEXT_DATA_SUFFIXES = {".cpg", ".csv", ".md", ".prj"}
 
 FASTSGWR_BLOBS = {
     "src/pygwrx/data/Crime/Crime.csv": "ac8ac10e020232a5293e7984c9e90ac440f91414",
     "src/pygwrx/data/HIV/HIV.csv": "cbe28a992be30dab5f7913f277d87672d5865d13",
     "src/pygwrx/data/Housing/Housing.csv": "35f4a3e7f8fea05d8f34a0c2bd03312afe74559e",
 }
+
+
+def _canonical_integrity_bytes(path: Path) -> bytes:
+    """Return LF-normalized text bytes and exact binary bytes."""
+    data = path.read_bytes()
+    if path.suffix.lower() in _TEXT_DATA_SUFFIXES:
+        return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return data
+
+
+def _canonical_crlf_bytes(path: Path) -> bytes:
+    """Restore canonical CRLF bytes for pinned FastSGWR comparison."""
+    normalized = _canonical_integrity_bytes(path)
+    return normalized.replace(b"\n", b"\r\n")
 
 
 def _git_blob_sha1(data: bytes) -> str:
@@ -51,7 +67,7 @@ def main() -> None:
         if not path.is_file():
             errors.append(f"missing file: {relative}")
             continue
-        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        actual = hashlib.sha256(_canonical_integrity_bytes(path)).hexdigest()
         if actual != expected:
             errors.append(
                 f"SHA-256 mismatch for {relative}: expected {expected}, got {actual}"
@@ -69,7 +85,7 @@ def main() -> None:
 
     for relative, expected in FASTSGWR_BLOBS.items():
         path = ROOT / relative
-        actual = _git_blob_sha1(path.read_bytes())
+        actual = _git_blob_sha1(_canonical_crlf_bytes(path))
         if actual != expected:
             errors.append(
                 f"Git blob mismatch for {relative}: expected {expected}, got {actual}"

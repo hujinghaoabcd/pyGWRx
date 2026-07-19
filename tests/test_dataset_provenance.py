@@ -7,6 +7,7 @@ import pygwrx
 from pygwrx.io import get_dataset_info, list_datasets, load_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
+_TEXT_DATA_SUFFIXES = {".cpg", ".csv", ".md", ".prj"}
 
 
 def _git_blob_sha1(data: bytes) -> str:
@@ -21,6 +22,14 @@ def _canonical_crlf_bytes(path: Path) -> bytes:
     """Restore canonical CRLF bytes for pinned upstream CSV comparison."""
     normalized = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
     return normalized.replace(b"\n", b"\r\n")
+
+
+def _canonical_integrity_bytes(path: Path) -> bytes:
+    """Return platform-independent bytes for the local integrity manifest."""
+    data = path.read_bytes()
+    if path.suffix.lower() in _TEXT_DATA_SUFFIXES:
+        return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return data
 
 
 def test_every_dataset_exposes_exact_provenance_metadata():
@@ -73,4 +82,5 @@ def test_data_hash_manifest_covers_and_verifies_every_bundled_file():
     }
     assert set(listed) == actual_paths
     for relative, expected in listed.items():
-        assert hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() == expected
+        actual = hashlib.sha256(_canonical_integrity_bytes(ROOT / relative)).hexdigest()
+        assert actual == expected

@@ -14,6 +14,7 @@ __license__ = "MIT"
 
 from typing import Optional, Tuple
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -149,10 +150,15 @@ def plot_mixed_gwr_coefficients(
             axes[0].text(0.5, 0.5, "No global variables", ha="center", va="center")
         axes[0].set_title("Global coefficients")
         if local_coef.shape[1]:
+            labels = [names[i] for i in local_indices]
+            version_parts = matplotlib.__version__.split(".")
+            version = (int(version_parts[0]), int(version_parts[1]))
+            label_keyword = "tick_labels" if version >= (3, 9) else "labels"
+            boxplot_kwargs = {label_keyword: labels}
             axes[1].boxplot(
                 [local_coef[:, j] for j in range(local_coef.shape[1])],
-                tick_labels=[names[i] for i in local_indices],
                 showfliers=False,
+                **boxplot_kwargs,
             )
             axes[1].axhline(0.0, color="0.4", linestyle="--", linewidth=0.8)
         axes[1].set_title("Local coefficient distributions")
