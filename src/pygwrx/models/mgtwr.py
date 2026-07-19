@@ -20,10 +20,11 @@ __license__ = "MIT"
 
 import warnings
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 import numpy as np
 import pandas as pd
+from numpy.typing import NDArray
 from scipy.stats import t as student_t
 
 from pygwrx.core._summary import format_summary
@@ -195,7 +196,10 @@ class MGTWR(MGWR):
             raise ValueError("bandwidths and taus must be supplied together.")
         if taus is not None:
             try:
-                raw_taus = np.asarray(taus, dtype=float).reshape(-1)
+                raw_taus = cast(
+                    NDArray[np.float64],
+                    np.asarray(taus, dtype=np.float64).reshape(-1),
+                )
             except (TypeError, ValueError) as error:
                 raise TypeError("taus must contain numeric values.") from error
             if raw_taus.size == 0:
