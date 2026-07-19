@@ -46,6 +46,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
 
   verify-install:
     needs: publish
@@ -60,7 +61,8 @@ jobs:
         shell: bash
         run: |
           ROOT="$PWD"
-          VERSION=$(python -c "import sys; sys.path.insert(0, 'src'); import pygwrx; print(pygwrx.__version__)")
+          VERSION=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/pygwrx/__init__.py)
+          test -n "$VERSION"
           python -m venv .testpypi-env
           .testpypi-env/bin/python -m pip install --upgrade pip
           for attempt in 1 2 3 4 5 6; do
