@@ -1,0 +1,43 @@
+# Pre-commit hooks for pyGWRx.
+# Install once:  python -m pip install -e ".[dev]" && pre-commit install
+# Run on all files:  pre-commit run --all-files
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-ast
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: mixed-line-ending
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+        exclude: ^(src/pygwrx/data/|docs/assets/|docs/images/)
+
+  - repo: https://github.com/psf/black
+    rev: 26.5.1
+    hooks:
+      - id: black
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.22
+    hooks:
+      - id: ruff-check
+
+  - repo: https://github.com/pycqa/isort
+    rev: 8.0.1
+    hooks:
+      - id: isort
+
+  - repo: local
+    hooks:
+      - id: mypy-typed-api
+        name: mypy typed API
+        entry: python -m mypy
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

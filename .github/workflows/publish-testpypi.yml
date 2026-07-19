@@ -1,0 +1,81 @@
+name: Publish to TestPyPI
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Build and verify
+        run: |
+          python -m pip install --upgrade pip build twine
+          rm -rf build dist src/*.egg-info
+          python -m build
+          python -m twine check dist/*
+          python tools/verify_distributions.py dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/pyGWRx
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish with Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  verify-install:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Install and exercise the exact TestPyPI release
+        shell: bash
+        run: |
+          ROOT="$PWD"
+          VERSION=$(python -c "import sys; sys.path.insert(0, 'src'); import pygwrx; print(pygwrx.__version__)")
+          python -m venv .testpypi-env
+          .testpypi-env/bin/python -m pip install --upgrade pip
+          for attempt in 1 2 3 4 5 6; do
+            if .testpypi-env/bin/python -m pip install \
+              --index-url https://test.pypi.org/simple/ \
+              --extra-index-url https://pypi.org/simple/ \
+              "pyGWRx==${VERSION}"; then
+              break
+            fi
+            if [ "$attempt" -eq 6 ]; then
+              echo "TestPyPI package was not installable after six attempts." >&2
+              exit 1
+            fi
+            sleep 20
+          done
+          TMP=$(mktemp -d)
+          (cd "$TMP" && "$ROOT/.testpypi-env/bin/python" "$ROOT/tools/smoke_installed_distribution.py")
+          .testpypi-env/bin/python -m pip check

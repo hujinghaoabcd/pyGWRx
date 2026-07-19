@@ -1,0 +1,319 @@
+site_name: pyGWRx
+site_description: A unified research platform for geographically weighted modelling in Python
+site_author: Jinghao Hu
+site_url: https://hujinghaoabcd.github.io/pyGWRx
+repo_name: hujinghaoabcd/pyGWRx
+repo_url: https://github.com/hujinghaoabcd/pyGWRx
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 Jinghao Hu
+
+strict: true
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  logo: assets/images/logo.svg
+  favicon: assets/images/mark.svg
+  font: false
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+    - content.tabs.link
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+
+extra:
+  generator: false
+  alternate:
+    - name: English
+      link: /
+      lang: en
+    - name: 简体中文
+      link: /zh/
+      lang: zh
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/hujinghaoabcd/pyGWRx
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/pygwrx/
+
+plugins:
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+      lang:
+        - en
+        - zh
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            docstring_section_style: table
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_signature_annotations: true
+            separate_signature: true
+            merge_init_into_class: true
+            filters:
+              - "!^_"
+            members_order: source
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      title: On this page
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra_javascript:
+  - assets/js/mathjax.js
+  - assets/js/site.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+extra_css:
+  - assets/css/extra.css
+
+nav:
+- Home: index.md
+- User Guide:
+  - Getting Started:
+    - Overview: getting-started/index.md
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+    - Core Concepts: getting-started/concepts.md
+    - Data and Inputs: getting-started/data-and-inputs.md
+    - Choosing a Model: getting-started/choosing-a-model.md
+  - Model Handbook:
+    - Overview: models/index.md
+    - Standard GWR: models/gwr.md
+    - MGWR: models/mgwr.md
+    - Robust GWR: models/rgwr.md
+    - STWR: models/stwr.md
+    - GTWR: models/gtwr.md
+    - GWGLM: models/gwglm.md
+    - GWLasso: models/gw-lasso.md
+    - Mixed GWR: models/mixed-gwr.md
+    - GWPCA: models/gwpca.md
+    - GWDA: models/gwda.md
+    - GWSS: models/gwss.md
+    - Scalable GWR: models/scalable-gwr.md
+    - LCR-GWR: models/lcr-gwr.md
+    - Bootstrap GWR: models/bootstrap-gwr.md
+    - SGWR: models/sgwr.md
+    - SGTWR: models/sgtwr.md
+    - MGTWR: models/mgtwr.md
+    - LG-GWR: models/lg-gwr.md
+    - GR-GWR: models/gr-gwr.md
+  - Function Guides:
+    - Overview: guides/index.md
+    - Core Numerics: guides/core-numerics.md
+    - Kernels and Bandwidths: guides/kernels-and-bandwidths.md
+    - Diagnostics and Inference: guides/diagnostics.md
+    - Visualization and Gallery: guides/visualization.md
+    - Prediction and Results: guides/prediction-and-results.md
+    - Spatiotemporal Data: guides/spatiotemporal-data.md
+    - Geospatial I/O: guides/geospatial-io.md
+    - Datasets: guides/datasets.md
+    - Performance and Reproducibility: guides/performance-and-reproducibility.md
+    - Troubleshooting: guides/troubleshooting.md
+  - Tutorials:
+    - Overview: tutorials/index.md
+    - End-to-End GWR: tutorials/end-to-end-gwr.md
+    - Compare Models: tutorials/compare-models.md
+    - Spatiotemporal Workflow: tutorials/spatiotemporal-workflow.md
+    - Original Models: tutorials/original-models.md
+- Examples:
+  - Overview: examples/index.md
+  - Models: examples/models.md
+  - Core: examples/core.md
+  - Diagnostics: examples/diagnostics.md
+  - Plotting: examples/plotting.md
+  - I/O: examples/io.md
+  - Workflows: examples/workflows.md
+- API Reference:
+  - Overview: api/index.md
+  - Models:
+    - Overview: api/models/index.md
+    - GWR: api/models/gwr.md
+    - MGWR: api/models/mgwr.md
+    - RGWR: api/models/rgwr.md
+    - STWR: api/models/stwr.md
+    - GTWR: api/models/gtwr.md
+    - GWGLM: api/models/gwglm.md
+    - GWLasso: api/models/gw-lasso.md
+    - MixedGWR: api/models/mixed-gwr.md
+    - GWPCA: api/models/gwpca.md
+    - GWDA: api/models/gwda.md
+    - GWSS: api/models/gwss.md
+    - ScalableGWR: api/models/scalable-gwr.md
+    - LCRGWR: api/models/lcr-gwr.md
+    - BootstrapGWR: api/models/bootstrap-gwr.md
+    - SGWR: api/models/sgwr.md
+    - SGTWR: api/models/sgtwr.md
+    - MGTWR: api/models/mgtwr.md
+    - LGGWR: api/models/lg-gwr.md
+    - GRGWR: api/models/gr-gwr.md
+  - Core:
+    - Overview: api/core/index.md
+    - Base Classes: api/core/base.md
+    - Kernels: api/core/kernels.md
+    - Bandwidth: api/core/bandwidth.md
+    - Optimization: api/core/optimization.md
+    - Solvers: api/core/solver.md
+    - Metrics: api/core/metrics.md
+    - Distances and Validation: api/core/utils.md
+  - Diagnostics:
+    - Overview: api/diagnostics/index.md
+    - Model Summaries: api/diagnostics/model.md
+    - Residuals and Influence: api/diagnostics/residuals.md
+    - Local Collinearity: api/diagnostics/collinearity.md
+    - Parameter Inference: api/diagnostics/inference.md
+    - Temporal: api/diagnostics/temporal.md
+    - Weights: api/diagnostics/weights.md
+    - Regimes: api/diagnostics/regimes.md
+  - Plotting:
+    - Overview: api/plotting/index.md
+    - Surfaces: api/plotting/surfaces.md
+    - Array Maps: api/plotting/array-maps.md
+    - Comparison: api/plotting/comparison.md
+    - Bandwidth: api/plotting/bandwidth.md
+    - Diagnostics: api/plotting/diagnostics.md
+    - Robust and GLM: api/plotting/robust.md
+    - Regularization: api/plotting/regularization.md
+    - Bootstrap: api/plotting/bootstrap.md
+    - Multivariate: api/plotting/multivariate.md
+    - Scalable GWR: api/plotting/scalable.md
+    - Temporal: api/plotting/temporal.md
+    - Weight Decomposition: api/plotting/decomposition.md
+    - LGGWR Geometry: api/plotting/geometry.md
+    - GRGWR Regimes: api/plotting/regimes.md
+  - I/O:
+    - Overview: api/io/index.md
+    - Conversion and Persistence: api/io/data.md
+    - Dataset Registry: api/io/datasets.md
+  - Complete Public Inventory: api/public-api-inventory.md
+- Resources:
+  - Theory and References:
+    - Reference Catalogue: theory/references.md
+    - Algorithm Encyclopedia (Chinese): theory/model-encyclopedia.zh.md
+    - LG-GWR Monograph (Chinese): theory/lg-gwr-monograph.zh.md
+    - GR-GWR Monograph (Chinese): theory/gr-gwr-monograph.zh.md
+    - Figure Manifest: assets/figures/FIGURE_MANIFEST.md
+  - Development:
+    - Overview: development/index.md
+    - Contributing: development/contributing.md
+    - Testing: development/testing.md
+    - Examples and API Contract: development/examples-and-api-contract.md
+    - Documentation Workflow: development/documentation.md
+    - Typing and py.typed Policy: development/typing.md
+    - Security and SBOM: development/security.md
+    - Release Procedure: development/release.md
+  - Project:
+    - Overview: project/index.md
+    - Status and Scope: project/status-and-scope.md
+    - API Stability: project/api-stability.md
+    - Citation: project/citation.md
+    - Licence: project/license.md
+    - Changelog: project/changelog.md
+    - Archived Material: project/archived-material.md
+- 中文:
+  - 中文首页: zh/index.md
+  - 模型手册:
+    - 模型总览: zh/models/index.md
+    - 标准 GWR: zh/models/gwr.md
+    - MGWR: zh/models/mgwr.md
+    - 稳健 GWR: zh/models/rgwr.md
+    - STWR: zh/models/stwr.md
+    - GTWR: zh/models/gtwr.md
+    - GWGLM: zh/models/gwglm.md
+    - GWLasso: zh/models/gw-lasso.md
+    - Mixed GWR: zh/models/mixed-gwr.md
+    - GWPCA: zh/models/gwpca.md
+    - GWDA: zh/models/gwda.md
+    - GWSS: zh/models/gwss.md
+    - Scalable GWR: zh/models/scalable-gwr.md
+    - LCR-GWR: zh/models/lcr-gwr.md
+    - Bootstrap GWR: zh/models/bootstrap-gwr.md
+    - SGWR: zh/models/sgwr.md
+    - SGTWR: zh/models/sgtwr.md
+    - MGTWR: zh/models/mgtwr.md
+    - LG-GWR: zh/models/lg-gwr.md
+    - GR-GWR: zh/models/gr-gwr.md
+  - 使用指南:
+    - 指南总览: zh/guides/index.md
+    - 模型选择: zh/guides/model-selection.md
+    - 数据与输入: zh/guides/data-and-inputs.md
+    - 核函数与带宽: zh/guides/kernels-and-bandwidths.md
+    - 结果与预测: zh/guides/prediction-and-results.md
+    - 诊断与推断: zh/guides/diagnostics.md
+    - API 与完整示例: zh/guides/api-and-examples.md
+    - 可视化图谱: zh/guides/visualization.md
+  - 项目与发布:
+    - 类型、安全与发布策略: zh/project/release-and-security.md
+  - 理论资料:
+    - 模型算法百科: theory/model-encyclopedia.zh.md
+    - LG-GWR 专论: theory/lg-gwr-monograph.zh.md
+    - GR-GWR 专论: theory/gr-gwr-monograph.zh.md

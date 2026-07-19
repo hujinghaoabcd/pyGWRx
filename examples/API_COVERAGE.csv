@@ -1,0 +1,175 @@
+namespace,symbol,kind,summary,example
+models,GWR,class,Gaussian geographically weighted regression.,examples/models/01_gwr.py
+models,GWRPredictionResult,class,Rich prediction result returned by :meth:`GWR.predict_result`.,examples/models/01_gwr.py
+models,MGWR,class,Gaussian multiscale geographically weighted regression.,examples/models/02_mgwr.py
+models,RGWR,class,Classical robust geographically weighted regression.,examples/models/03_rgwr.py
+models,STWR,class,Spatiotemporal weighted regression.,examples/models/04_stwr.py
+models,STWRPredictionResult,class,Detailed predictions produced at the latest modeled time stage.,examples/models/04_stwr.py
+models,GTWR,class,Geographically and temporally weighted regression.,examples/models/05_gtwr.py
+models,GTWRPredictionResult,class,Rich prediction result returned by :meth:`GTWR.predict_result`.,examples/models/05_gtwr.py
+models,GWGLM,class,Geographically weighted generalized linear model.,examples/models/06_gwglm.py
+models,GWGLMPredictionResult,class,Rich prediction result returned by :meth:`GWGLM.predict_result`.,examples/models/06_gwglm.py
+models,GWLasso,class,Geographically weighted Lasso regression.,examples/models/07_gw_lasso.py
+models,MixedGWR,class,Fit a semiparametric GWR with global and local coefficients.,examples/models/08_mixed_gwr.py
+models,GWPCA,class,Fit a basic geographically weighted principal component analysis.,examples/models/09_gwpca.py
+models,GWDA,class,Fit geographically weighted linear or quadratic discriminant analysis.,examples/models/10_gwda.py
+models,GWSS,class,Compute geographically weighted summary statistics.,examples/models/11_gwss.py
+models,ScalableGWR,class,Scalable GWR using a linear multiscale polynomial kernel.,examples/models/12_scalable_gwr.py
+models,LCRGWR,class,Locally compensated ridge geographically weighted regression.,examples/models/13_lcr_gwr.py
+models,BootstrapGWR,class,Test GWR coefficient non-stationarity by parametric bootstrap.,examples/models/14_bootstrap_gwr.py
+models,SGWR,class,Similarity and geographically weighted regression.,examples/models/15_sgwr.py
+models,SGTWR,class,Spatiotemporal geographically weighted regression with similarity.,examples/models/16_sgtwr.py
+models,SGTWRPredictionResult,class,Detailed predictions from a fitted SGTWR model.,examples/models/16_sgtwr.py
+models,MGTWR,class,Gaussian multiscale geographically and temporally weighted regression.,examples/models/17_mgtwr.py
+models,LGGWR,class,Latent-Geometry Geographically Weighted Regression.,examples/models/18_lg_gwr.py
+models,LGGWRPredictionResult,class,Detailed LG-GWR predictions at evaluation locations.,examples/models/18_lg_gwr.py
+models,GRGWR,class,Geo-Regime Geographically Weighted Regression.,examples/models/19_gr_gwr.py
+models,GRGWRPredictionResult,class,Detailed GR-GWR predictions at evaluation locations.,examples/models/19_gr_gwr.py
+core,BaseSpatialEstimator,class,Root class for all spatial estimators.,examples/core/08_base_classes.py
+core,BaseSpatialRegressor,class,Base class for spatial regression estimators.,examples/core/08_base_classes.py
+core,BaseGWR,class,Base class for single-bandwidth local kernel-weighted regressions.,examples/core/08_base_classes.py
+core,SpatiotemporalMixin,class,No summary is available.,examples/core/08_base_classes.py
+core,MultiscaleMixin,class,No summary is available.,examples/core/08_base_classes.py
+core,BaseSpatiotemporalRegressor,class,Base for spatiotemporal GWR-family regressors.,examples/core/08_base_classes.py
+core,BaseMultiscaleRegressor,class,Base for one-bandwidth-per-coefficient regressors.,examples/core/08_base_classes.py
+core,BaseSpatialClassifier,class,Base class for spatial classifiers such as GWDA.,examples/core/08_base_classes.py
+core,BaseSpatialTransformer,class,Root class for all spatial estimators.,examples/core/08_base_classes.py
+core,BaseSpatialStatistics,class,Root class for all spatial estimators.,examples/core/08_base_classes.py
+core,BaseSpatialInference,class,Root class for all spatial estimators.,examples/core/08_base_classes.py
+core,gaussian_kernel,function,Compute Gaussian kernel weights.,examples/core/01_kernels.py
+core,bisquare_kernel,function,Compute bi-square (quartic) kernel weights.,examples/core/01_kernels.py
+core,exponential_kernel,function,Compute exponential kernel weights.,examples/core/01_kernels.py
+core,tricube_kernel,function,Compute tri-cube kernel weights.,examples/core/01_kernels.py
+core,boxcar_kernel,function,Compute boxcar (uniform) kernel weights.,examples/core/01_kernels.py
+core,get_kernel_function,function,Return a built-in kernel by name or validate a custom callable.,examples/core/01_kernels.py
+core,BandwidthSelector,class,Abstract base class for bandwidth selection methods.,examples/core/07_bandwidth_selectors.py
+core,CrossValidationSelector,class,Select bandwidth by strict leave-one-out squared prediction error.,examples/core/07_bandwidth_selectors.py
+core,AICSelector,class,Select bandwidth using Gaussian GWR AIC or AICc.,examples/core/07_bandwidth_selectors.py
+core,BICSelector,class,Select bandwidth using Gaussian GWR BIC.,examples/core/07_bandwidth_selectors.py
+core,get_bandwidth_selector,function,Create a bandwidth selector by method name.,examples/core/07_bandwidth_selectors.py
+core,OptimizationResult,class,Result returned by a one-dimensional optimizer.,examples/core/06_optimization.py
+core,GoldenSectionSearch,class,Golden-section search for one-dimensional minimization.,examples/core/06_optimization.py
+core,BrentSearch,class,Brent's bounded method for continuous one-dimensional minimization.,examples/core/06_optimization.py
+core,weighted_least_squares,function,Solve a weighted least-squares problem.,examples/core/04_solver.py
+core,local_regression,function,Perform local weighted regression at target locations.,examples/core/04_solver.py
+core,compute_hat_matrix,function,Compute the GWR hat matrix ``S`` such that ``y_hat = S @ y``.,examples/core/04_solver.py
+core,adaptive_bandwidth_weights,function,Convert an adaptive neighbour-order bandwidth into a distance scale.,examples/core/04_solver.py
+core,compute_r_squared,function,"Compute the coefficient of determination, R².",examples/core/05_metrics.py
+core,compute_adjusted_r_squared,function,Compute GWR adjusted R² from residual effective degrees of freedom.,examples/core/05_metrics.py
+core,compute_aic,function,Compute Gaussian GWR AIC using trace(S) as the complexity term.,examples/core/05_metrics.py
+core,compute_aicc,function,Compute Gaussian GWR corrected AIC (AICc). Compute the corrected Akaike information criterion for Gaussian GWR.,examples/core/05_metrics.py
+core,compute_bic,function,Compute Gaussian GWR BIC using trace(S).,examples/core/05_metrics.py
+core,compute_local_r_squared,function,Compute local weighted R² values. Compute a locally weighted coefficient of determination.,examples/core/05_metrics.py
+core,compute_effective_parameters,function,"Return trace(S), the first common effective-parameter convention.",examples/core/05_metrics.py
+core,compute_diagnostics,function,Compute diagnostic statistics for a Gaussian GWR-style model.,examples/core/05_metrics.py
+core,compute_trace_statistics,function,Compute trace(S) and trace(S'S) from a validated hat matrix.,examples/core/05_metrics.py
+core,compute_edf,function,Compute residual effective degrees of freedom using the GWmodel convention.,examples/core/05_metrics.py
+core,compute_enp,function,Compute the GWmodel-style effective number of parameters. Compute the effective parameter count using the GWmodel convention.,examples/core/05_metrics.py
+core,euclidean_distance,function,Compute pairwise Euclidean distances. Compute Euclidean distances between coordinate arrays.,examples/core/02_distances_and_validation.py
+core,manhattan_distance,function,Compute pairwise Manhattan (L1/city-block) distances.,examples/core/02_distances_and_validation.py
+core,chebyshev_distance,function,Compute pairwise Chebyshev (L-infinity) distances.,examples/core/02_distances_and_validation.py
+core,minkowski_distance,function,Compute pairwise Minkowski (Lp) distances. Compute Minkowski distances between coordinate arrays.,examples/core/02_distances_and_validation.py
+core,haversine_distance,function,Compute great-circle distances using the Haversine formula.,examples/core/02_distances_and_validation.py
+core,compute_distance_matrix,function,Compute a pairwise distance matrix.,examples/core/02_distances_and_validation.py
+core,DistanceCache,class,Distance-matrix cache policy based on actual matrix memory. Decide whether a distance matrix is small enough to cache.,examples/core/02_distances_and_validation.py
+core,validate_coords,function,"Validate coordinate data and return a floating-point array of shape (n, 2).",examples/core/02_distances_and_validation.py
+core,validate_data,function,Validate a single-response feature matrix and target vector.,examples/core/02_distances_and_validation.py
+core,add_intercept,function,Add a leading intercept column of ones to a feature matrix.,examples/core/02_distances_and_validation.py
+core,extract_geopandas_coords,function,"Extract [x, y] coordinates from the active Point geometry column.",examples/core/03_geopandas_coordinates.py
+core,chunked_computation,function,"Yield half-open ``(start, end)`` index ranges for chunked processing.",examples/core/02_distances_and_validation.py
+diagnostics,DiagnosticSummary,class,Normalized global diagnostics for one fitted estimator.,examples/diagnostics/01_model_and_residual_diagnostics.py
+diagnostics,diagnostics_frame,function,Return one row of normalized global diagnostics per model.,examples/diagnostics/01_model_and_residual_diagnostics.py
+diagnostics,model_diagnostic_summary,function,Normalize global diagnostics exposed by any supported fitted model.,examples/diagnostics/01_model_and_residual_diagnostics.py
+diagnostics,InfluenceThresholds,class,Common reference thresholds for local influence diagnostics.,examples/diagnostics/01_model_and_residual_diagnostics.py
+diagnostics,influence_thresholds,function,Return transparent rule-of-thumb thresholds for a fitted model.,examples/diagnostics/01_model_and_residual_diagnostics.py
+diagnostics,local_diagnostic_frame,function,Collect available row-wise diagnostics without mutating the model.,examples/diagnostics/01_model_and_residual_diagnostics.py
+diagnostics,LocalCollinearityDiagnostics,class,Diagnose spatially varying multicollinearity in a fitted GWR model.,examples/diagnostics/02_inference_and_collinearity.py
+diagnostics,ParameterInference,class,One local coefficient surface with inference arrays.,examples/diagnostics/02_inference_and_collinearity.py
+diagnostics,adjust_pvalues,function,"Adjust p values using Bonferroni, BH, or BY correction.",examples/diagnostics/02_inference_and_collinearity.py
+diagnostics,feature_names,function,Return stable predictor names for a fitted model.,examples/diagnostics/02_inference_and_collinearity.py
+diagnostics,parameter_inference,function,"Extract a coefficient, test statistic, and standard error surface.",examples/diagnostics/02_inference_and_collinearity.py
+diagnostics,parameter_significance,function,"Return coefficient values, p values, and significance categories.",examples/diagnostics/02_inference_and_collinearity.py
+diagnostics,TemporalGroups,class,Unique time values and row indices for a fitted spatiotemporal model.,examples/diagnostics/03_temporal_diagnostics.py
+diagnostics,model_times,function,Return one time value per plotted row.,examples/diagnostics/03_temporal_diagnostics.py
+diagnostics,parameter_trajectory,function,Aggregate a parameter surface over time or follow the nearest location.,examples/diagnostics/03_temporal_diagnostics.py
+diagnostics,temporal_groups,function,Group fitted rows by exact time value while preserving chronological order.,examples/diagnostics/03_temporal_diagnostics.py
+diagnostics,temporal_parameter_frame,function,Return local parameters with coordinates and times in tidy form.,examples/diagnostics/03_temporal_diagnostics.py
+diagnostics,WeightComponents,class,Named weight matrices exposed by a fitted model.,examples/diagnostics/04_weight_diagnostics.py
+diagnostics,focus_weight_components,function,Return one row from every stored weight component.,examples/diagnostics/04_weight_diagnostics.py
+diagnostics,weight_components,function,Collect stored weight matrices using stable semantic names.,examples/diagnostics/04_weight_diagnostics.py
+diagnostics,boundary_frame,function,Return unique regime-boundary edges and their endpoints.,examples/diagnostics/05_regime_diagnostics.py
+diagnostics,regime_frame,function,"Return coordinates, regime labels, residuals, and connectivity metadata.",examples/diagnostics/05_regime_diagnostics.py
+diagnostics,regime_summary,function,"Summarize regime sizes, residual error, and component counts.",examples/diagnostics/05_regime_diagnostics.py
+plotting,plot_coefficient_map,function,Plot one fitted local coefficient surface.,examples/plotting/01_surfaces_and_arrays.py
+plotting,plot_significance_map,function,Dispatch to model-aware or historical array-based significance mapping.,examples/plotting/01_surfaces_and_arrays.py
+plotting,plot_model_significance_map,function,"Map negative-significant, non-significant, and positive-significant areas.",examples/plotting/01_surfaces_and_arrays.py
+plotting,plot_local_diagnostic_map,function,Plot a fitted local diagnostic such as Local R² or Cook's distance.,examples/plotting/01_surfaces_and_arrays.py
+plotting,plot_local_collinearity,function,Plot local condition numbers or LCR-GWR ridge compensation.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_array_significance_map,function,Plot significant and non-significant locations from local p-values.,examples/plotting/01_surfaces_and_arrays.py
+plotting,plot_local_coefficients,function,Plot one column of a local coefficient array.,examples/plotting/01_surfaces_and_arrays.py
+plotting,plot_coefficient_surface,function,Interpolate a local coefficient array to a regular plotting grid.,examples/plotting/01_surfaces_and_arrays.py
+plotting,plot_local_r2,function,Plot spatial local R² values.,examples/plotting/01_surfaces_and_arrays.py
+plotting,plot_bandwidth,function,Visualize fixed-distance bandwidth footprints at selected locations.,examples/plotting/01_surfaces_and_arrays.py
+plotting,create_choropleth,function,Create a validated GeoDataFrame choropleth.,examples/plotting/01_surfaces_and_arrays.py
+plotting,plot_multiple_coefficients,function,Create a panel containing every coefficient column.,examples/plotting/01_surfaces_and_arrays.py
+plotting,compare_coefficient_surfaces,function,Compare the same local coefficient across two or more fitted models.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,compare_model_diagnostics,function,Compare normalized global diagnostics across fitted models.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_kernel_weights,function,Show the spatial neighbourhood and weight-decay curve at one calibration point.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_mgwr_bandwidths,function,Plot variable-specific MGWR bandwidths.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_residuals,function,Plot residuals against fitted values with a binned mean trend.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_residual_histogram,function,Plot a residual histogram and optional fitted normal density.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_qq,function,Create a normal Q–Q plot for residuals.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_spatial_residuals,function,Map residuals using calibration point coordinates.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_observed_vs_predicted,function,Plot observed and predicted values with a one-to-one reference.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_bandwidth_selection,function,Compatibility wrapper for :func:`pygwrx.plotting.bandwidth.plot_bandwidth_selection`.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_coefficient_variability,function,Compare distributions of local coefficients across variables.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_diagnostic_panel,function,Create a complete calibration-diagnostic panel without displaying it.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_local_diagnostics,function,Plot several local diagnostic arrays on a common coordinate set.,examples/plotting/02_diagnostics_and_comparison.py
+plotting,plot_rgwr_weights,function,Map final robust weights and outline completely rejected observations.,examples/plotting/03_robust_regularized_bootstrap.py
+plotting,plot_rgwr_convergence,function,Plot iteration MSE and the number of downweighted observations.,examples/plotting/03_robust_regularized_bootstrap.py
+plotting,plot_gwglm_residuals,function,"Map Pearson, deviance, or raw residuals from a fitted GWGLM.",examples/plotting/03_robust_regularized_bootstrap.py
+plotting,plot_gwlasso_selection_frequency,function,Plot the percentage of locations with a non-zero coefficient.,examples/plotting/03_robust_regularized_bootstrap.py
+plotting,plot_gwlasso_active_map,function,Map locations where a GWLasso coefficient is active.,examples/plotting/03_robust_regularized_bootstrap.py
+plotting,plot_gwlasso_alpha,function,Map the locally selected Lasso penalty.,examples/plotting/03_robust_regularized_bootstrap.py
+plotting,plot_mixed_gwr_coefficients,function,Compare global coefficients with distributions of local coefficients.,examples/plotting/03_robust_regularized_bootstrap.py
+plotting,plot_bootstrap_pvalues,function,Map localized bootstrap p values or show a global modified-test p value.,examples/plotting/03_robust_regularized_bootstrap.py
+plotting,plot_bootstrap_bandwidths,function,Plot bandwidth variability across bootstrap replications.,examples/plotting/03_robust_regularized_bootstrap.py
+plotting,plot_gwss_statistic,function,Map a local GWSS univariate or pairwise summary statistic.,examples/plotting/04_multivariate_and_classification.py
+plotting,plot_gwpca_explained_variance,function,Map local explained variance for one component or cumulatively.,examples/plotting/04_multivariate_and_classification.py
+plotting,plot_gwpca_loading,function,Map a local principal-component loading surface.,examples/plotting/04_multivariate_and_classification.py
+plotting,plot_gwda_classification,function,Map predicted classes or maximum class probability for GWDA.,examples/plotting/04_multivariate_and_classification.py
+plotting,plot_gwda_confusion_matrix,function,Plot a calibration/validation confusion matrix when labels are available.,examples/plotting/04_multivariate_and_classification.py
+plotting,plot_scalable_gwr_kernel,function,Plot fitted polynomial-kernel components and their mixture.,examples/plotting/03_robust_regularized_bootstrap.py
+plotting,plot_temporal_coefficient_slices,function,Plot coefficient maps at selected observed time slices.,examples/plotting/05_temporal_and_weights.py
+plotting,plot_mgtwr_scales,function,Plot variable-specific spatial bandwidths and temporal scale parameters.,examples/plotting/05_temporal_and_weights.py
+plotting,plot_temporal_trajectory,function,Plot a coefficient trajectory aggregated by time or followed by location.,examples/plotting/05_temporal_and_weights.py
+plotting,plot_temporal_residuals,function,Plot fitted residuals against time with a zero reference line.,examples/plotting/05_temporal_and_weights.py
+plotting,plot_temporal_bandwidths,function,"Plot spatial/temporal scales for GTWR, MGTWR, STWR, or SGTWR.",examples/plotting/05_temporal_and_weights.py
+plotting,plot_weight_decomposition,function,"Map stored spatial, temporal, similarity, and combined weights.",examples/plotting/05_temporal_and_weights.py
+plotting,plot_weight_profiles,function,Compare sorted one-dimensional profiles of stored weight components.,examples/plotting/05_temporal_and_weights.py
+plotting,plot_selection_history,function,Plot AICc/CV values from an SGWR/STWR/SGTWR parameter search.,examples/plotting/05_temporal_and_weights.py
+plotting,plot_lggwr_latent_geometry,function,Compare physical coordinates with the first two latent dimensions.,examples/plotting/06_lggwr_and_grgwr.py
+plotting,plot_lggwr_metric_matrix,function,Plot the rotation-invariant metric matrix ``A.T @ A`` or ``B.T @ B``.,examples/plotting/06_lggwr_and_grgwr.py
+plotting,plot_lggwr_training,function,Plot LOO loss and bandwidth updates from latent-geometry learning.,examples/plotting/06_lggwr_and_grgwr.py
+plotting,plot_lggwr_neighbourhood_comparison,function,Compare geographical and learned nearest neighbours around one observation.,examples/plotting/06_lggwr_and_grgwr.py
+plotting,plot_grgwr_regimes,function,Map final mechanism regimes and optional boundary graph edges.,examples/plotting/06_lggwr_and_grgwr.py
+plotting,plot_grgwr_convergence,function,Plot the accepted penalized objective sequence.,examples/plotting/06_lggwr_and_grgwr.py
+plotting,plot_grgwr_regime_sizes,function,Plot sample counts and optional RMSE by final regime.,examples/plotting/06_lggwr_and_grgwr.py
+plotting,plot_grgwr_coefficient_surface,function,Map a GR-GWR coefficient while overlaying discovered regime boundaries.,examples/plotting/06_lggwr_and_grgwr.py
+io,load_data,function,"Load a user data file and extract model features, target, and coordinates. Extract predictors, an optional response, and coordinates from a user data file.",examples/io/02_tabular_roundtrip.py
+io,to_geodataframe,function,Convert aligned arrays into a point GeoDataFrame.,examples/io/03_geodataframe_roundtrip.py
+io,from_geodataframe,function,Extract aligned arrays from a point GeoDataFrame.,examples/io/03_geodataframe_roundtrip.py
+io,save_results,function,"Save model results to CSV, Parquet, Shapefile, GeoJSON, or GeoPackage.",examples/io/02_tabular_roundtrip.py
+io,load_dataset,function,Load a bundled example dataset by name.,examples/io/01_bundled_datasets.py
+io,load_dublin_voter,function,Load the Dublin voter turnout dataset. See :func:`load_dataset`.,examples/io/01_bundled_datasets.py
+io,load_hiv,function,Load the county-level HIV prevalence dataset. See :func:`load_dataset`.,examples/io/01_bundled_datasets.py
+io,load_crime,function,Load the county-level crime dataset. See :func:`load_dataset`.,examples/io/01_bundled_datasets.py
+io,load_housing,function,Load the neighborhood house-price dataset. See :func:`load_dataset`.,examples/io/01_bundled_datasets.py
+io,load_columbus,function,Load the Columbus (OH) crime dataset. See :func:`load_dataset`.,examples/io/01_bundled_datasets.py
+io,load_ewhp,function,Load the England & Wales house-price dataset. See :func:`load_dataset`.,examples/io/01_bundled_datasets.py
+io,load_georgia,function,Load the Georgia educational-attainment dataset. See :func:`load_dataset`.,examples/io/01_bundled_datasets.py
+io,get_dublin_voter,function,Load the Dublin voter turnout dataset. See :func:`load_dataset`.,examples/io/01_bundled_datasets.py
+io,load_dubvoter,function,Load the Dublin voter turnout dataset. See :func:`load_dataset`.,examples/io/01_bundled_datasets.py
+io,get_dubvoter,function,Load the Dublin voter turnout dataset. See :func:`load_dataset`.,examples/io/01_bundled_datasets.py
+io,get_dataset_info,function,Return registry metadata for a dataset without loading its data file.,examples/io/01_bundled_datasets.py
+io,list_datasets,function,List available built-in datasets and optionally print their metadata.,examples/io/01_bundled_datasets.py

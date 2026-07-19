@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use pyGWRx in your research, please cite it as below."
+title: "pyGWRx: Geographically weighted modelling in Python"
+abstract: >-
+  pyGWRx provides geographically weighted regression, multiscale,
+  spatio-temporal, robust, generalized, diagnostic, and exploratory spatial
+  modelling methods with reproducible datasets, examples, and documentation.
+type: software
+authors:
+  - given-names: Jinghao
+    family-names: Hu
+    email: hujinghao20@mails.ucas.ac.cn
+    affiliation: University of Chinese Academy of Sciences
+version: 0.1.2
+date-released: 2026-07-19
+license: MIT
+repository-code: "https://github.com/hujinghaoabcd/pyGWRx"
+url: "https://hujinghaoabcd.github.io/pyGWRx/"
+keywords:
+  - geographically weighted regression
+  - spatial statistics
+  - spatial non-stationarity
+  - GWR
+  - Python

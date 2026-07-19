@@ -1,0 +1,51 @@
+name: Security and SBOM
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  schedule:
+    - cron: "23 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install audit tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pip-audit cyclonedx-bom
+      - name: Create isolated audited environment
+        run: |
+          python -m venv .audit-env
+          .audit-env/bin/python -m pip install --upgrade pip
+          .audit-env/bin/python -m pip install -e ".[all]"
+          .audit-env/bin/python -m pip check
+      - name: Audit installed release dependencies
+        run: |
+          AUDIT_SITE=$(.audit-env/bin/python -c "import site; print(site.getsitepackages()[0])")
+          python -m pip_audit --strict --progress-spinner=off --path "$AUDIT_SITE"
+      - name: Generate reproducible CycloneDX SBOM
+        run: >-
+          cyclonedx-py environment .audit-env
+          --pyproject pyproject.toml
+          --mc-type library
+          --output-reproducible
+          --output-format JSON
+          --output-file SBOM.cdx.json
+      - name: Finalize and validate SBOM
+        run: .audit-env/bin/python tools/finalize_sbom.py SBOM.cdx.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: cyclonedx-sbom
+          path: SBOM.cdx.json

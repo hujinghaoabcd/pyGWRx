@@ -1,0 +1,55 @@
+{#-
+  Single-row documentation header for pyGWRx.
+  The uploaded project logo is rendered directly through partials/logo.html.
+-#}
+{% import "partials/tabs-item.html" as item with context %}
+{% set class = "md-header md-header--shadow" %}
+<header class="{{ class }}" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="{{ lang.t('header') }}">
+    {# The project logo is intentionally hidden from the header for now. #}
+
+    <label class="md-header__button md-icon pygx-menu-button" for="__drawer">
+      {% set icon = config.theme.icon.menu or "material/menu" %}
+      {% include ".icons/" ~ icon ~ ".svg" %}
+    </label>
+
+    <div class="pygx-header-tabs" data-md-component="tabs">
+      <ul class="md-tabs__list">
+        {% for nav_item in nav.items %}
+          {% if nav_item.title not in ["Resources", "中文"] %}
+            {{ item.render(nav_item) }}
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="pygx-header-tools">
+      {% if config.theme.palette %}
+        {% if not config.theme.palette is mapping %}
+          {% include "partials/palette.html" %}
+        {% endif %}
+      {% endif %}
+      {% if not config.theme.palette is mapping %}
+        {% include "partials/javascripts/palette.html" %}
+      {% endif %}
+      {% if config.extra.alternate %}
+        {% include "partials/alternate.html" %}
+      {% endif %}
+      {% if "material/search" in config.plugins %}
+        {% set search = config.plugins["material/search"] | attr("config") %}
+        {% if search.enabled %}
+          <label class="md-header__button md-icon" for="__search">
+            {% set icon = config.theme.icon.search or "material/magnify" %}
+            {% include ".icons/" ~ icon ~ ".svg" %}
+          </label>
+          {% include "partials/search.html" %}
+        {% endif %}
+      {% endif %}
+      {% if config.repo_url %}
+        <div class="md-header__source">
+          {% include "partials/source.html" %}
+        </div>
+      {% endif %}
+    </div>
+  </nav>
+</header>

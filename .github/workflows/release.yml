@@ -1,0 +1,203 @@
+name: PyPI and GitHub Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+env:
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+  NUMEXPR_NUM_THREADS: "1"
+  MPLBACKEND: "Agg"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install release validation environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,docs]"
+      - name: Verify tag matches package version
+        shell: bash
+        run: |
+          VERSION=$(python -c "import pygwrx; print(pygwrx.__version__)")
+          test "v${VERSION}" = "${GITHUB_REF_NAME}"
+      - name: Quality, provenance, and API gates
+        run: |
+          python -m black --check src tests tools examples
+          python -m isort --check-only src tests tools examples
+          python -m ruff check src tests tools examples
+          python -m mypy
+          python tools/verify_data_provenance.py
+          python examples/validate_coverage.py
+          python tools/generate_example_docs.py
+          python tools/generate_api_docs.py
+          git diff --exit-code
+      - name: Non-reference test batch 1
+        run: python tools/run_tests.py --batch 1
+      - name: Non-reference test batch 2
+        run: python tools/run_tests.py --batch 2
+      - name: Non-reference test batch 3
+        run: python tools/run_tests.py --batch 3
+      - name: Independent reference suite
+        run: python -m pytest -q -m reference
+      - name: Strict documentation build
+        run: python -m mkdocs build --strict --clean --site-dir site
+      - name: Package documentation site
+        shell: bash
+        run: |
+          VERSION=$(python -c "import pygwrx; print(pygwrx.__version__)")
+          (cd site && zip -qr "../pyGWRx-${VERSION}-documentation-site.zip" .)
+      - uses: actions/upload-artifact@v7
+        with:
+          name: documentation-site
+          path: pyGWRx-*-documentation-site.zip
+
+  compatibility:
+    name: Release compatibility (${{ matrix.os }} / Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install package and tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test]"
+          python -m pip check
+      - name: Run release compatibility batch 1
+        run: python tools/run_tests.py --batch 1
+      - name: Run release compatibility batch 2
+        run: python tools/run_tests.py --batch 2
+      - name: Run release compatibility batch 3
+        run: python tools/run_tests.py --batch 3
+
+  build:
+    needs: [validate, compatibility]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Build and verify distributions
+        run: |
+          python -m pip install --upgrade pip build twine cyclonedx-bom
+          rm -rf build dist src/*.egg-info
+          python -m build
+          python -m twine check dist/*
+          python tools/verify_distributions.py dist
+      - name: Exercise wheel and sdist in isolated environments
+        shell: bash
+        run: |
+          ROOT="$PWD"
+          python -m venv .wheel-env
+          .wheel-env/bin/python -m pip install --upgrade pip
+          .wheel-env/bin/python -m pip install dist/*.whl
+          TMP=$(mktemp -d)
+          (cd "$TMP" && "$ROOT/.wheel-env/bin/python" "$ROOT/tools/smoke_installed_distribution.py")
+          .wheel-env/bin/python -m pip check
+          python -m venv .sdist-env
+          .sdist-env/bin/python -m pip install --upgrade pip
+          .sdist-env/bin/python -m pip install dist/*.tar.gz
+          TMP=$(mktemp -d)
+          (cd "$TMP" && "$ROOT/.sdist-env/bin/python" "$ROOT/tools/smoke_installed_distribution.py")
+          .sdist-env/bin/python -m pip check
+      - name: Generate wheel-runtime SBOM
+        shell: bash
+        run: |
+          WHEEL=$(find dist -maxdepth 1 -name '*.whl' -print -quit)
+          python -m venv .sbom-env
+          .sbom-env/bin/python -m pip install --upgrade pip
+          .sbom-env/bin/python -m pip install "${WHEEL}[all]"
+          .sbom-env/bin/python -m pip check
+          cyclonedx-py environment .sbom-env \
+            --pyproject pyproject.toml \
+            --mc-type library \
+            --output-reproducible \
+            --output-format JSON \
+            --output-file SBOM.cdx.json
+          .sbom-env/bin/python tools/finalize_sbom.py SBOM.cdx.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: python-package-distributions
+          path: dist/
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-supporting-assets
+          path: |
+            SBOM.cdx.json
+            pyGWRx_0.1.2_release_notes.md
+            MODIFICATION_AND_VALIDATION_REPORT.md
+            HANDOFF_NEXT_CONVERSATION.md
+
+  publish-pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pyGWRx
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish with Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    needs: [build, publish-pypi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v7
+        with:
+          name: python-package-distributions
+          path: dist/
+      - uses: actions/download-artifact@v7
+        with:
+          name: release-supporting-assets
+          path: release-assets/
+      - uses: actions/download-artifact@v7
+        with:
+          name: documentation-site
+          path: release-assets/
+      - name: Create release checksums
+        shell: bash
+        run: sha256sum dist/* release-assets/* > SHA256SUMS
+      - name: Create GitHub Release and upload assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${GITHUB_REF_NAME}"
+          dist/* release-assets/* SHA256SUMS
+          --verify-tag
+          --title "pyGWRx ${GITHUB_REF_NAME#v}"
+          --notes-file pyGWRx_0.1.2_release_notes.md

@@ -1,0 +1,30 @@
+include LICENSE
+include CITATION.cff
+include CHANGELOG.md
+include README.md
+include README.zh.md
+include .pre-commit-config.yaml
+include HANDOFF_NEXT_CONVERSATION.md
+include MODIFICATION_AND_VALIDATION_REPORT.md
+include pyGWRx_0.1.2_release_notes.md
+include DATA_PROVENANCE.md
+include SECURITY.md
+include DATA_LICENSES.md
+include THIRD_PARTY_NOTICES.md
+include DATA_HASHES.sha256
+recursive-include licenses *.txt
+include mkdocs.yml
+include requirements-docs.txt
+recursive-include docs *.md *.css *.js *.png *.svg
+recursive-include examples *.py *.md *.csv *.json
+recursive-include tools *.py
+recursive-include tests *.py *.json
+recursive-include overrides *.html
+prune archive
+prune examples/output
+prune site
+prune build
+prune dist
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude .DS_Store

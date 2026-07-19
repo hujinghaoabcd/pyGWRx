@@ -1,0 +1,190 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyGWRx"
+dynamic = ["version"]
+description = "A professional Geographically Weighted Regression library with multiple GWR variants"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE", "DATA_LICENSES.md", "THIRD_PARTY_NOTICES.md", "DATA_HASHES.sha256", "licenses/*.txt"]
+authors = [
+    {name = "Jinghao Hu", email = "hujinghao20@mails.ucas.ac.cn"}
+]
+keywords = ["gwr", "geographically weighted regression", "spatial analysis", "spatial statistics"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+
+dependencies = [
+    "numpy>=1.25.2",
+    "scipy>=1.11.4",
+    "pandas>=2.0.3",
+    "matplotlib>=3.7.2",
+    "geopandas>=0.14.4",
+    "shapely>=2.0.2",
+]
+
+[project.optional-dependencies]
+ml = [
+    "scikit-learn>=1.3.2",
+]
+parquet = [
+    "pyarrow>=14.0.1",
+]
+reference = [
+    "mgwr>=2.2.1",
+    "spglm>=1.1.0",
+]
+all = [
+    "scikit-learn>=1.3.2",
+    "pyarrow>=14.0.1",
+]
+test = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "scikit-learn>=1.3.2",
+    "pyarrow>=14.0.1",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "scikit-learn>=1.3.2",
+    "pyarrow>=14.0.1",
+    "mgwr>=2.2.1",
+    "spglm>=1.1.0",
+    "black>=24.0.0",
+    "ruff>=0.6.0",
+    "isort>=5.13.0",
+    "mypy>=1.10.0",
+    "build>=1.2.0",
+    "twine>=5.1.0",
+    "pip-audit>=2.7.3",
+    "cyclonedx-bom>=4.6.0",
+    "pre-commit>=4.6.0",
+]
+security = [
+    "pip-audit>=2.7.3",
+    "cyclonedx-bom>=4.6.0",
+    "pre-commit>=4.6.0",
+]
+docs = [
+    "mkdocs>=1.6.0,<2.0",
+    "mkdocs-material>=9.5.0,<10.0",
+    "mkdocstrings[python]>=0.25.0",
+    "pymdown-extensions>=10.8.0",
+    "black>=24.0.0",
+    "scikit-learn>=1.3.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/hujinghaoabcd/pyGWRx"
+Documentation = "https://hujinghaoabcd.github.io/pyGWRx"
+Repository = "https://github.com/hujinghaoabcd/pyGWRx"
+Issues = "https://github.com/hujinghaoabcd/pyGWRx/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "pygwrx.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pygwrx = [
+    "py.typed",
+    "data/**/*.csv",
+    "data/**/*.shp",
+    "data/**/*.shx",
+    "data/**/*.dbf",
+    "data/**/*.prj",
+    "data/**/*.cpg",
+    "data/**/*.md",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = ["--strict-config", "--strict-markers"]
+markers = [
+    "reference: numerical comparisons against independently maintained implementations or published reference values",
+]
+filterwarnings = [
+    "error::pytest.PytestUnraisableExceptionWarning",
+    "error::pytest.PytestUnhandledThreadExceptionWarning",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+py_version = 311
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.coverage.run]
+branch = true
+source = ["pygwrx"]
+omit = ["src/pygwrx/data/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+precision = 1
+fail_under = 74
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
+
+[tool.mypy]
+python_version = "3.11"
+files = [
+    "src/pygwrx/__init__.py",
+    "src/pygwrx/_optional.py",
+    "src/pygwrx/core/_summary.py",
+    "src/pygwrx/core/kernels.py",
+    "src/pygwrx/core/solver.py",
+    "src/pygwrx/diagnostics/_utils.py",
+    "src/pygwrx/io/data.py",
+    "src/pygwrx/io/datasets.py",
+    "src/pygwrx/models/mgtwr.py",
+    "src/pygwrx/plotting/_validation.py",
+]
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+follow_imports = "skip"
+ignore_missing_imports = true
+no_implicit_optional = true
+no_site_packages = true
+pretty = true
+show_error_codes = true
+strict_equality = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+[tool.ruff.lint.per-file-ignores]
+"examples/**/*.py" = ["E402"]
+
