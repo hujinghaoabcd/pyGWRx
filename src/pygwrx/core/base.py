@@ -151,13 +151,23 @@ class BaseSpatialEstimator(ABC):
 
 
 class BaseSpatialRegressor(BaseSpatialEstimator):
-    """Base class for spatial regression estimators."""
+    """Base class for geographically weighted spatial regressors.
+
+    This class combines the common regression contract with kernel,
+    bandwidth, local-parameter, prediction, fitted-state, and result-
+    export behavior used throughout the pyGWRx regression family.
+    """
 
     def __init__(
         self,
-        *,
+        kernel: KernelLike = "gaussian",
+        bandwidth: BandwidthLike = "cv",
+        bandwidth_method: str = "cv",
         fit_intercept: bool = True,
         distance_metric: str = "euclidean",
+        adaptive: bool = False,
+        bandwidth_range: Optional[Tuple[float, float]] = None,
+        optimization_method: str = "golden_section",
         random_state: Optional[int] = None,
         verbose: bool = False,
     ) -> None:
@@ -171,6 +181,22 @@ class BaseSpatialRegressor(BaseSpatialEstimator):
         self.fit_intercept = bool(fit_intercept)
         self._reset_regression_state()
 
+        self._validate_gwr_parameters(
+            kernel=kernel,
+            bandwidth=bandwidth,
+            bandwidth_method=bandwidth_method,
+            adaptive=adaptive,
+            bandwidth_range=bandwidth_range,
+            optimization_method=optimization_method,
+        )
+        self.kernel = kernel
+        self.bandwidth = bandwidth
+        self.bandwidth_method = bandwidth_method.strip().lower()
+        self.adaptive = bool(adaptive)
+        self.bandwidth_range = bandwidth_range
+        self.optimization_method = optimization_method
+        self._reset_gwr_state()
+
     def _reset_regression_state(self) -> None:
         self.coef_: Optional[np.ndarray] = None
         self.intercept_: Optional[np.ndarray] = None
@@ -183,6 +209,76 @@ class BaseSpatialRegressor(BaseSpatialEstimator):
         self.coords_train_: Optional[np.ndarray] = None
         self.times_train_: Optional[np.ndarray] = None
         self.context_train_: Optional[np.ndarray] = None
+
+    def _reset_gwr_state(self) -> None:
+        self.bandwidth_: Optional[Union[float, int]] = None
+        self.kernel_func_: Optional[Callable] = None
+        self.hat_matrix_: Optional[np.ndarray] = None
+
+    @staticmethod
+    def _validate_gwr_parameters(
+        *,
+        kernel: KernelLike,
+        bandwidth: BandwidthLike,
+        bandwidth_method: str,
+        adaptive: bool,
+        bandwidth_range: Optional[Tuple[float, float]],
+        optimization_method: str,
+    ) -> None:
+        if not isinstance(kernel, str) and not callable(kernel):
+            raise TypeError("kernel must be a string name or callable.")
+        if isinstance(kernel, str) and not kernel.strip():
+            raise ValueError("kernel name cannot be empty.")
+
+        if bandwidth is not None and not isinstance(
+            bandwidth, (str, int, float, np.integer, np.floating)
+        ):
+            raise TypeError("bandwidth must be numeric, a selection token, or None.")
+        if isinstance(bandwidth, (bool, np.bool_)):
+            raise TypeError("bandwidth must not be boolean.")
+        if isinstance(bandwidth, str):
+            token = bandwidth.strip().lower()
+            if token not in {"cv", "aic", "aicc", "bic", "adaptive"}:
+                raise ValueError(
+                    "bandwidth string must be one of 'cv', 'aic', 'aicc', 'bic', 'adaptive'."
+                )
+        elif bandwidth is not None:
+            value = float(bandwidth)
+            if not np.isfinite(value) or value <= 0:
+                raise ValueError(
+                    "numeric bandwidth must be finite and greater than zero."
+                )
+            if adaptive and not value.is_integer():
+                raise ValueError(
+                    "adaptive numeric bandwidth must be an integer neighbour count."
+                )
+
+        if not isinstance(bandwidth_method, str) or not bandwidth_method.strip():
+            raise ValueError("bandwidth_method must be a non-empty string.")
+        if not isinstance(adaptive, (bool, np.bool_)):
+            raise TypeError("adaptive must be boolean.")
+
+        if bandwidth_range is not None:
+            if (
+                not isinstance(bandwidth_range, (tuple, list))
+                or len(bandwidth_range) != 2
+            ):
+                raise TypeError(
+                    "bandwidth_range must be a two-element tuple/list or None."
+                )
+            lower, upper = float(bandwidth_range[0]), float(bandwidth_range[1])
+            if not np.isfinite(lower) or not np.isfinite(upper):
+                raise ValueError("bandwidth_range values must be finite.")
+            if lower <= 0 or upper <= 0 or lower > upper:
+                raise ValueError("bandwidth_range must satisfy 0 < lower <= upper.")
+            if adaptive and (not lower.is_integer() or not upper.is_integer()):
+                raise ValueError("adaptive bandwidth_range values must be integers.")
+
+        valid_optimizers = {"grid", "golden_section", "brent"}
+        if optimization_method not in valid_optimizers:
+            raise ValueError(
+                f"optimization_method must be one of {sorted(valid_optimizers)}."
+            )
 
     @abstractmethod
     def fit(self, X: ArrayLike, y: ArrayLike, coords: ArrayLike, **kwargs: Any):
@@ -316,115 +412,6 @@ class BaseSpatialRegressor(BaseSpatialEstimator):
             crs=crs,
         )
 
-
-class BaseGWR(BaseSpatialRegressor):
-    """Base class for single-bandwidth local kernel-weighted regressions."""
-
-    def __init__(
-        self,
-        kernel: KernelLike = "gaussian",
-        bandwidth: BandwidthLike = "cv",
-        bandwidth_method: str = "cv",
-        fit_intercept: bool = True,
-        distance_metric: str = "euclidean",
-        adaptive: bool = False,
-        bandwidth_range: Optional[Tuple[float, float]] = None,
-        optimization_method: str = "golden_section",
-        random_state: Optional[int] = None,
-        verbose: bool = False,
-    ) -> None:
-        super().__init__(
-            fit_intercept=fit_intercept,
-            distance_metric=distance_metric,
-            random_state=random_state,
-            verbose=verbose,
-        )
-        self._validate_gwr_parameters(
-            kernel=kernel,
-            bandwidth=bandwidth,
-            bandwidth_method=bandwidth_method,
-            adaptive=adaptive,
-            bandwidth_range=bandwidth_range,
-            optimization_method=optimization_method,
-        )
-        self.kernel = kernel
-        self.bandwidth = bandwidth
-        self.bandwidth_method = bandwidth_method.strip().lower()
-        self.adaptive = bool(adaptive)
-        self.bandwidth_range = bandwidth_range
-        self.optimization_method = optimization_method
-        self._reset_gwr_state()
-
-    def _reset_gwr_state(self) -> None:
-        self.bandwidth_: Optional[Union[float, int]] = None
-        self.kernel_func_: Optional[Callable] = None
-        self.hat_matrix_: Optional[np.ndarray] = None
-
-    @staticmethod
-    def _validate_gwr_parameters(
-        *,
-        kernel: KernelLike,
-        bandwidth: BandwidthLike,
-        bandwidth_method: str,
-        adaptive: bool,
-        bandwidth_range: Optional[Tuple[float, float]],
-        optimization_method: str,
-    ) -> None:
-        if not isinstance(kernel, str) and not callable(kernel):
-            raise TypeError("kernel must be a string name or callable.")
-        if isinstance(kernel, str) and not kernel.strip():
-            raise ValueError("kernel name cannot be empty.")
-
-        if bandwidth is not None and not isinstance(
-            bandwidth, (str, int, float, np.integer, np.floating)
-        ):
-            raise TypeError("bandwidth must be numeric, a selection token, or None.")
-        if isinstance(bandwidth, (bool, np.bool_)):
-            raise TypeError("bandwidth must not be boolean.")
-        if isinstance(bandwidth, str):
-            token = bandwidth.strip().lower()
-            if token not in {"cv", "aic", "aicc", "bic", "adaptive"}:
-                raise ValueError(
-                    "bandwidth string must be one of 'cv', 'aic', 'aicc', 'bic', 'adaptive'."
-                )
-        elif bandwidth is not None:
-            value = float(bandwidth)
-            if not np.isfinite(value) or value <= 0:
-                raise ValueError(
-                    "numeric bandwidth must be finite and greater than zero."
-                )
-            if adaptive and not value.is_integer():
-                raise ValueError(
-                    "adaptive numeric bandwidth must be an integer neighbour count."
-                )
-
-        if not isinstance(bandwidth_method, str) or not bandwidth_method.strip():
-            raise ValueError("bandwidth_method must be a non-empty string.")
-        if not isinstance(adaptive, (bool, np.bool_)):
-            raise TypeError("adaptive must be boolean.")
-
-        if bandwidth_range is not None:
-            if (
-                not isinstance(bandwidth_range, (tuple, list))
-                or len(bandwidth_range) != 2
-            ):
-                raise TypeError(
-                    "bandwidth_range must be a two-element tuple/list or None."
-                )
-            lower, upper = float(bandwidth_range[0]), float(bandwidth_range[1])
-            if not np.isfinite(lower) or not np.isfinite(upper):
-                raise ValueError("bandwidth_range values must be finite.")
-            if lower <= 0 or upper <= 0 or lower > upper:
-                raise ValueError("bandwidth_range must satisfy 0 < lower <= upper.")
-            if adaptive and (not lower.is_integer() or not upper.is_integer()):
-                raise ValueError("adaptive bandwidth_range values must be integers.")
-
-        valid_optimizers = {"grid", "golden_section", "brent"}
-        if optimization_method not in valid_optimizers:
-            raise ValueError(
-                f"optimization_method must be one of {sorted(valid_optimizers)}."
-            )
-
     def _predict_basic(self, X: ArrayLike, coords: ArrayLike) -> np.ndarray:
         params = self._compute_local_parameters(coords)
         X_arr, _ = self._validate_prediction_inputs(X, coords)
@@ -465,6 +452,10 @@ class BaseGWR(BaseSpatialRegressor):
         return {"intercept": intercept, "coef": coef, "coords": coords_arr}
 
 
+# Backward-compatible public alias retained for the 0.1.x series.
+BaseGWR = BaseSpatialRegressor
+
+
 class SpatiotemporalMixin:
     times_train_: Optional[np.ndarray] = None
     spatial_bandwidth_: Optional[Union[float, int]] = None
@@ -495,11 +486,11 @@ class MultiscaleMixin:
         self.convergence_history_ = None
 
 
-class BaseSpatiotemporalRegressor(SpatiotemporalMixin, BaseGWR):
+class BaseSpatiotemporalRegressor(SpatiotemporalMixin, BaseSpatialRegressor):
     """Base for spatiotemporal GWR-family regressors."""
 
 
-class BaseMultiscaleRegressor(MultiscaleMixin, BaseGWR):
+class BaseMultiscaleRegressor(MultiscaleMixin, BaseSpatialRegressor):
     """Base for one-bandwidth-per-coefficient regressors."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

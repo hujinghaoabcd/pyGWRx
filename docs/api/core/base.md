@@ -20,13 +20,13 @@ Root class for all spatial estimators.
 
 ## `BaseSpatialRegressor`
 
-Base class for spatial regression estimators.
+Base class for geographically weighted spatial regressors.
 
 | Property | Value |
 |---|---|
 | Type | `class` |
 | Import | `from pygwrx.core import BaseSpatialRegressor` |
-| Signature | `BaseSpatialRegressor(*, fit_intercept: 'bool' = True, distance_metric: 'str' = 'euclidean', random_state: 'Optional[int]' = None, verbose: 'bool' = False) -> 'None'` |
+| Signature | `BaseSpatialRegressor(kernel: 'KernelLike' = 'gaussian', bandwidth: 'BandwidthLike' = 'cv', bandwidth_method: 'str' = 'cv', fit_intercept: 'bool' = True, distance_metric: 'str' = 'euclidean', adaptive: 'bool' = False, bandwidth_range: 'Optional[Tuple[float, float]]' = None, optimization_method: 'str' = 'golden_section', random_state: 'Optional[int]' = None, verbose: 'bool' = False) -> 'None'` |
 | Maintained example | [`examples/core/08_base_classes.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/08_base_classes.py) |
 
 ::: pygwrx.core.BaseSpatialRegressor
@@ -34,7 +34,7 @@ Base class for spatial regression estimators.
 
 ## `BaseGWR`
 
-Base class for single-bandwidth local kernel-weighted regressions.
+Base class for geographically weighted spatial regressors.
 
 | Property | Value |
 |---|---|
@@ -214,7 +214,7 @@ Root class for all spatial estimators.
             return np.full(Xa.shape[0], self.mean_)
     
     
-    class TinyGWR(BaseGWR):
+    class TinyGWR(BaseSpatialRegressor):
         """Minimal concrete GWR-style regressor."""
     
         def fit(self, X, y, coords, **kwargs):
@@ -316,6 +316,10 @@ Root class for all spatial estimators.
         def summary(self):
             self._check_is_fitted()
             return f"n_samples={self.n_samples_}"
+    
+    
+    # BaseGWR remains an identity alias for backward compatibility.
+    assert BaseGWR is BaseSpatialRegressor
     
     
     X = pd.DataFrame({"x": [0.0, 1.0, 2.0, 3.0]})

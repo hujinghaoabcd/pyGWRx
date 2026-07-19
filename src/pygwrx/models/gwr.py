@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 
 from pygwrx.core.bandwidth import get_bandwidth_selector
-from pygwrx.core.base import BaseGWR
+from pygwrx.core.base import BaseSpatialRegressor
 from pygwrx.core.kernels import get_kernel_function
 from pygwrx.core.metrics import compute_diagnostics
 from pygwrx.core.solver import adaptive_bandwidth_weights, weighted_least_squares
@@ -91,7 +91,7 @@ class _LocalFitResult:
     hat_matrix: Optional[np.ndarray]
 
 
-class GWR(BaseGWR):
+class GWR(BaseSpatialRegressor):
     """Gaussian geographically weighted regression.
 
     At each target location :math:`s_i`, the model estimates

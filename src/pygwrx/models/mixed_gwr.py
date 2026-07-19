@@ -21,7 +21,7 @@ from typing import Callable, Optional, Union
 import numpy as np
 import pandas as pd
 
-from pygwrx.core.base import BaseGWR
+from pygwrx.core.base import BaseSpatialRegressor
 from pygwrx.core.kernels import get_kernel_function
 from pygwrx.core.metrics import compute_diagnostics
 from pygwrx.core.utils import (
@@ -38,7 +38,7 @@ from pygwrx.models._mixed_gwr_core import (
 VariableSpec = Optional[Sequence[Union[int, str]]]
 
 
-class MixedGWR(BaseGWR):
+class MixedGWR(BaseSpatialRegressor):
     """Fit a semiparametric GWR with global and local coefficients.
 
     Mixed GWR partitions explanatory variables into globally constant and
