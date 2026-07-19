@@ -6,6 +6,7 @@
 </p>
 
 <p align="center">
+  <a href="https://pypi.org/project/pyGWRx/"><img alt="PyPI" src="https://img.shields.io/pypi/v/pyGWRx.svg?color=139C5A"></a>
   <a href="https://github.com/hujinghaoabcd/pyGWRx/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-139C5A.svg"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.11--3.14-174D5B.svg">
   <img alt="Status" src="https://img.shields.io/badge/Status-Alpha-F4B942.svg">
@@ -16,6 +17,7 @@
 
 <p align="center">
   <a href="README.md">English</a> · <b>简体中文</b> ·
+  <a href="https://pypi.org/project/pyGWRx/">PyPI</a> ·
   <a href="https://hujinghaoabcd.github.io/pyGWRx/zh/">中文文档</a> ·
   <a href="https://hujinghaoabcd.github.io/pyGWRx/zh/models/">中文模型手册</a> ·
   <a href="https://hujinghaoabcd.github.io/pyGWRx/examples/">示例</a> ·
@@ -38,7 +40,7 @@ pyGWRx 是一个面向**地理加权建模**的 Python 实现与研究平台。�
 
 > pyGWRx 采用统一的 **fit → 结果检查 → 诊断 → 可视化** 使用方式，并明确不实现 scikit-learn estimator contract，也不承诺 `Pipeline`、`GridSearchCV`、`clone` 或 `check_estimator` 兼容。
 
-## 主要特点
+## ✨ 主要特点
 
 - **19 个模型集中管理**：经典、多尺度、稳健、广义、时空、正则化、多变量、可扩展、相似性和原创研究模型。
 - **能力边界明确**：回归、分类、变换、局部统计和推断模型不会被笼统描述成同一种“预测器”。
@@ -47,32 +49,46 @@ pyGWRx 是一个面向**地理加权建模**的 Python 实现与研究平台。�
 - **完整空间分析基础安装**：默认同时安装 NumPy、SciPy、pandas、Matplotlib、GeoPandas 和 Shapely，安装后即可使用地图与 GeoDataFrame 工作流。
 - **可复现研究流程**：确定性示例数据、显式随机种子、严格文档构建和可选参考实现对照测试。
 
-## 安装
+## 📦 安装
 
-支持 **Python 3.11–3.14**。Alpha 阶段建议从源码安装：
+pyGWRx 支持 **Python 3.11–3.14**，普通用户可直接从 PyPI 安装：
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install --upgrade pyGWRx
+```
+
+需要固定当前正式版本时：
+
+```bash
+python -m pip install "pyGWRx==0.1.2"
+```
+
+Matplotlib、GeoPandas 和 Shapely 已包含在标准安装中。其余用户功能按需安装：
+
+```bash
+python -m pip install "pyGWRx[ml]"       # GWLasso、GWPCA、GRGWR
+python -m pip install "pyGWRx[parquet]"  # PyArrow
+python -m pip install "pyGWRx[all]"      # 全部面向用户的可选功能
+```
+
+检查已安装版本：
+
+```bash
+python -c "import pygwrx; print(pygwrx.__version__)"
+```
+
+需要参与开发时，再使用源码可编辑安装：
 
 ```bash
 git clone https://github.com/hujinghaoabcd/pyGWRx.git
 cd pyGWRx
-python -m pip install --upgrade pip
-python -m pip install -e .
-```
-
-Matplotlib、GeoPandas 和 Shapely 已包含在普通安装中。其余可选功能按需安装：
-
-```bash
-python -m pip install -e ".[ml]"        # GWLasso、GWPCA、GRGWR
-python -m pip install -e ".[parquet]"   # PyArrow
-python -m pip install -e ".[all]"       # 其余全部用户功能
-python -m pip install -e ".[test]"      # 测试环境
-python -m pip install -e ".[dev]"       # 开发与构建工具
-python -m pip install -e ".[docs]"      # 文档工具链
-python -m pip install -e ".[reference]" # 可选参考实现对照测试
+python -m pip install -e ".[dev,docs]"
 ```
 
 基础安装已经包含 Matplotlib、GeoPandas 和 Shapely；scikit-learn 与 PyArrow 仍作为可选依赖。
 
-## 五分钟 GWR 示例
+## 🚀 五分钟 GWR 示例
 
 ```python
 import numpy as np
@@ -268,7 +284,7 @@ mkdocs build --strict --clean
 363 passed
 ```
 
-该 Linux/Python 3.13 本地结果包含 360 个非 reference 测试（其中包括不依赖外部包的 MGTWR 冻结数值基准）以及 3 个通过可选 `reference` 分组执行的独立 GWGLM 数值对照测试。Windows/Linux/macOS × Python 3.11–3.14 的 12 组合矩阵已作为阻断式 GitHub Actions 工作流配置；在对应远程运行成功前，不将其表述为已通过。
+阻断式 GitHub Actions 工作流覆盖质量门、最低依赖、数值参考、覆盖率、发行包构建，以及 Windows/Linux/macOS × Python 3.11–3.14 的完整矩阵。
 
 ## 数据与法律提示
 
@@ -296,10 +312,10 @@ pyGWRx/
 ## 作者、引用与许可证
 
 - 作者：**Jinghao Hu**
+- PyPI 包：<https://pypi.org/project/pyGWRx/>
 - 引用信息：[`CITATION.cff`](CITATION.cff)
 - 源码许可证：[MIT](LICENSE)
 - 文档：<https://hujinghaoabcd.github.io/pyGWRx/>
-
 
 ## 真实数据五分钟入门
 
