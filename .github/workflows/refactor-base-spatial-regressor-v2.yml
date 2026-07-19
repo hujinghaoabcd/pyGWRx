@@ -1,0 +1,277 @@
+name: Temporary Base Spatial Regressor Refactor V2
+
+on:
+  push:
+    branches:
+      - refactor/base-spatial-regressor
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refactor/base-spatial-regressor
+
+      - name: Consolidate the regression base hierarchy
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+
+          import ast
+          from pathlib import Path
+          from textwrap import dedent, indent
+
+          root = Path('.')
+          base_path = root / 'src/pygwrx/core/base.py'
+          source = base_path.read_text(encoding='utf-8')
+          tree = ast.parse(source)
+          classes = {
+              node.name: node
+              for node in tree.body
+              if isinstance(node, ast.ClassDef)
+          }
+          spatial = classes['BaseSpatialRegressor']
+          gwr = classes['BaseGWR']
+          source_lines = source.splitlines()
+
+          def method_source(class_node: ast.ClassDef, name: str) -> str:
+              for node in class_node.body:
+                  if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == name:
+                      starts = [node.lineno, *(item.lineno for item in node.decorator_list)]
+                      return '\n'.join(source_lines[min(starts) - 1 : node.end_lineno])
+              raise RuntimeError(f'Method {class_node.name}.{name} not found')
+
+          new_init = indent(
+              dedent(
+                  '''\
+                  def __init__(
+                      self,
+                      kernel: KernelLike = "gaussian",
+                      bandwidth: BandwidthLike = "cv",
+                      bandwidth_method: str = "cv",
+                      fit_intercept: bool = True,
+                      distance_metric: str = "euclidean",
+                      adaptive: bool = False,
+                      bandwidth_range: Optional[Tuple[float, float]] = None,
+                      optimization_method: str = "golden_section",
+                      random_state: Optional[int] = None,
+                      verbose: bool = False,
+                  ) -> None:
+                      super().__init__(
+                          distance_metric=distance_metric,
+                          random_state=random_state,
+                          verbose=verbose,
+                      )
+                      if not isinstance(fit_intercept, (bool, np.bool_)):
+                          raise TypeError("fit_intercept must be boolean.")
+                      self.fit_intercept = bool(fit_intercept)
+                      self._reset_regression_state()
+
+                      self._validate_gwr_parameters(
+                          kernel=kernel,
+                          bandwidth=bandwidth,
+                          bandwidth_method=bandwidth_method,
+                          adaptive=adaptive,
+                          bandwidth_range=bandwidth_range,
+                          optimization_method=optimization_method,
+                      )
+                      self.kernel = kernel
+                      self.bandwidth = bandwidth
+                      self.bandwidth_method = bandwidth_method.strip().lower()
+                      self.adaptive = bool(adaptive)
+                      self.bandwidth_range = bandwidth_range
+                      self.optimization_method = optimization_method
+                      self._reset_gwr_state()
+                  '''
+              ).rstrip(),
+              '    ',
+          )
+
+          class_header = dedent(
+              '''\
+              class BaseSpatialRegressor(BaseSpatialEstimator):
+                  """Base class for geographically weighted spatial regressors.
+
+                  This class combines the common regression contract with kernel,
+                  bandwidth, local-parameter, prediction, fitted-state, and result-
+                  export behavior used throughout the pyGWRx regression family.
+                  """
+              '''
+          ).rstrip()
+
+          sections = [
+              class_header,
+              new_init,
+              method_source(spatial, '_reset_regression_state'),
+              method_source(gwr, '_reset_gwr_state'),
+              method_source(gwr, '_validate_gwr_parameters'),
+          ]
+          for name in (
+              'fit',
+              'predict',
+              '_validate_inputs',
+              '_validate_prediction_inputs',
+              '_store_training_data',
+              'score',
+              'get_diagnostics',
+              'to_frame',
+              'to_geodataframe',
+          ):
+              sections.append(method_source(spatial, name))
+          for name in ('_predict_basic', '_compute_local_parameters'):
+              sections.append(method_source(gwr, name))
+
+          replacement = (
+              '\n\n'.join(sections)
+              + '\n\n\n# Backward-compatible public alias retained for the 0.1.x series.\n'
+              + 'BaseGWR = BaseSpatialRegressor\n'
+          )
+          updated = (
+              '\n'.join(
+                  source_lines[: spatial.lineno - 1]
+                  + replacement.splitlines()
+                  + source_lines[gwr.end_lineno :]
+              )
+              + '\n'
+          )
+          updated = updated.replace(
+              'class BaseSpatiotemporalRegressor(SpatiotemporalMixin, BaseGWR):',
+              'class BaseSpatiotemporalRegressor(SpatiotemporalMixin, BaseSpatialRegressor):',
+          )
+          updated = updated.replace(
+              'class BaseMultiscaleRegressor(MultiscaleMixin, BaseGWR):',
+              'class BaseMultiscaleRegressor(MultiscaleMixin, BaseSpatialRegressor):',
+          )
+          ast.parse(updated)
+          if 'class BaseGWR(' in updated:
+              raise RuntimeError('The redundant BaseGWR class still exists')
+          if 'BaseGWR = BaseSpatialRegressor' not in updated:
+              raise RuntimeError('The compatibility alias was not created')
+          base_path.write_text(updated, encoding='utf-8', newline='\n')
+
+          for relative in (
+              'src/pygwrx/models/gwr.py',
+              'src/pygwrx/models/mixed_gwr.py',
+              'src/pygwrx/models/gw_lasso.py',
+          ):
+              path = root / relative
+              text = path.read_text(encoding='utf-8')
+              text = text.replace(
+                  'from pygwrx.core.base import BaseGWR',
+                  'from pygwrx.core.base import BaseSpatialRegressor',
+              )
+              text = text.replace('(BaseGWR):', '(BaseSpatialRegressor):')
+              ast.parse(text)
+              path.write_text(text, encoding='utf-8', newline='\n')
+
+          example_path = root / 'examples/core/08_base_classes.py'
+          example = example_path.read_text(encoding='utf-8')
+          example = example.replace(
+              'class TinyGWR(BaseGWR):',
+              'class TinyGWR(BaseSpatialRegressor):',
+          )
+          marker = 'X = pd.DataFrame({"x": [0.0, 1.0, 2.0, 3.0]})'
+          if marker not in example:
+              raise RuntimeError('Example insertion marker not found')
+          example = example.replace(
+              marker,
+              '# BaseGWR remains an identity alias for backward compatibility.\n'
+              'assert BaseGWR is BaseSpatialRegressor\n\n\n'
+              + marker,
+              1,
+          )
+          ast.parse(example)
+          example_path.write_text(example, encoding='utf-8', newline='\n')
+
+          test_path = root / 'tests/test_base_spatial_regressor_hierarchy.py'
+          test_path.write_text(
+              dedent(
+                  '''\
+                  # SPDX-FileCopyrightText: 2026 Jinghao Hu
+                  # SPDX-License-Identifier: MIT
+
+                  """Regression tests for the consolidated spatial regressor hierarchy."""
+
+                  from pygwrx.core import (
+                      BaseGWR,
+                      BaseMultiscaleRegressor,
+                      BaseSpatialRegressor,
+                      BaseSpatiotemporalRegressor,
+                  )
+                  from pygwrx.models.gw_lasso import GWLasso
+                  from pygwrx.models.gwr import GWR
+                  from pygwrx.models.mgwr import MGWR
+                  from pygwrx.models.mixed_gwr import MixedGWR
+
+
+                  def test_base_gwr_is_backward_compatible_identity_alias() -> None:
+                      assert BaseGWR is BaseSpatialRegressor
+
+
+                  def test_gwr_family_uses_base_spatial_regressor() -> None:
+                      for estimator in (GWR, GWLasso, MixedGWR, MGWR):
+                          assert issubclass(estimator, BaseSpatialRegressor)
+
+
+                  def test_specialized_regressor_bases_use_consolidated_parent() -> None:
+                      assert issubclass(BaseSpatiotemporalRegressor, BaseSpatialRegressor)
+                      assert issubclass(BaseMultiscaleRegressor, BaseSpatialRegressor)
+                  '''
+              ),
+              encoding='utf-8',
+              newline='\n',
+          )
+
+          init_path = root / 'src/pygwrx/core/__init__.py'
+          init_text = init_path.read_text(encoding='utf-8')
+          if 'BaseGWR,' not in init_text or 'BaseSpatialRegressor,' not in init_text:
+              raise RuntimeError('Expected public base exports are missing')
+
+          guide_path = root / 'docs/guides/core-numerics.md'
+          guide = guide_path.read_text(encoding='utf-8')
+          note = dedent(
+              '''
+
+              ## Regression base hierarchy
+
+              `BaseSpatialRegressor` is the single shared base for the geographically
+              weighted regression family. It owns the common regression state, kernel
+              and bandwidth configuration, local parameter computation, prediction
+              validation, and result export behavior. `BaseGWR` remains available as
+              an identity alias for backward compatibility with pyGWRx 0.1.2 code.
+              '''
+          )
+          if '## Regression base hierarchy' not in guide:
+              guide = guide.rstrip() + note + '\n'
+          guide_path.write_text(guide, encoding='utf-8', newline='\n')
+          PY
+
+      - name: Install validation environment
+        run: python -m pip install -e ".[all,test]"
+
+      - name: Regenerate public API documentation
+        run: python tools/generate_api_docs.py
+
+      - name: Run focused hierarchy tests
+        run: >-
+          python -m pytest -q
+          tests/test_base_spatial_regressor_hierarchy.py
+          tests/test_gwr.py
+          tests/test_mgwr.py
+
+      - name: Commit refactor
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/pygwrx/core/base.py src/pygwrx/core/__init__.py \
+            src/pygwrx/models/gwr.py src/pygwrx/models/mixed_gwr.py \
+            src/pygwrx/models/gw_lasso.py examples/core/08_base_classes.py \
+            tests/test_base_spatial_regressor_hierarchy.py docs/guides/core-numerics.md \
+            docs/api examples/API_COVERAGE.csv examples/API_COVERAGE.json
+          git commit -m "Consolidate GWR base hierarchy"
+          git push origin HEAD:refactor/base-spatial-regressor
