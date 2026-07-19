@@ -2,9 +2,19 @@
 
 This section takes a new user from installation to a defensible first analysis. The goal is not merely to make a model run; it is to establish a correct data contract, neighbourhood definition, validation plan, and interpretation workflow.
 
+## Quick installation
+
+pyGWRx supports Python 3.11–3.14 and is available from PyPI:
+
+```bash
+python -m pip install --upgrade pyGWRx
+```
+
+See the [installation guide](installation.md) for isolated environments, optional extras, version pinning, and source-development setup.
+
 <div class="grid cards" markdown>
 
-- **[Installation](installation.md)** — Python versions, optional extras, isolated environments, and verification.
+- **[Installation](installation.md)** — PyPI installation, Python versions, optional extras, isolated environments, and verification.
 - **[Quick start](quickstart.md)** — a complete GWR fit, diagnostics, prediction, and export workflow.
 - **[Core concepts](concepts.md)** — local weighting, kernels, bandwidths, hat matrices, inference, and validation.
 - **[Data and inputs](data-and-inputs.md)** — array shapes, DataFrames, coordinates, time, classes, exposure, and GeoDataFrames.
