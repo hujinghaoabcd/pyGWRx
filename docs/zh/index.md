@@ -11,12 +11,29 @@ hide:
 
 当前公开版本包含 **19 个模型族、174 个公开 API、45 个可运行示例**，并将模型、数值底座、诊断、绘图与数据接口组织在一套统一文档中。
 
-[五分钟开始](../getting-started/quickstart.md){ .md-button .md-button--primary }
+[安装 pyGWRx](guides/#安装){ .md-button .md-button--primary }
+[五分钟开始](../getting-started/quickstart.md){ .md-button }
 [选择模型](guides/model-selection.md){ .md-button }
 [模型手册](models/index.md){ .md-button }
 [API 与示例](guides/api-and-examples.md){ .md-button }
 
 </div>
+
+## 快速安装
+
+支持 Python 3.11–3.14，可直接从 PyPI 安装：
+
+```bash
+python -m pip install --upgrade pyGWRx
+```
+
+安装完成后检查版本：
+
+```bash
+python -c "import pygwrx; print(pygwrx.__version__)"
+```
+
+更多环境隔离、可选依赖和版本锁定说明见[中文使用指南](guides/#安装)。
 
 ## 从你的研究问题开始
 
@@ -39,7 +56,7 @@ hide:
   </article>
   <article class="pygx-model-group">
     <h3>功能使用指南</h3>
-    <p>数据输入、坐标与距离、核函数、带宽、预测、诊断、绘图和 API 使用方式。</p>
+    <p>安装、数据输入、坐标与距离、核函数、带宽、预测、诊断、绘图和 API 使用方式。</p>
     <div class="pygx-model-links"><a href="guides/">进入使用指南</a></div>
   </article>
   <article class="pygx-model-group">
