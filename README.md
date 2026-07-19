@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/pyGWRx/"><img alt="PyPI" src="https://img.shields.io/pypi/v/pygwrx?label=PyPI&color=139C5A"></a>
+  <a href="https://pypi.org/project/pyGWRx/"><img alt="PyPI" src="https://img.shields.io/badge/PyPI-v0.1.2-139C5A.svg"></a>
   <a href="https://github.com/hujinghaoabcd/pyGWRx/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-139C5A.svg"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.11--3.14-174D5B.svg">
   <img alt="Status" src="https://img.shields.io/badge/Status-Alpha-F4B942.svg">
