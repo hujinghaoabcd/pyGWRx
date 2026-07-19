@@ -642,10 +642,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#source-installation" class="md-nav__link">
+  <a href="#install-from-pypi" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Source installation
+        Install from PyPI
       
     </span>
   </a>
@@ -664,10 +664,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#isolated-environment" class="md-nav__link">
+  <a href="#use-an-isolated-environment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Isolated environment
+        Use an isolated environment
       
     </span>
   </a>
@@ -675,10 +675,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
+  <a href="#verify-the-installed-package" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verify
+        Verify the installed package
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-from-source-for-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install from source for development
       
     </span>
   </a>
@@ -6395,10 +6406,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#source-installation" class="md-nav__link">
+  <a href="#install-from-pypi" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Source installation
+        Install from PyPI
       
     </span>
   </a>
@@ -6417,10 +6428,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#isolated-environment" class="md-nav__link">
+  <a href="#use-an-isolated-environment" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Isolated environment
+        Use an isolated environment
       
     </span>
   </a>
@@ -6428,10 +6439,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
+  <a href="#verify-the-installed-package" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verify
+        Verify the installed package
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#install-from-source-for-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install from source for development
       
     </span>
   </a>
@@ -6571,15 +6593,21 @@
 <h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
 <ul>
 <li>CPython <strong>3.11–3.14</strong></li>
-<li>NumPy, SciPy, pandas, Matplotlib, GeoPandas, and Shapely for the base package</li>
-<li>Python 3.12 or 3.13 is recommended for local development</li>
+<li>A recent <code>pip</code></li>
+<li>NumPy, SciPy, pandas, Matplotlib, GeoPandas, and Shapely are installed with the base package</li>
 </ul>
-<h2 id="source-installation">Source installation<a class="headerlink" href="#source-installation" title="Permanent link">&para;</a></h2>
+<p>Python 3.12 or 3.13 is recommended for local development.</p>
+<h2 id="install-from-pypi">Install from PyPI<a class="headerlink" href="#install-from-pypi" title="Permanent link">&para;</a></h2>
+<p>Install or upgrade the latest published release:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pyGWRx
 </span></code></pre></div>
-<p>The base install includes Matplotlib, GeoPandas, and Shapely so plotting, mapping, GeoDataFrame workflows, and MGTWR are available immediately. scikit-learn and PyArrow remain optional.</p>
+<p>For a reproducible environment, pin the current release explicitly:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;pyGWRx==0.1.2&quot;</span>
+</span></code></pre></div>
+<p>The base installation includes Matplotlib, GeoPandas, and Shapely, so plotting, mapping, GeoDataFrame workflows, and MGTWR are available immediately.</p>
 <h2 id="optional-dependency-groups">Optional dependency groups<a class="headerlink" href="#optional-dependency-groups" title="Permanent link">&para;</a></h2>
+<p>Install only the additional features required by your workflow:</p>
 <table>
 <thead>
 <tr>
@@ -6591,71 +6619,77 @@
 <tbody>
 <tr>
 <td><code>ml</code></td>
-<td><code>python -m pip install -e ".[ml]"</code></td>
-<td>GWLasso, GWPCA, and GRGWR dependencies</td>
+<td><code>python -m pip install "pyGWRx[ml]"</code></td>
+<td>scikit-learn support used by GWLasso, GWPCA, and GRGWR</td>
 </tr>
 <tr>
 <td><code>parquet</code></td>
-<td><code>python -m pip install -e ".[parquet]"</code></td>
-<td>Parquet and GeoParquet persistence</td>
+<td><code>python -m pip install "pyGWRx[parquet]"</code></td>
+<td>PyArrow persistence for Parquet and GeoParquet</td>
 </tr>
 <tr>
 <td><code>all</code></td>
-<td><code>python -m pip install -e ".[all]"</code></td>
-<td>all remaining user-facing optional features</td>
-</tr>
-<tr>
-<td><code>test</code></td>
-<td><code>python -m pip install -e ".[test]"</code></td>
-<td>runtime test environment</td>
-</tr>
-<tr>
-<td><code>dev</code></td>
-<td><code>python -m pip install -e ".[dev]"</code></td>
-<td>lint, test, typing, build, and release tools</td>
-</tr>
-<tr>
-<td><code>docs</code></td>
-<td><code>python -m pip install -e ".[docs]"</code></td>
-<td>documentation toolchain</td>
-</tr>
-<tr>
-<td><code>reference</code></td>
-<td><code>python -m pip install -e ".[reference]"</code></td>
-<td>external numerical-reference packages used by comparison tests</td>
+<td><code>python -m pip install "pyGWRx[all]"</code></td>
+<td>all user-facing optional features</td>
 </tr>
 </tbody>
 </table>
-<p>Optional imports for scikit-learn and PyArrow are lazy. Plotting, geospatial support, and MGTWR are part of the standard installation.</p>
-<h2 id="isolated-environment">Isolated environment<a class="headerlink" href="#isolated-environment" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">venv</label><label for="__tabbed_1_2">conda</label></div>
+<p>The <code>test</code>, <code>dev</code>, <code>docs</code>, and <code>reference</code> extras are intended for contributors working from a source checkout rather than ordinary package users.</p>
+<h2 id="use-an-isolated-environment">Use an isolated environment<a class="headerlink" href="#use-an-isolated-environment" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows PowerShell</label><label for="__tabbed_1_2">Linux and macOS</label><label for="__tabbed_1_3">conda</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">  </span><span class="c1"># Windows: .venv\Scripts\Activate.ps1</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
+<div class="language-powershell highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">py</span> <span class="p">-</span><span class="n">3</span><span class="p">.</span><span class="n">13</span> <span class="n">-m</span> <span class="n">venv</span> <span class="p">.</span><span class="n">venv</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="p">.\.</span><span class="n">venv</span><span class="p">\</span><span class="n">Scripts</span><span class="p">\</span><span class="n">Activate</span><span class="p">.</span><span class="n">ps1</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="p">-</span><span class="n">-upgrade</span> <span class="n">pip</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">python</span> <span class="n">-m</span> <span class="n">pip</span> <span class="n">install</span> <span class="p">-</span><span class="n">-upgrade</span> <span class="n">pyGWRx</span>
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>pygwrx<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.13
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>conda<span class="w"> </span>activate<span class="w"> </span>pygwrx
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all]&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python3.13<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pyGWRx
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>pygwrx<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.13
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>conda<span class="w"> </span>activate<span class="w"> </span>pygwrx
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pyGWRx
 </span></code></pre></div>
 </div>
 </div>
 </div>
-<h2 id="verify">Verify<a class="headerlink" href="#verify" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import pygwrx; print(pygwrx.__version__)&quot;</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python<span class="w"> </span>tools/generate_api_docs.py
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>python<span class="w"> </span>examples/validate_coverage.py
+<h2 id="verify-the-installed-package">Verify the installed package<a class="headerlink" href="#verify-the-installed-package" title="Permanent link">&para;</a></h2>
+<p>These checks run entirely against the installed distribution and do not require a repository checkout:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import pygwrx; print(pygwrx.__version__)&quot;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;from pygwrx import GWR, MGWR, MGTWR; print(&#39;Core model imports passed&#39;)&quot;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;from pygwrx.io import load_dataset; X, y, coords = load_dataset(&#39;columbus&#39;, return_type=&#39;arrays&#39;); print(X.shape, y.shape, coords.shape)&quot;</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>check
+</span></code></pre></div>
+<p>For version 0.1.2, the dataset command should print:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>(49, 2) (49,) (49, 2)
+</span></code></pre></div>
+<h2 id="install-from-source-for-development">Install from source for development<a class="headerlink" href="#install-from-source-for-development" title="Permanent link">&para;</a></h2>
+<p>Clone the repository only when you plan to modify pyGWRx, run its complete test suite, or build the documentation:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/hujinghaoabcd/pyGWRx.git
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">cd</span><span class="w"> </span>pyGWRx
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pip
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[dev,docs]&quot;</span>
+</span></code></pre></div>
+<p>Additional contributor environments can be installed as needed:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[test]&quot;</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[reference]&quot;</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;.[all,test,dev,docs,reference]&quot;</span>
 </span></code></pre></div>
 <h2 id="blasopenmp-stability">BLAS/OpenMP stability<a class="headerlink" href="#blasopenmp-stability" title="Permanent link">&para;</a></h2>
 <p>For reproducible CI and local runs:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MKL_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">NUMEXPR_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MKL_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">NUMEXPR_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
 </span></code></pre></div>
+<p>On Windows PowerShell, set the same variables with <code>$env:NAME = "1"</code>.</p>
 <h2 id="coordinate-units">Coordinate units<a class="headerlink" href="#coordinate-units" title="Permanent link">&para;</a></h2>
 <p>Do not treat longitude/latitude degrees as Euclidean metres. Project to an appropriate CRS or select a distance treatment consistent with the study region.</p>
 

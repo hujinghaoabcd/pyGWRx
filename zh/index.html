@@ -6259,7 +6259,7 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        从你的研究问题开始
+        快速安装
       
     </span>
   </a>
@@ -6270,7 +6270,7 @@
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        中文文档入口
+        从你的研究问题开始
       
     </span>
   </a>
@@ -6279,6 +6279,17 @@
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        中文文档入口
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
         使用边界
@@ -6377,12 +6388,21 @@
 <div class="model-hero">
 <p><strong>面向空间异质性、时空关系与局部统计分析的 Python 研究工具。</strong></p>
 <p>当前公开版本包含 <strong>19 个模型族、174 个公开 API、45 个可运行示例</strong>，并将模型、数值底座、诊断、绘图与数据接口组织在一套统一文档中。</p>
-<p><a class="md-button md-button--primary" href="../getting-started/quickstart/">五分钟开始</a>
+<p><a class="md-button md-button--primary" href="guides/#安装">安装 pyGWRx</a>
+<a class="md-button" href="../getting-started/quickstart/">五分钟开始</a>
 <a class="md-button" href="guides/model-selection/">选择模型</a>
 <a class="md-button" href="models/">模型手册</a>
 <a class="md-button" href="guides/api-and-examples/">API 与示例</a></p>
 </div>
-<h2 id="_1">从你的研究问题开始<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h2 id="_1">快速安装<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>支持 Python 3.11–3.14，可直接从 PyPI 安装：</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>pyGWRx
+</span></code></pre></div>
+<p>安装完成后检查版本：</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import pygwrx; print(pygwrx.__version__)&quot;</span>
+</span></code></pre></div>
+<p>更多环境隔离、可选依赖和版本锁定说明见<a href="guides/#安装">中文使用指南</a>。</p>
+<h2 id="_2">从你的研究问题开始<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -6424,7 +6444,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="_2">中文文档入口<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h2 id="_3">中文文档入口<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <div class="pygx-model-groups">
   <article class="pygx-model-group">
     <h3>19 个模型手册</h3>
@@ -6433,7 +6453,7 @@
   </article>
   <article class="pygx-model-group">
     <h3>功能使用指南</h3>
-    <p>数据输入、坐标与距离、核函数、带宽、预测、诊断、绘图和 API 使用方式。</p>
+    <p>安装、数据输入、坐标与距离、核函数、带宽、预测、诊断、绘图和 API 使用方式。</p>
     <div class="pygx-model-links"><a href="guides/">进入使用指南</a></div>
   </article>
   <article class="pygx-model-group">
@@ -6443,7 +6463,7 @@
   </article>
 </div>
 
-<h2 id="_3">使用边界<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_4">使用边界<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <div class="admonition important">
 <p class="admonition-title">先读能力边界，再调用模型</p>
 <ul>
