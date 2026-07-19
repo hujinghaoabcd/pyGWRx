@@ -8,6 +8,7 @@
 </p>
 
 <p align="center">
+  <a href="https://pypi.org/project/pyGWRx/"><img alt="PyPI" src="https://img.shields.io/pypi/v/pyGWRx.svg?color=139C5A"></a>
   <a href="https://github.com/hujinghaoabcd/pyGWRx/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-139C5A.svg"></a>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.11--3.14-174D5B.svg">
   <img alt="Status" src="https://img.shields.io/badge/Status-Alpha-F4B942.svg">
@@ -18,6 +19,7 @@
 
 <p align="center">
   <b>English</b> · <a href="README.zh.md">简体中文</a> ·
+  <a href="https://pypi.org/project/pyGWRx/">PyPI</a> ·
   <a href="https://hujinghaoabcd.github.io/pyGWRx/">Documentation</a> ·
   <a href="https://hujinghaoabcd.github.io/pyGWRx/models/">Model Handbook</a> ·
   <a href="https://hujinghaoabcd.github.io/pyGWRx/examples/">Examples</a> ·
@@ -40,7 +42,7 @@ The library is designed around five layers:
 
 > pyGWRx follows a consistent **fit → inspect → diagnose → visualize** style. It deliberately does **not** implement the scikit-learn estimator contract, `Pipeline`, `GridSearchCV`, `clone`, or `check_estimator`.
 
-## Why use it
+## ✨ Why use it
 
 - **One documented model family:** classic, multiscale, robust, generalized, temporal, regularized, multivariate, scalable, similarity-based, and research models in one package.
 - **Explicit capability boundaries:** regression, classification, transformation, local statistics, and inference models are not presented as interchangeable predictors.
@@ -49,32 +51,46 @@ The library is designed around five layers:
 - **Complete spatial base install:** NumPy, SciPy, pandas, Matplotlib, GeoPandas, and Shapely are installed together so mapping and GeoDataFrame workflows work immediately.
 - **Research reproducibility:** deterministic example data, explicit random seeds, strict documentation builds, and reference-comparison tests where available.
 
-## Installation
+## 📦 Installation
 
-pyGWRx supports **Python 3.11–3.14**. During the Alpha phase, install from a source checkout:
+pyGWRx supports **Python 3.11–3.14** and is available from PyPI:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install --upgrade pyGWRx
+```
+
+For an exactly reproducible environment, pin the published release:
+
+```bash
+python -m pip install "pyGWRx==0.1.2"
+```
+
+Matplotlib, GeoPandas, and Shapely are included in the standard installation. Add optional user features only when needed:
+
+```bash
+python -m pip install "pyGWRx[ml]"       # GWLasso, GWPCA, GRGWR
+python -m pip install "pyGWRx[parquet]"  # PyArrow persistence
+python -m pip install "pyGWRx[all]"      # all user-facing optional features
+```
+
+Verify the installed package:
+
+```bash
+python -c "import pygwrx; print(pygwrx.__version__)"
+```
+
+For source development, clone the repository and use an editable install:
 
 ```bash
 git clone https://github.com/hujinghaoabcd/pyGWRx.git
 cd pyGWRx
-python -m pip install --upgrade pip
-python -m pip install -e .
-```
-
-Matplotlib, GeoPandas, and Shapely are included in the normal installation. Add only the remaining optional features you need:
-
-```bash
-python -m pip install -e ".[ml]"        # GWLasso, GWPCA, GRGWR
-python -m pip install -e ".[parquet]"   # PyArrow persistence
-python -m pip install -e ".[all]"       # all remaining user-facing extras
-python -m pip install -e ".[test]"      # tests
-python -m pip install -e ".[dev]"       # development/build tooling
-python -m pip install -e ".[docs]"      # MkDocs documentation toolchain
-python -m pip install -e ".[reference]" # optional numerical-reference tests
+python -m pip install -e ".[dev,docs]"
 ```
 
 The base installation includes Matplotlib, GeoPandas, and Shapely. scikit-learn and PyArrow remain optional.
 
-## Five-minute GWR example
+## 🚀 Five-minute GWR example
 
 ```python
 import numpy as np
@@ -275,7 +291,7 @@ Current stable-suite baseline:
 363 passed
 ```
 
-This local Linux/Python 3.13 result includes 360 non-reference tests, including a frozen self-contained MGTWR numerical fixture, and 3 independently maintained GWGLM comparisons from the optional `reference` extra. The 12-combination operating-system/Python matrix is configured as a blocking GitHub Actions workflow and must not be described as passed until the corresponding remote run succeeds.
+The blocking GitHub Actions workflow validates quality gates, minimum dependencies, numerical references, coverage, distributions, and the Windows/Linux/macOS × Python 3.11–3.14 matrix.
 
 ## Data and legal notice
 
@@ -303,10 +319,10 @@ Historical prototypes, previous examples, previous documentation, legacy GTWR re
 ## Citation, author, and licence
 
 - Author: **Jinghao Hu**
+- PyPI package: <https://pypi.org/project/pyGWRx/>
 - Citation metadata: [`CITATION.cff`](CITATION.cff)
 - Source licence: [MIT](LICENSE)
 - Documentation: <https://hujinghaoabcd.github.io/pyGWRx/>
-
 
 ## Real-data five-minute start
 
