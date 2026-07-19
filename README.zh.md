@@ -1,7 +1,6 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/hujinghaoabcd/pyGWRx/main/docs/assets/images/logo.svg" alt="pyGWRx" width="460">
+  <img src="./docs/assets/images/logo.svg" alt="pyGWRx" width="460">
 </p>
-
 <p align="center">
   面向地理加权回归、局部空间统计、时空建模、诊断与可视化的 Python 研究型库
 </p>
