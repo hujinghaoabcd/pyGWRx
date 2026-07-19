@@ -1,0 +1,1030 @@
+/* pyGWRx documentation visual system
+   GeoPandas-inspired clarity with a richer research-software identity. */
+
+:root {
+  --pygx-green-900: #07533c;
+  --pygx-green-800: #087f5b;
+  --pygx-green-700: #0b8f64;
+  --pygx-green-600: #139c5a;
+  --pygx-green-500: #2f9e72;
+  --pygx-green-200: #b7ead3;
+  --pygx-green-100: #dcf7e9;
+  --pygx-green-050: #f2fbf7;
+  --pygx-blue-800: #174d5b;
+  --pygx-blue-700: #1f6677;
+  --pygx-blue-100: #dceff2;
+  --pygx-ink-950: #13242b;
+  --pygx-ink-800: #263b44;
+  --pygx-ink-650: #48616b;
+  --pygx-ink-500: #6a7e86;
+  --pygx-line: #dce6e3;
+  --pygx-line-strong: #c8d8d3;
+  --pygx-canvas: #ffffff;
+  --pygx-canvas-soft: #f7faf9;
+  --pygx-code: #f3f7f6;
+  --pygx-gold: #f4b942;
+  --pygx-shadow-sm: 0 1px 2px rgba(15, 45, 37, 0.06), 0 4px 14px rgba(15, 45, 37, 0.04);
+  --pygx-shadow-md: 0 10px 32px rgba(13, 54, 43, 0.10);
+  --md-primary-fg-color: var(--pygx-green-800);
+  --md-primary-fg-color--light: var(--pygx-green-600);
+  --md-primary-fg-color--dark: var(--pygx-green-900);
+  --md-accent-fg-color: var(--pygx-green-700);
+  --md-default-bg-color: var(--pygx-canvas);
+  --md-default-fg-color: var(--pygx-ink-950);
+  --md-default-fg-color--light: var(--pygx-ink-650);
+  --md-default-fg-color--lighter: var(--pygx-ink-500);
+  --md-default-fg-color--lightest: var(--pygx-line);
+  --md-code-bg-color: var(--pygx-code);
+  --md-code-fg-color: #17362f;
+  --md-typeset-a-color: var(--pygx-green-800);
+}
+
+[data-md-color-scheme="slate"] {
+  --pygx-green-900: #b8f3d8;
+  --pygx-green-800: #79d9ad;
+  --pygx-green-700: #62c99b;
+  --pygx-green-600: #48b987;
+  --pygx-green-500: #55c895;
+  --pygx-green-200: #204b3d;
+  --pygx-green-100: #173c32;
+  --pygx-green-050: #122a24;
+  --pygx-blue-800: #9bd7e2;
+  --pygx-blue-700: #73bdcc;
+  --pygx-blue-100: #153741;
+  --pygx-ink-950: #edf7f3;
+  --pygx-ink-800: #d4e7e0;
+  --pygx-ink-650: #a9c1b9;
+  --pygx-ink-500: #819b93;
+  --pygx-line: #29423a;
+  --pygx-line-strong: #39594f;
+  --pygx-canvas: #0f1917;
+  --pygx-canvas-soft: #121f1c;
+  --pygx-code: #14231f;
+  --pygx-gold: #f4c75a;
+  --pygx-shadow-sm: 0 1px 2px rgba(0,0,0,.18), 0 8px 22px rgba(0,0,0,.14);
+  --pygx-shadow-md: 0 14px 36px rgba(0,0,0,.28);
+  --md-default-bg-color: var(--pygx-canvas);
+  --md-default-fg-color: var(--pygx-ink-950);
+  --md-default-fg-color--light: var(--pygx-ink-650);
+  --md-default-fg-color--lighter: var(--pygx-ink-500);
+  --md-default-fg-color--lightest: var(--pygx-line);
+  --md-code-bg-color: var(--pygx-code);
+  --md-code-fg-color: #d8eee6;
+}
+
+/* Typography and global rhythm */
+html { scroll-behavior: smooth; }
+body,
+input {
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+}
+code,
+kbd,
+pre {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+.md-grid { max-width: 91rem; }
+.md-main__inner { margin-top: 0; }
+.md-content { min-width: 0; }
+.md-content__inner { padding-top: 2rem; padding-bottom: 4rem; }
+.md-content__inner::before { display: none; }
+.md-typeset {
+  color: var(--pygx-ink-800);
+  font-size: 0.83rem;
+  line-height: 1.72;
+}
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  color: var(--pygx-ink-950);
+  letter-spacing: -0.025em;
+}
+.md-typeset h1 {
+  margin: 0 0 1.15rem;
+  font-weight: 760;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.08;
+}
+.md-typeset h2 {
+  margin-top: 2.6rem;
+  padding-top: .25rem;
+  font-weight: 720;
+  font-size: 1.55rem;
+  line-height: 1.25;
+}
+.md-typeset h3 { margin-top: 2rem; font-weight: 690; font-size: 1.15rem; }
+.md-typeset h4 { font-weight: 680; }
+.md-typeset p,
+.md-typeset ul,
+.md-typeset ol { max-width: 75ch; }
+.md-typeset strong { color: var(--pygx-ink-950); font-weight: 680; }
+.md-typeset a { text-underline-offset: .17em; text-decoration-thickness: .06em; }
+.md-typeset a:hover { color: var(--pygx-green-600); }
+.md-typeset hr { border-color: var(--pygx-line); margin: 2.4rem 0; }
+.md-typeset blockquote {
+  border-left: .22rem solid var(--pygx-green-500);
+  background: var(--pygx-green-050);
+  color: var(--pygx-ink-650);
+  border-radius: 0 .55rem .55rem 0;
+  padding: .8rem 1rem;
+}
+
+/* Announcement bar */
+.md-banner {
+  background: var(--pygx-green-900);
+  color: white;
+}
+[data-md-color-scheme="slate"] .md-banner { background: #0b3227; }
+.md-banner__inner { margin: 0 auto; padding: .45rem .8rem; }
+.pygx-announcement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .55rem;
+  font-size: .72rem;
+}
+.pygx-announcement__badge {
+  display: inline-flex;
+  border: 1px solid rgba(255,255,255,.45);
+  border-radius: 999px;
+  padding: .12rem .48rem;
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+.pygx-announcement a { color: white; font-weight: 680; text-decoration: underline; text-underline-offset: .15em; }
+
+/* Header: light, restrained, PyData-like */
+.md-header {
+  background: color-mix(in srgb, var(--pygx-canvas) 96%, transparent);
+  color: var(--pygx-ink-950);
+  border-bottom: 1px solid var(--pygx-line);
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+  transition: box-shadow .18s ease, background .18s ease;
+}
+.md-header.is-scrolled { box-shadow: 0 8px 26px rgba(21, 62, 51, .08); }
+.md-header__inner { min-height: 3.2rem; }
+.md-header__button { color: var(--pygx-ink-650); }
+.md-header__button:hover { color: var(--pygx-green-800); opacity: 1; }
+.md-header__button.md-logo { padding: .38rem .3rem .38rem .1rem; }
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg { width: 2.05rem; height: 2.05rem; }
+.md-header__title { color: var(--pygx-ink-950); font-size: .86rem; font-weight: 760; letter-spacing: -.02em; }
+.md-header__topic:first-child::after {
+  content: " spatial modelling";
+  color: var(--pygx-ink-500);
+  font-weight: 520;
+  margin-left: .35rem;
+  letter-spacing: 0;
+}
+.md-search__form {
+  background: var(--pygx-canvas-soft);
+  border: 1px solid var(--pygx-line);
+  border-radius: .55rem;
+  box-shadow: none;
+}
+.md-search__input { color: var(--pygx-ink-950); }
+.md-search__input::placeholder { color: var(--pygx-ink-500); }
+.md-search__icon { color: var(--pygx-ink-500); }
+.md-search__output { border: 1px solid var(--pygx-line); border-radius: .65rem; box-shadow: var(--pygx-shadow-md); }
+
+/* Top-level navigation */
+.md-tabs {
+  background: var(--pygx-canvas);
+  color: var(--pygx-ink-650);
+  border-bottom: 1px solid var(--pygx-line);
+  box-shadow: none;
+}
+.md-tabs__list { gap: .15rem; }
+.md-tabs__item { height: 2.85rem; }
+.md-tabs__link {
+  margin-top: 0;
+  padding: .84rem .65rem .68rem;
+  font-size: .72rem;
+  font-weight: 630;
+  opacity: 1;
+  border-bottom: 2px solid transparent;
+}
+.md-tabs__link:hover { color: var(--pygx-green-800); }
+.md-tabs__link--active { color: var(--pygx-green-800); border-color: var(--pygx-green-600); }
+
+/* Side navigation */
+.md-sidebar { padding-top: 1.4rem; }
+.md-sidebar__scrollwrap { scrollbar-width: thin; }
+.md-nav { font-size: .72rem; }
+.md-nav__title {
+  color: var(--pygx-ink-950);
+  font-weight: 730;
+  background: transparent;
+  box-shadow: none;
+}
+.md-nav__item .md-nav__link {
+  color: var(--pygx-ink-650);
+  border-radius: .36rem;
+  margin: .08rem 0;
+  padding: .28rem .45rem;
+  transition: color .12s ease, background .12s ease;
+}
+.md-nav__item .md-nav__link:hover {
+  color: var(--pygx-green-800);
+  background: var(--pygx-green-050);
+}
+.md-nav__link--active,
+.md-nav__link--active:hover {
+  color: var(--pygx-green-800) !important;
+  background: var(--pygx-green-100) !important;
+  font-weight: 680;
+}
+.md-nav__item--nested > .md-nav__link { color: var(--pygx-ink-800); font-weight: 630; }
+.md-nav--secondary { border-left: 1px solid var(--pygx-line); padding-left: .55rem; }
+.md-nav--secondary .md-nav__link { padding-top: .18rem; padding-bottom: .18rem; }
+
+/* Tables */
+.md-typeset .md-typeset__table { width: 100%; }
+.md-typeset table:not([class]) {
+  display: table;
+  width: 100%;
+  border: 1px solid var(--pygx-line);
+  border-radius: .68rem;
+  overflow: hidden;
+  box-shadow: none;
+  font-size: .74rem;
+}
+.md-typeset table:not([class]) th {
+  background: var(--pygx-canvas-soft);
+  color: var(--pygx-ink-950);
+  border-bottom: 1px solid var(--pygx-line-strong);
+  font-weight: 700;
+  padding: .68rem .75rem;
+}
+.md-typeset table:not([class]) td {
+  border-top: 1px solid var(--pygx-line);
+  padding: .62rem .75rem;
+  vertical-align: top;
+}
+.md-typeset table:not([class]) tr:hover td { background: color-mix(in srgb, var(--pygx-green-050) 72%, transparent); }
+.md-typeset table code { white-space: nowrap; }
+
+/* Code blocks */
+.md-typeset code {
+  border-radius: .28rem;
+  background: var(--pygx-code);
+  color: var(--pygx-green-900);
+  padding: .1em .3em;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pygx-line) 60%, transparent);
+}
+.md-typeset pre > code {
+  background: transparent;
+  color: inherit;
+  box-shadow: none;
+  padding: .95rem 1.05rem;
+  line-height: 1.62;
+}
+.md-typeset .highlight {
+  border: 1px solid var(--pygx-line);
+  border-radius: .68rem;
+  background: var(--pygx-code);
+  box-shadow: none;
+  overflow: hidden;
+}
+.md-typeset .highlighttable { border: 1px solid var(--pygx-line); border-radius: .68rem; overflow: hidden; }
+.md-typeset .highlighttable .highlight { border: 0; border-radius: 0; }
+.md-clipboard { color: var(--pygx-ink-500); }
+.md-clipboard:hover { color: var(--pygx-green-800); }
+
+/* Admonitions and tabs */
+.md-typeset .admonition,
+.md-typeset details {
+  border: 1px solid var(--pygx-line);
+  border-left-width: .2rem;
+  border-radius: .62rem;
+  box-shadow: none;
+  background: var(--pygx-canvas);
+}
+.md-typeset .admonition-title,
+.md-typeset summary { background: var(--pygx-canvas-soft); }
+.md-typeset .tabbed-labels {
+  border-bottom: 1px solid var(--pygx-line);
+  gap: .25rem;
+}
+.md-typeset .tabbed-labels > label {
+  color: var(--pygx-ink-650);
+  font-weight: 650;
+  padding: .65rem .75rem;
+}
+.md-typeset .tabbed-labels > label:hover { color: var(--pygx-green-800); }
+.md-typeset .tabbed-set > input:checked + label { color: var(--pygx-green-800); border-color: var(--pygx-green-600); }
+
+/* API / mkdocstrings */
+.doc-object { margin: 1.8rem 0 2.5rem; }
+.doc-object .doc-heading {
+  border-top: 1px solid var(--pygx-line);
+  padding-top: 1.25rem;
+}
+.doc-object .doc-heading code {
+  color: var(--pygx-blue-800);
+  background: transparent;
+  box-shadow: none;
+  font-size: .95em;
+}
+.doc-signature {
+  border: 1px solid var(--pygx-line);
+  border-left: .22rem solid var(--pygx-green-500);
+  border-radius: .55rem;
+  background: var(--pygx-code);
+  padding: .75rem .85rem;
+  overflow-x: auto;
+}
+.doc-contents { padding-left: .15rem; }
+.doc-contents h5 { color: var(--pygx-ink-950); font-size: .8rem; }
+
+/* Buttons */
+.md-typeset .md-button {
+  border: 1px solid var(--pygx-line-strong);
+  border-radius: .52rem;
+  color: var(--pygx-ink-800);
+  font-weight: 680;
+  padding: .54rem .85rem;
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+}
+.md-typeset .md-button:hover {
+  color: var(--pygx-green-900);
+  border-color: var(--pygx-green-500);
+  background: var(--pygx-green-050);
+  transform: translateY(-1px);
+  box-shadow: var(--pygx-shadow-sm);
+}
+.md-typeset .md-button--primary {
+  color: white;
+  background: var(--pygx-green-800);
+  border-color: var(--pygx-green-800);
+}
+.md-typeset .md-button--primary:hover {
+  color: white;
+  background: var(--pygx-green-900);
+  border-color: var(--pygx-green-900);
+}
+
+/* Landing page */
+.pygx-home .md-content__inner { padding-top: 0; }
+.pygx-home h1 { display: none; }
+.pygx-hero {
+  position: relative;
+  overflow: hidden;
+  margin: 0 calc(50% - 50vw) 2.8rem;
+  padding: clamp(3.6rem, 8vw, 6.6rem) max(1.2rem, calc((100vw - 83rem) / 2));
+  background:
+    radial-gradient(circle at 82% 22%, color-mix(in srgb, var(--pygx-green-200) 70%, transparent) 0, transparent 32%),
+    radial-gradient(circle at 72% 76%, color-mix(in srgb, var(--pygx-blue-100) 85%, transparent) 0, transparent 35%),
+    linear-gradient(135deg, var(--pygx-canvas) 12%, var(--pygx-green-050) 100%);
+  border-bottom: 1px solid var(--pygx-line);
+}
+.pygx-hero::after {
+  content: "";
+  position: absolute;
+  width: 26rem;
+  height: 26rem;
+  right: max(2rem, calc((100vw - 92rem) / 2));
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: .42;
+  background-image:
+    radial-gradient(circle at 20% 32%, var(--pygx-green-600) 0 5px, transparent 6px),
+    radial-gradient(circle at 62% 17%, var(--pygx-green-500) 0 7px, transparent 8px),
+    radial-gradient(circle at 79% 52%, var(--pygx-blue-700) 0 6px, transparent 7px),
+    radial-gradient(circle at 38% 72%, var(--pygx-green-800) 0 8px, transparent 9px),
+    radial-gradient(circle at 86% 83%, var(--pygx-gold) 0 5px, transparent 6px),
+    linear-gradient(31deg, transparent 31%, var(--pygx-green-200) 31.5% 32.5%, transparent 33%),
+    linear-gradient(147deg, transparent 45%, var(--pygx-green-200) 45.5% 46.5%, transparent 47%),
+    linear-gradient(78deg, transparent 52%, var(--pygx-blue-100) 52.5% 53.5%, transparent 54%);
+  border-radius: 50%;
+}
+.pygx-hero__inner { position: relative; z-index: 2; max-width: 55rem; }
+.pygx-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  color: var(--pygx-green-900);
+  background: color-mix(in srgb, var(--pygx-green-100) 78%, transparent);
+  border: 1px solid var(--pygx-green-200);
+  border-radius: 999px;
+  padding: .32rem .65rem;
+  font-size: .69rem;
+  font-weight: 760;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+.pygx-eyebrow::before { content: ""; width: .43rem; height: .43rem; border-radius: 50%; background: var(--pygx-green-600); box-shadow: 0 0 0 .22rem color-mix(in srgb, var(--pygx-green-200) 65%, transparent); }
+.pygx-hero h2 {
+  max-width: 17ch;
+  margin: 1.2rem 0 .95rem;
+  color: var(--pygx-ink-950);
+  font-size: clamp(2.45rem, 6vw, 4.6rem);
+  line-height: .99;
+  letter-spacing: -.055em;
+  font-weight: 790;
+}
+.pygx-hero h2 span { color: var(--pygx-green-800); }
+.pygx-hero__lead {
+  max-width: 44rem !important;
+  margin: 0 0 1.45rem !important;
+  color: var(--pygx-ink-650);
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  line-height: 1.62;
+}
+.pygx-hero__actions { display: flex; flex-wrap: wrap; gap: .65rem; margin: 1.4rem 0 1.75rem; }
+.pygx-hero__actions .md-button { margin: 0; }
+.pygx-hero__meta { display: flex; flex-wrap: wrap; gap: .65rem 1.25rem; color: var(--pygx-ink-650); font-size: .72rem; }
+.pygx-hero__meta strong { color: var(--pygx-ink-950); }
+
+.pygx-section { margin: 3.3rem 0; }
+.pygx-section__kicker { color: var(--pygx-green-800); font-size: .68rem; font-weight: 780; letter-spacing: .08em; text-transform: uppercase; }
+.pygx-section > h2 { margin-top: .35rem; margin-bottom: .65rem; }
+.pygx-section__intro { color: var(--pygx-ink-650); font-size: .92rem; max-width: 65ch !important; }
+
+.pygx-paths {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .8rem;
+  margin-top: 1.5rem;
+}
+.pygx-path {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 12rem;
+  padding: 1.15rem;
+  color: var(--pygx-ink-800) !important;
+  text-decoration: none !important;
+  border: 1px solid var(--pygx-line);
+  border-radius: .78rem;
+  background: var(--pygx-canvas);
+  box-shadow: var(--pygx-shadow-sm);
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.pygx-path:hover { transform: translateY(-3px); border-color: var(--pygx-green-500); box-shadow: var(--pygx-shadow-md); }
+.pygx-path__number { color: var(--pygx-green-700); font-size: .67rem; font-weight: 780; letter-spacing: .07em; }
+.pygx-path h3 { margin: .8rem 0 .4rem; font-size: 1.03rem; }
+.pygx-path p { margin: 0 0 1rem; color: var(--pygx-ink-650); font-size: .74rem; line-height: 1.55; }
+.pygx-path__arrow { margin-top: auto; color: var(--pygx-green-800); font-weight: 720; }
+
+.pygx-split {
+  display: grid;
+  grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
+  gap: 2rem;
+  align-items: start;
+  margin-top: 1.35rem;
+}
+.pygx-layer-list { display: grid; gap: .65rem; }
+.pygx-layer {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr;
+  gap: .75rem;
+  padding: .9rem;
+  border-bottom: 1px solid var(--pygx-line);
+}
+.pygx-layer__index { color: var(--pygx-green-700); font-size: .72rem; font-weight: 800; }
+.pygx-layer h3 { margin: 0 0 .18rem; font-size: .92rem; }
+.pygx-layer p { margin: 0; color: var(--pygx-ink-650); font-size: .74rem; }
+.pygx-code-card {
+  overflow: hidden;
+  border: 1px solid var(--pygx-line-strong);
+  border-radius: .8rem;
+  background: var(--pygx-code);
+  box-shadow: var(--pygx-shadow-md);
+}
+.pygx-code-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .65rem .8rem;
+  border-bottom: 1px solid var(--pygx-line);
+  background: var(--pygx-canvas-soft);
+  color: var(--pygx-ink-650);
+  font-size: .68rem;
+}
+.pygx-code-card__dots { display: flex; gap: .28rem; }
+.pygx-code-card__dots i { display: block; width: .48rem; height: .48rem; border-radius: 50%; background: var(--pygx-line-strong); }
+.pygx-code-card__dots i:nth-child(1) { background: #ef6a67; }
+.pygx-code-card__dots i:nth-child(2) { background: var(--pygx-gold); }
+.pygx-code-card__dots i:nth-child(3) { background: var(--pygx-green-500); }
+.pygx-code-card .highlight { margin: 0; border: 0; border-radius: 0; }
+
+.pygx-model-groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .8rem;
+  margin-top: 1.4rem;
+}
+.pygx-model-group {
+  padding: 1rem 1.05rem;
+  border: 1px solid var(--pygx-line);
+  border-radius: .7rem;
+  background: var(--pygx-canvas);
+}
+.pygx-model-group h3 { margin: 0 0 .55rem; font-size: .93rem; }
+.pygx-model-group p { margin: 0 0 .75rem; color: var(--pygx-ink-650); font-size: .72rem; }
+.pygx-model-links { display: flex; flex-wrap: wrap; gap: .32rem; }
+.pygx-model-links a {
+  display: inline-flex;
+  padding: .22rem .48rem;
+  color: var(--pygx-green-900) !important;
+  text-decoration: none !important;
+  border: 1px solid var(--pygx-green-200);
+  border-radius: 999px;
+  background: var(--pygx-green-050);
+  font-size: .67rem;
+  font-weight: 650;
+}
+.pygx-model-links a:hover { background: var(--pygx-green-100); border-color: var(--pygx-green-500); }
+
+.pygx-proof {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .8rem;
+  margin-top: 1.4rem;
+}
+.pygx-proof article { padding: 1.05rem; border-top: 2px solid var(--pygx-green-500); background: var(--pygx-canvas-soft); border-radius: 0 0 .65rem .65rem; }
+.pygx-proof h3 { margin: 0 0 .35rem; font-size: .92rem; }
+.pygx-proof p { margin: 0; color: var(--pygx-ink-650); font-size: .73rem; }
+
+.pygx-cta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  margin: 3.5rem 0 1rem;
+  padding: 1.45rem 1.55rem;
+  border-radius: .8rem;
+  color: white;
+  background: linear-gradient(120deg, var(--pygx-green-900), var(--pygx-blue-800));
+  box-shadow: var(--pygx-shadow-md);
+}
+.pygx-cta h2 { color: white; margin: 0 0 .25rem; padding: 0; }
+.pygx-cta p { margin: 0; color: rgba(255,255,255,.78); }
+.pygx-cta .md-button { color: var(--pygx-green-900); background: white; border-color: white; margin: 0; }
+
+/* Existing model and figure content */
+.model-hero {
+  border: 1px solid var(--pygx-line);
+  border-left: .24rem solid var(--pygx-green-500);
+  border-radius: .68rem;
+  padding: 1rem 1.1rem;
+  margin: .5rem 0 1.4rem;
+  background: linear-gradient(135deg, var(--pygx-green-050), transparent 68%);
+}
+.model-hero p { margin: .12rem 0; }
+.figure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: .9rem;
+  margin: 1rem 0 1.5rem;
+}
+.figure-grid figure {
+  margin: 0;
+  padding: .6rem;
+  border: 1px solid var(--pygx-line);
+  border-radius: .68rem;
+  background: var(--pygx-canvas);
+  box-shadow: var(--pygx-shadow-sm);
+}
+.figure-grid img { width: 100%; height: auto; border-radius: .42rem; }
+.figure-grid figcaption { margin-top: .45rem; text-align: center; color: var(--pygx-ink-500); font-size: .7rem; }
+.pygwrx-muted { color: var(--pygx-ink-500); }
+
+/* Footer */
+.md-footer { background: var(--pygx-canvas-soft); color: var(--pygx-ink-650); border-top: 1px solid var(--pygx-line); }
+.md-footer-meta { background: var(--pygx-canvas-soft); }
+.md-footer__link { color: var(--pygx-ink-800); }
+.md-footer__link:hover { color: var(--pygx-green-800); opacity: 1; }
+.md-copyright { color: var(--pygx-ink-500); }
+
+@media screen and (max-width: 76rem) {
+  .pygx-hero::after { right: -7rem; opacity: .25; }
+  .pygx-paths { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pygx-model-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media screen and (max-width: 60rem) {
+  .md-header__topic:first-child::after { display: none; }
+  .md-typeset { font-size: .8rem; }
+  .pygx-split { grid-template-columns: 1fr; }
+  .pygx-proof { grid-template-columns: 1fr; }
+}
+
+@media screen and (max-width: 44.9375em) {
+  .md-grid { max-width: 100%; }
+  .md-content__inner { padding-top: 1.25rem; }
+  .md-typeset h1 { font-size: 2rem; }
+  .pygx-announcement { justify-content: flex-start; }
+  .pygx-hero { padding: 3rem 1rem 3.2rem; }
+  .pygx-hero::after { display: none; }
+  .pygx-hero h2 { font-size: 2.55rem; }
+  .pygx-paths,
+  .pygx-model-groups { grid-template-columns: 1fr; }
+  .pygx-path { min-height: auto; }
+  .pygx-cta { grid-template-columns: 1fr; }
+  .md-typeset table:not([class]) { display: block; font-size: .68rem; }
+}
+
+/* Remove the default top gap on the landing page without affecting manuals. */
+.pygx-home { margin-top: -2rem; }
+.pygx-home > h1 { display: none; }
+
+/* Language selector and source links */
+.md-select__inner,
+.md-source__repository { color: var(--pygx-ink-800); }
+.md-select__list { border: 1px solid var(--pygx-line); border-radius: .55rem; box-shadow: var(--pygx-shadow-md); }
+.md-source:hover { opacity: 1; color: var(--pygx-green-800); }
+
+/* Search keyboard hint, close to the restrained PyData pattern. */
+.md-search__form::after {
+  content: "Ctrl K";
+  position: absolute;
+  right: .65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: .12rem .35rem;
+  border: 1px solid var(--pygx-line-strong);
+  border-radius: .28rem;
+  color: var(--pygx-ink-500);
+  background: var(--pygx-canvas);
+  font-size: .57rem;
+  line-height: 1.2;
+  pointer-events: none;
+}
+[dir="rtl"] .md-search__form::after { right: auto; left: .65rem; }
+.md-search__input { padding-right: 3.4rem; }
+@media screen and (max-width: 44.9375em) {
+  .pygx-home { margin-top: -1.25rem; }
+  .md-search__form::after { display: none; }
+  .md-search__input { padding-right: 2.2rem; }
+}
+
+/* Landing-page title is present for semantics but hidden visually. */
+.pygx-home-title { display: none !important; }
+body:has(.pygx-home) .md-content__button { display: none; }
+
+/* API property tables must remain readable for long annotated signatures. */
+.md-typeset table code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* --------------------------------------------------------------------------
+   Header and homepage hero refinement
+   Scope: the single-row site header and the first homepage section only.
+   -------------------------------------------------------------------------- */
+
+/* Keep the logo, primary navigation, utilities, search, and repository icon
+   on one desktop row. */
+.md-header {
+  background: color-mix(in srgb, var(--pygx-canvas) 97%, transparent);
+  border-bottom: 1px solid var(--pygx-line);
+}
+
+.md-header__inner {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  min-height: 3.78rem;
+  max-width: 100rem;
+  padding: 0 1rem;
+}
+
+/* Owner-approved full pyGWRx logo: original vector geometry with stronger line weight and the homepage palette. */
+.md-header__button.md-logo {
+  display: inline-flex;
+  flex: 0 0 6.6rem;
+  align-items: center;
+  justify-content: flex-start;
+  width: 6.6rem;
+  height: 2.4rem;
+  margin: 0;
+  padding: .05rem 0;
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  display: block;
+  width: 6.35rem !important;
+  height: auto !important;
+  max-height: 1.9rem;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.pygx-menu-button { display: none; }
+
+.pygx-header-tabs {
+  display: flex;
+  flex: 1 1 auto;
+  align-self: stretch;
+  min-width: 0;
+  margin-left: .25rem;
+  overflow: hidden;
+}
+
+.pygx-header-tabs .md-tabs__list {
+  display: flex;
+  align-items: stretch;
+  gap: .18rem;
+  min-width: max-content;
+  margin: 0;
+  padding: 0;
+}
+
+.pygx-header-tabs .md-tabs__item {
+  display: flex;
+  align-items: stretch;
+  height: auto;
+  padding: 0;
+}
+
+.pygx-header-tabs .md-tabs__link {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0 .62rem;
+  border-bottom: 2px solid transparent;
+  color: var(--pygx-ink-800);
+  font-size: .76rem;
+  font-weight: 630;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.pygx-header-tabs .md-tabs__link:hover,
+.pygx-header-tabs .md-tabs__link--active {
+  color: var(--pygx-green-800);
+}
+
+.pygx-header-tabs .md-tabs__link--active {
+  border-bottom-color: var(--pygx-green-600);
+}
+
+.pygx-header-tools {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: .05rem;
+  margin-left: auto;
+}
+
+.pygx-header-tools .md-header__button {
+  margin: 0;
+}
+
+.pygx-header-tools .md-search {
+  width: 13rem;
+  margin-left: .25rem;
+}
+
+.pygx-header-tools .md-search__form {
+  height: 2.35rem;
+  border-radius: 1.2rem;
+}
+
+.pygx-header-tools .md-search__input {
+  height: 2.35rem;
+  font-size: .75rem;
+}
+
+.md-header__source {
+  width: auto;
+  max-width: none;
+  margin-left: .18rem;
+}
+
+.md-header__source .md-source {
+  width: auto;
+  padding: .45rem .25rem;
+}
+
+.md-header__source .md-source__icon {
+  width: 1.45rem;
+  height: 1.45rem;
+  margin: 0;
+}
+
+.md-header__source .md-source__repository,
+.md-header__source .md-source__facts {
+  display: none;
+}
+
+/* The separate Material tabs row is intentionally unused by the custom
+   header. This rule also prevents a duplicate row if a theme update emits it. */
+body > .md-container > .md-tabs,
+.md-header > .md-tabs {
+  display: none !important;
+}
+
+/* Homepage: change only the first section; all sections below it keep their
+   existing markup and styling. */
+.pygx-home { margin-top: 0; }
+
+.pygx-hero {
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - 4.25rem);
+  margin-top: 0;
+  padding-top: clamp(4.2rem, 7vh, 5.6rem);
+  padding-bottom: clamp(4.2rem, 7vh, 5.6rem);
+}
+
+.pygx-hero__inner {
+  width: min(49rem, 58vw);
+  max-width: 49rem;
+}
+
+.pygx-hero h2 {
+  max-width: none;
+  margin: 0 0 1.25rem;
+  font-size: clamp(3.05rem, 5.2vw, 4.75rem);
+  font-weight: 790;
+  line-height: .99;
+  letter-spacing: -.052em;
+}
+
+.pygx-hero__lead {
+  max-width: 44rem !important;
+  margin: 0 !important;
+  font-size: clamp(.98rem, 1.45vw, 1.12rem);
+  line-height: 1.66;
+}
+
+.pygx-hero__actions {
+  gap: .8rem;
+  margin: 1.6rem 0 0;
+}
+
+.pygx-hero__actions .md-button {
+  min-width: 10.2rem;
+  padding: .64rem 1rem;
+  text-align: center;
+}
+
+.pygx-hero::after {
+  width: 31rem;
+  height: 31rem;
+  right: max(1rem, calc((100vw - 98rem) / 2));
+}
+
+@media screen and (max-width: 76rem) {
+  .md-header__inner { padding: 0 .75rem; }
+  .md-header__button.md-logo {
+    flex-basis: 6.2rem;
+    width: 6.2rem;
+  }
+  .md-header__button.md-logo img,
+  .md-header__button.md-logo svg { width: 5.95rem !important; }
+  .pygx-header-tabs .md-tabs__link { padding: 0 .45rem; font-size: .7rem; }
+  .pygx-header-tools .md-search { width: 11rem; }
+  .pygx-hero__inner { width: min(47rem, 66vw); }
+}
+
+@media screen and (max-width: 60rem) {
+  .md-header__inner { min-height: 3.55rem; }
+  .pygx-menu-button { display: inline-flex; order: -1; }
+  .pygx-header-tabs { display: none; }
+  .md-header__button.md-logo {
+    flex-basis: 6rem;
+    width: 6rem;
+    height: 2.2rem;
+  }
+  .md-header__button.md-logo img,
+  .md-header__button.md-logo svg {
+    width: 5.7rem !important;
+    max-height: 1.75rem;
+  }
+  .pygx-header-tools .md-search { width: auto; margin-left: 0; }
+  .pygx-hero { min-height: auto; }
+  .pygx-hero__inner { width: min(100%, 45rem); }
+}
+
+@media screen and (max-width: 44.9375em) {
+  .md-header__inner { padding: 0 .45rem; }
+  .md-header__button.md-logo {
+    flex-basis: 5.4rem;
+    width: 5.4rem;
+  }
+  .md-header__button.md-logo img,
+  .md-header__button.md-logo svg { width: 5.15rem !important; }
+  .pygx-hero {
+    padding-top: 3.4rem;
+    padding-bottom: 3.6rem;
+  }
+  .pygx-hero h2 { font-size: clamp(2.55rem, 12vw, 3.35rem); }
+  .pygx-hero__lead br { display: none; }
+  .pygx-hero__actions .md-button { min-width: 0; }
+}
+
+/* Final desktop alignment for the approved header/hero composition. */
+@media screen and (min-width: 76.01rem) {
+  .md-header__inner { padding-left: 1rem; padding-right: 1rem; }
+
+  .md-header__button.md-logo {
+    flex-basis: 6.4rem;
+    width: 6.4rem;
+  }
+
+  .md-header__button.md-logo img,
+  .md-header__button.md-logo svg {
+    width: 6.15rem !important;
+    max-height: 1.82rem;
+  }
+
+  .pygx-header-tabs { margin-left: .55rem; }
+}
+
+.pygx-header-tabs .md-tabs__item--active .md-tabs__link {
+  color: var(--pygx-green-800);
+  border-bottom-color: var(--pygx-green-600);
+}
+
+body:has(.pygx-home) .md-main__inner,
+body:has(.pygx-home) .md-content__inner {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+@media screen and (min-width: 60.01rem) {
+  .pygx-hero__inner { transform: translateY(-1.4rem); }
+}
+
+/* --------------------------------------------------------------------------
+   Header centering and homepage edge spacing correction
+   -------------------------------------------------------------------------- */
+@media screen and (min-width: 76.01rem) {
+  /* Three balanced columns keep the main menu visually centered regardless
+     of the logo width or the search/repository controls on the right. */
+  .md-header__inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    width: 100%;
+    max-width: 100rem;
+    min-height: 3.78rem;
+    margin: 0 auto;
+    padding: 0 1.35rem;
+    column-gap: 1rem;
+  }
+
+  .md-header__button.md-logo {
+    grid-column: 1;
+    justify-self: start;
+    margin: 0;
+  }
+
+  .pygx-header-tabs {
+    grid-column: 2;
+    justify-self: center;
+    align-self: stretch;
+    flex: none;
+    width: auto;
+    margin: 0;
+    overflow: visible;
+  }
+
+  .pygx-header-tabs .md-tabs__list {
+    justify-content: center;
+  }
+
+  .pygx-header-tools {
+    grid-column: 3;
+    justify-self: end;
+    margin-left: 0;
+  }
+
+  /* Keep the first-screen copy away from the browser edge while retaining
+     the full-width visual background. */
+  .pygx-hero {
+    padding-left: clamp(3rem, 5vw, 5.5rem);
+    padding-right: clamp(3rem, 5vw, 5.5rem);
+  }
+
+  .pygx-hero__inner {
+    transform: translateY(-1.4rem);
+  }
+}
+
+@media screen and (min-width: 60.01rem) and (max-width: 76rem) {
+  .md-header__inner {
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .pygx-hero {
+    padding-left: 2.75rem;
+    padding-right: 2.75rem;
+  }
+}
+
+/* Temporary header simplification: the logo and the Resources/中文 top-level
+   tabs are omitted by the custom header template. Their source pages remain
+   available and can be restored without changing the documentation tree. */
