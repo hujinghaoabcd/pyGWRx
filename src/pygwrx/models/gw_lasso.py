@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 
 from pygwrx._optional import import_optional_dependency
-from pygwrx.core.base import BaseGWR
+from pygwrx.core.base import BaseSpatialRegressor
 from pygwrx.core.kernels import get_kernel_function
 from pygwrx.core.metrics import compute_diagnostics
 from pygwrx.core.solver import adaptive_bandwidth_weights
@@ -80,7 +80,7 @@ class _LocalFit:
     cv_score: float
 
 
-class GWLasso(BaseGWR):
+class GWLasso(BaseSpatialRegressor):
     r"""Geographically weighted Lasso regression.
 
     At evaluation location :math:`s`, the model solves

@@ -443,3 +443,12 @@ print("inference=", BasicInference().fit(X, y, coords).summary())
 ## API
 
 See the [Core API reference](../api/core/index.md), where every symbol includes its full docstring, signature, and mapped runnable example.
+
+## Regression base hierarchy
+
+`BaseSpatialRegressor` is the single shared base for the geographically
+weighted regression family. It owns the common regression state, kernel
+and bandwidth configuration, local parameter computation, prediction
+validation, and result export behavior. `BaseGWR` remains available as
+an identity alias for backward compatibility with pyGWRx 0.1.2 code.
+

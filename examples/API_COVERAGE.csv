@@ -26,8 +26,8 @@ models,LGGWRPredictionResult,class,Detailed LG-GWR predictions at evaluation loc
 models,GRGWR,class,Geo-Regime Geographically Weighted Regression.,examples/models/19_gr_gwr.py
 models,GRGWRPredictionResult,class,Detailed GR-GWR predictions at evaluation locations.,examples/models/19_gr_gwr.py
 core,BaseSpatialEstimator,class,Root class for all spatial estimators.,examples/core/08_base_classes.py
-core,BaseSpatialRegressor,class,Base class for spatial regression estimators.,examples/core/08_base_classes.py
-core,BaseGWR,class,Base class for single-bandwidth local kernel-weighted regressions.,examples/core/08_base_classes.py
+core,BaseSpatialRegressor,class,Base class for geographically weighted spatial regressors.,examples/core/08_base_classes.py
+core,BaseGWR,class,Base class for geographically weighted spatial regressors.,examples/core/08_base_classes.py
 core,SpatiotemporalMixin,class,No summary is available.,examples/core/08_base_classes.py
 core,MultiscaleMixin,class,No summary is available.,examples/core/08_base_classes.py
 core,BaseSpatiotemporalRegressor,class,Base for spatiotemporal GWR-family regressors.,examples/core/08_base_classes.py

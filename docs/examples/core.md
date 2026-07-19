@@ -477,7 +477,7 @@ class MeanRegressor(BaseSpatialRegressor):
         return np.full(Xa.shape[0], self.mean_)
 
 
-class TinyGWR(BaseGWR):
+class TinyGWR(BaseSpatialRegressor):
     """Minimal concrete GWR-style regressor."""
 
     def fit(self, X, y, coords, **kwargs):
@@ -579,6 +579,10 @@ class BasicInference(BaseSpatialInference):
     def summary(self):
         self._check_is_fitted()
         return f"n_samples={self.n_samples_}"
+
+
+# BaseGWR remains an identity alias for backward compatibility.
+assert BaseGWR is BaseSpatialRegressor
 
 
 X = pd.DataFrame({"x": [0.0, 1.0, 2.0, 3.0]})
