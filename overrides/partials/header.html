@@ -32,9 +32,7 @@
       {% if not config.theme.palette is mapping %}
         {% include "partials/javascripts/palette.html" %}
       {% endif %}
-      {% if config.extra.alternate %}
-        {% include "partials/alternate.html" %}
-      {% endif %}
+      {# Language selector intentionally hidden for now. config.extra.alternate is retained. #}
       {% if "material/search" in config.plugins %}
         {% set search = config.plugins["material/search"] | attr("config") %}
         {% if search.enabled %}
