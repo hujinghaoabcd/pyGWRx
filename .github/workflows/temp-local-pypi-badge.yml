@@ -1,0 +1,40 @@
+name: Temporary Local PyPI Badge Fix
+
+on:
+  push:
+    branches:
+      - fix/local-pypi-badge
+
+permissions:
+  contents: write
+
+jobs:
+  update-readmes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/local-pypi-badge
+
+      - name: Use repository-local PyPI badge
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          old = "https://img.shields.io/badge/PyPI-v0.1.2-139C5A.svg"
+          new = "./docs/assets/images/pypi-v0.1.2.svg"
+          for name in ("README.md", "README.zh.md"):
+              path = Path(name)
+              text = path.read_text(encoding="utf-8")
+              if old not in text:
+                  raise SystemExit(f"Expected badge URL not found in {name}")
+              path.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+          PY
+
+      - name: Commit local badge references
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md README.zh.md
+          git commit -m "Use local PyPI release badge"
+          git push origin HEAD:fix/local-pypi-badge
