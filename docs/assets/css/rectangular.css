@@ -1,0 +1,197 @@
+/* pyGWRx rectangular documentation interface
+   Loaded after the primary visual system so these rules stay isolated. */
+
+:root {
+  --pygx-ui-radius: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Rectangular interface
+   -------------------------------------------------------------------------- */
+
+/* Keep genuine circular decoration untouched; square only interface boxes. */
+.md-search__form,
+.md-search__output,
+.md-select__list,
+.md-dialog,
+.md-tooltip,
+.md-typeset blockquote,
+.md-typeset table:not([class]),
+.md-typeset code,
+.md-typeset kbd,
+.md-typeset input,
+.md-typeset textarea,
+.md-typeset select,
+.md-typeset .highlight,
+.md-typeset .highlighttable,
+.md-typeset .admonition,
+.md-typeset details,
+.md-typeset .tabbed-set,
+.md-typeset .tabbed-content,
+.md-typeset .md-button,
+.md-typeset .md-tag,
+.md-typeset .md-badge,
+.md-typeset .grid.cards > ul > li,
+.md-typeset .grid.cards > ol > li,
+.doc-signature,
+.pygx-announcement__badge,
+.pygx-eyebrow,
+.pygx-path,
+.pygx-code-card,
+.pygx-model-group,
+.pygx-model-links a,
+.pygx-proof article,
+.pygx-cta,
+.model-hero,
+.figure-grid figure,
+.figure-grid img,
+.md-search__form::after {
+  border-radius: var(--pygx-ui-radius) !important;
+}
+
+.md-typeset img:not(.twemoji) {
+  border-radius: 0 !important;
+}
+
+/* Let borders and spacing define cards instead of curves and floating shadows. */
+.pygx-path,
+.pygx-code-card,
+.pygx-model-group,
+.pygx-proof article,
+.pygx-cta,
+.model-hero,
+.figure-grid figure,
+.md-typeset .grid.cards > ul > li,
+.md-typeset .grid.cards > ol > li {
+  box-shadow: none !important;
+}
+
+.md-typeset .md-button:hover,
+.pygx-path:hover {
+  transform: none;
+}
+
+/* --------------------------------------------------------------------------
+   Ordered primary navigation
+   -------------------------------------------------------------------------- */
+
+.md-sidebar--primary {
+  border-right: 1px solid var(--pygx-line);
+}
+
+.md-sidebar--primary .md-sidebar__scrollwrap {
+  padding-right: .65rem;
+  scrollbar-width: thin;
+}
+
+.md-sidebar--primary .md-nav {
+  font-size: .71rem;
+  line-height: 1.35;
+}
+
+.md-sidebar--primary .md-nav__title {
+  margin: 0;
+  padding: .52rem;
+  border-bottom: 1px solid var(--pygx-line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  line-height: 1.25;
+}
+
+.md-sidebar--primary .md-nav__list,
+.md-sidebar--primary .md-nav__item {
+  margin: 0;
+  padding: 0;
+}
+
+.md-sidebar--primary .md-nav__item + .md-nav__item {
+  margin-top: 1px;
+}
+
+.md-sidebar--primary .md-nav__link {
+  display: flex;
+  align-items: flex-start;
+  min-height: 1.9rem;
+  margin: 0;
+  padding: .38rem .52rem;
+  border-radius: 0 !important;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: none;
+}
+
+.md-sidebar--primary .md-nav__link:hover {
+  color: var(--pygx-green-800);
+  background: var(--pygx-canvas-soft);
+}
+
+.md-sidebar--primary .md-nav__link--active,
+.md-sidebar--primary .md-nav__link--active:hover {
+  padding-left: calc(.52rem - .18rem);
+  border-left: .18rem solid var(--pygx-green-600);
+  color: var(--pygx-green-900) !important;
+  background: var(--pygx-green-050) !important;
+  font-weight: 700;
+}
+
+.md-sidebar--primary .md-nav__item--nested > .md-nav__link {
+  color: var(--pygx-ink-800);
+  font-weight: 660;
+}
+
+.md-sidebar--primary .md-nav__item--nested > .md-nav {
+  margin: 0 0 .35rem .5rem;
+  padding-left: .52rem;
+  border-left: 1px solid var(--pygx-line);
+}
+
+/* Current-page section groups become consistent dividers, not loose cards. */
+.md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item--nested > .md-nav__link,
+.md-sidebar--primary .md-nav__item--section > .md-nav__link {
+  margin-top: .78rem;
+  padding: .46rem .52rem .36rem;
+  border-bottom: 1px solid var(--pygx-line-strong);
+  color: var(--pygx-ink-950);
+  background: transparent !important;
+  font-size: .7rem;
+  font-weight: 730;
+  letter-spacing: .01em;
+}
+
+.md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item--nested:first-child > .md-nav__link,
+.md-sidebar--primary .md-nav__item--section:first-child > .md-nav__link {
+  margin-top: 0;
+}
+
+.md-sidebar--primary .md-nav__icon {
+  flex: 0 0 auto;
+  margin-top: .08rem;
+}
+
+/* Right-hand page outline follows the same compact rectangular rhythm. */
+.md-sidebar--secondary .md-nav__link {
+  margin: 0;
+  padding-top: .22rem;
+  padding-bottom: .22rem;
+  border-radius: 0;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary {
+    width: 15rem;
+  }
+}
+
+@media screen and (max-width: 60rem) {
+  .md-sidebar--primary {
+    border-right: 0;
+  }
+
+  .md-sidebar--primary .md-sidebar__scrollwrap {
+    padding-right: 0;
+  }
+}
