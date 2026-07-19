@@ -44,6 +44,8 @@ def run_batch(batch: int, timeout_seconds: int) -> None:
     ):
         env[variable] = "1"
     env["MPLBACKEND"] = "Agg"
+    env["PYTHONUTF8"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
 
     command = [
         sys.executable,

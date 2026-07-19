@@ -1381,14 +1381,14 @@ class GTWR(BaseSpatiotemporalRegressor):
             f"ksi: {self.ksi_}",
             f"Causal history-only weighting: {self.causal}",
             f"Time unit: {self.time_unit_}",
-            f"R²: {self.diagnostics_.get('r2', np.nan):.6f}",
-            f"Adjusted R²: {self.diagnostics_.get('adj_r2', np.nan):.6f}",
+            f"R-squared: {self.diagnostics_.get('r2', np.nan):.6f}",
+            f"Adjusted R-squared: {self.diagnostics_.get('adj_r2', np.nan):.6f}",
             f"AIC: {self.diagnostics_.get('aic', np.nan):.6f}",
             f"AICc: {self.diagnostics_.get('aicc', np.nan):.6f}",
             f"BIC: {self.diagnostics_.get('bic', np.nan):.6f}",
             f"trace(S): {self.diagnostics_.get('trace_S', np.nan):.6f}",
             f"trace(S'S): {self.diagnostics_.get('trace_StS', np.nan):.6f}",
-            f"Residual variance (sigma²): {self.sigma2_:.6f}",
+            f"Residual variance (sigma^2): {self.sigma2_:.6f}",
             "=" * 78,
         ]
         return "\n".join(lines)

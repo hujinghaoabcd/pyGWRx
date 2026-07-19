@@ -94,7 +94,7 @@ model.fit(X, y, coords)
 
 print(model.summary())
 print(model.to_frame().head())
-print("R²:", model.score(X, y, coords))
+print("R-squared:", model.score(X, y, coords))
 
 result = model.predict_result(X.iloc[:4], coords.iloc[:4])
 print(result.to_frame())

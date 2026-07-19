@@ -425,3 +425,4 @@ def test_summary_identifies_lcr_model(collinear_data):
     assert "Condition-number threshold" in summary
     assert "Locally compensated locations" in summary
     assert "trace(S)" in summary
+    summary.encode("cp936")

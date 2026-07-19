@@ -235,7 +235,7 @@ _PROVENANCE: Dict[str, Dict[str, Optional[str]]] = {
         "source_revision": "b63064938a2ba5a1eb27cc7bdb642eaa62cb5de6",
         "source_path": "Data/HIV.csv",
         "evidence_date": "2026-07-19",
-        "integrity": "Local SHA-256 plus exact upstream/local Git blob SHA-1 match.",
+        "integrity": "Local SHA-256 plus pinned upstream Git blob SHA-1 after reversible CSV line-ending normalization.",
     },
     "crime": {
         "source_version": "FastSGWR",
@@ -243,7 +243,7 @@ _PROVENANCE: Dict[str, Dict[str, Optional[str]]] = {
         "source_revision": "b63064938a2ba5a1eb27cc7bdb642eaa62cb5de6",
         "source_path": "Data/Crime.csv",
         "evidence_date": "2026-07-19",
-        "integrity": "Local SHA-256 plus exact upstream/local Git blob SHA-1 match.",
+        "integrity": "Local SHA-256 plus pinned upstream Git blob SHA-1 after reversible CSV line-ending normalization.",
     },
     "housing": {
         "source_version": "FastSGWR",
@@ -251,7 +251,7 @@ _PROVENANCE: Dict[str, Dict[str, Optional[str]]] = {
         "source_revision": "b63064938a2ba5a1eb27cc7bdb642eaa62cb5de6",
         "source_path": "Data/Housing.csv",
         "evidence_date": "2026-07-19",
-        "integrity": "Local SHA-256 plus exact upstream/local Git blob SHA-1 match.",
+        "integrity": "Local SHA-256 plus pinned upstream Git blob SHA-1 after reversible CSV line-ending normalization.",
     },
     "columbus": {
         "source_version": "spData 2.3.5",

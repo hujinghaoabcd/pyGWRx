@@ -22,6 +22,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 def test_example_runs_from_unrelated_working_directory(tmp_path, relative_script):
     env = os.environ.copy()
     env.setdefault("MPLBACKEND", "Agg")
+    env["PYTHONUTF8"] = "0"
+    env["PYTHONIOENCODING"] = "cp936"
     completed = subprocess.run(
         [sys.executable, str(PROJECT_ROOT / relative_script)],
         cwd=tmp_path,

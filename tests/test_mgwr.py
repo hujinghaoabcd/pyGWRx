@@ -239,3 +239,4 @@ def test_summary_reports_variable_specific_scales():
     assert "Initial GWR bandwidth: 20" in summary
     assert "Converged: True" in summary
     assert "trace(S)" in summary
+    summary.encode("cp936")

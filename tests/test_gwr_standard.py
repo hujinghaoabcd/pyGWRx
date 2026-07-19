@@ -150,6 +150,7 @@ def test_summary_survives_singular_global_reference():
     text = model.summary()
     assert "Global OLS reference" in text
     assert "Local coefficient distribution" in text
+    text.encode("cp936")
 
 
 def test_public_models_no_longer_expose_backend_parameter():

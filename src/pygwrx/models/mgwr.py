@@ -1236,8 +1236,8 @@ class MGWR(BaseMultiscaleRegressor):
 
         lines.extend(["", "MGWR diagnostics", "-" * 88])
         for label, key in (
-            ("R²", "r2"),
-            ("Adjusted R²", "adj_r2"),
+            ("R-squared", "r2"),
+            ("Adjusted R-squared", "adj_r2"),
             ("RSS", "rss"),
             ("RMSE", "rmse"),
             ("MAE", "mae"),
@@ -1252,7 +1252,7 @@ class MGWR(BaseMultiscaleRegressor):
             value = self.diagnostics_.get(key, np.nan) if self.diagnostics_ else np.nan
             lines.append(f"{label:<32}{value:>16.6f}")
         sigma2 = np.nan if self.sigma2_ is None else self.sigma2_
-        lines.append(f"{'Residual variance (sigma²)':<32}{sigma2:>16.6f}")
+        lines.append(f"{'Residual variance (sigma^2)':<32}{sigma2:>16.6f}")
         lines.append("=" * 88)
         return "\n".join(lines)
 

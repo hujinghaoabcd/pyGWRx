@@ -727,7 +727,7 @@ class GWR(BaseGWR):
             f"Kernel: {self.kernel}",
             f"Bandwidth: {self.bandwidth_} ({'adaptive neighbours' if self.adaptive else 'fixed distance'})",
             f"Distance metric: {self.distance_metric}",
-            f"Residual variance (sigma²): {self.sigma2_:.6f}",
+            f"Residual variance (sigma^2): {self.sigma2_:.6f}",
             "",
             "Global OLS reference",
             "-" * 78,
@@ -753,8 +753,8 @@ class GWR(BaseGWR):
 
         lines.extend(["", "GWR diagnostics", "-" * 78])
         ordered = (
-            ("R²", "r2"),
-            ("Adjusted R²", "adj_r2"),
+            ("R-squared", "r2"),
+            ("Adjusted R-squared", "adj_r2"),
             ("RSS", "rss"),
             ("RMSE", "rmse"),
             ("MAE", "mae"),

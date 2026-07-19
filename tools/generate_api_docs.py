@@ -629,7 +629,9 @@ def generate() -> None:
         "w", newline="", encoding="utf-8"
     ) as handle:
         writer = csv.DictWriter(
-            handle, fieldnames=["namespace", "symbol", "kind", "summary", "example"]
+            handle,
+            fieldnames=["namespace", "symbol", "kind", "summary", "example"],
+            lineterminator="\n",
         )
         writer.writeheader()
         writer.writerows(rows)

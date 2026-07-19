@@ -35,9 +35,11 @@ def _batch_files(batch: int) -> list[Path]:
 def run_batch(batch: int, timeout_seconds: int) -> None:
     """Run one time-bounded coverage batch in a fresh data file."""
     target = _COVERAGE_FILES[batch - 1]
+    default_target = Path(".coverage")
     target.unlink(missing_ok=True)
+    default_target.unlink(missing_ok=True)
     env = os.environ.copy()
-    env["COVERAGE_FILE"] = str(target)
+    env["COVERAGE_FILE"] = str(target.resolve())
     for variable in (
         "OPENBLAS_NUM_THREADS",
         "MKL_NUM_THREADS",
@@ -46,6 +48,8 @@ def run_batch(batch: int, timeout_seconds: int) -> None:
     ):
         env[variable] = "1"
     env["MPLBACKEND"] = "Agg"
+    env["PYTHONUTF8"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
     command = [
         sys.executable,
         "-m",
@@ -64,6 +68,14 @@ def run_batch(batch: int, timeout_seconds: int) -> None:
         raise RuntimeError(
             f"Coverage batch {batch} exceeded {timeout_seconds} seconds."
         ) from exc
+
+    # pytest-cov releases differ in whether they honour COVERAGE_FILE.
+    # Normalize either output location to the stable batch filename expected
+    # by the combine step.
+    if not target.is_file() and default_target.is_file():
+        default_target.replace(target)
+    if not target.is_file():
+        raise RuntimeError(f"Coverage batch {batch} did not create {target}.")
 
 
 def combine() -> None:

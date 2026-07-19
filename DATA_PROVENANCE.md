@@ -7,11 +7,12 @@ separate claims:
 
 - **Provenance pin** identifies an upstream package release or repository commit.
 - **Local integrity** uses `DATA_HASHES.sha256` to identify every redistributed file.
-- **Byte identity** is claimed only where it was directly verified. For the three
-  FastSGWR CSV files, the local Git blob SHA-1 exactly matches the blob stored at the
-  pinned commit. For CRAN-derived datasets, this audit fixes the package release and
-  records processing, but does not claim a fresh byte-for-byte comparison with the
-  compressed CRAN source archive.
+- **Byte identity** is claimed only where it was directly verified. The three
+  FastSGWR CSV files are stored with repository-standard LF line endings; restoring
+  canonical CRLF line endings reproduces the exact Git blob SHA-1 at the pinned
+  commit. For CRAN-derived datasets, this audit fixes the package release and records
+  processing, but does not claim a fresh byte-for-byte comparison with the compressed
+  CRAN source archive.
 
 Evidence was reviewed on **2026-07-19**.
 
@@ -23,9 +24,9 @@ Evidence was reviewed on **2026-07-19**.
 | Dublin Voter | `GWmodel` 2.4-1, released 2024-09-07 | `DubVoter` / `Dub.voter` example data | ESRI Shapefile sidecars retained; CRS declaration normalized to EPSG:29902 | Local SHA-256 only |
 | EWHP | `GWmodel` 2.4-1, released 2024-09-07 | `EWHP` and `EWOutline` example data | Modelling values retained in CSV form | Local SHA-256 only |
 | Georgia Educ | `GWmodel` 2.4-1, released 2024-09-07 | `Georgia` / Georgia counties example data | Duplicate county keys dissolved during preparation; projected centroids and coordinate fields refreshed; final release contains 159 counties in EPSG:32616 | Local SHA-256 only |
-| Crime | FastSGWR commit `b63064938a2ba5a1eb27cc7bdb642eaa62cb5de6` | `Data/Crime.csv` | No modelling-value changes | Git blob SHA-1 and local SHA-256 |
-| HIV | FastSGWR commit `b63064938a2ba5a1eb27cc7bdb642eaa62cb5de6` | `Data/HIV.csv` | No modelling-value changes | Git blob SHA-1 and local SHA-256 |
-| Housing | FastSGWR commit `b63064938a2ba5a1eb27cc7bdb642eaa62cb5de6` | `Data/Housing.csv` | No modelling-value changes | Git blob SHA-1 and local SHA-256 |
+| Crime | FastSGWR commit `b63064938a2ba5a1eb27cc7bdb642eaa62cb5de6` | `Data/Crime.csv` | No modelling-value changes; LF line-ending normalization only | Pinned Git blob SHA-1 after canonical CRLF restoration and local SHA-256 |
+| HIV | FastSGWR commit `b63064938a2ba5a1eb27cc7bdb642eaa62cb5de6` | `Data/HIV.csv` | No modelling-value changes; LF line-ending normalization only | Pinned Git blob SHA-1 after canonical CRLF restoration and local SHA-256 |
+| Housing | FastSGWR commit `b63064938a2ba5a1eb27cc7bdb642eaa62cb5de6` | `Data/Housing.csv` | No modelling-value changes; LF line-ending normalization only | Pinned Git blob SHA-1 after canonical CRLF restoration and local SHA-256 |
 
 ## Exact source records
 
@@ -70,15 +71,16 @@ Evidence was reviewed on **2026-07-19**.
 - Commit evidence date: `2026-07-19`
 - License: upstream MIT notice preserved as `licenses/FastSGWR-MIT.txt`
 
-| Local file | Upstream path | Upstream/local Git blob SHA-1 | Local SHA-256 |
+| Local file | Upstream path | Pinned upstream Git blob SHA-1 | Local SHA-256 |
 |---|---|---|---|
 | `src/pygwrx/data/Crime/Crime.csv` | `Data/Crime.csv` | `ac8ac10e020232a5293e7984c9e90ac440f91414` | `0cacb7f155bc93293ce85847b01073b3bcdfdb6b279967afc9e1c3d6db20daf0` |
 | `src/pygwrx/data/HIV/HIV.csv` | `Data/HIV.csv` | `cbe28a992be30dab5f7913f277d87672d5865d13` | `88236793c8d927a72b98cc945a5e15682d424d3201508e359fa4f9d561f80e25` |
 | `src/pygwrx/data/Housing/Housing.csv` | `Data/Housing.csv` | `35f4a3e7f8fea05d8f34a0c2bd03312afe74559e` | `c2e8469da73b8e041364b93ca39fdf87ac4a6d56b19227ba803370cbf3aa010a` |
 
-The Git blob SHA-1 was recomputed locally as
-`SHA1("blob " + byte_length + NUL + file_bytes)` and matched the blob identifier
-reported by GitHub at the pinned commit for all three files.
+The Git blob SHA-1 is recomputed as
+`SHA1("blob " + byte_length + NUL + canonical_crlf_bytes)`. This restores the
+upstream CRLF convention from the repository-standard LF copy and matches the blob
+identifier reported by GitHub at the pinned commit for all three files.
 
 ## Reproducing the local integrity manifest
 

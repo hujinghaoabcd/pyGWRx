@@ -20,6 +20,8 @@ env:
   NUMEXPR_NUM_THREADS: "1"
   PYTHONWARNINGS: "default"
   MPLBACKEND: "Agg"
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
 
 jobs:
   quality:

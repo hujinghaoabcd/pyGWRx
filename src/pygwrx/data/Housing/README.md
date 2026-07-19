@@ -44,7 +44,7 @@ SGWR model and introducing its software implementation.* Annals of GIS, 31(4),
 - Licence: `MIT`
 - Upstream snapshot: FastSGWR commit `b63064938a2ba5a1eb27cc7bdb642eaa62cb5de6`
 - Upstream path: `Data/Housing.csv`
-- Upstream/local Git blob SHA-1: `35f4a3e7f8fea05d8f34a0c2bd03312afe74559e`
+- Pinned upstream Git blob SHA-1: `35f4a3e7f8fea05d8f34a0c2bd03312afe74559e`
 - Evidence reviewed: `2026-07-19`
-- pyGWRx processing: none; local bytes match the pinned upstream Git blob.
+- pyGWRx processing: modelling values are unchanged; repository CSV line endings are normalized to LF. Restoring canonical CRLF bytes reproduces the pinned upstream Git blob.
 - Integrity: see `DATA_PROVENANCE.md` and `DATA_HASHES.sha256`.

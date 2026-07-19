@@ -34,7 +34,7 @@ jobs:
       - name: Audit installed release dependencies
         run: |
           AUDIT_SITE=$(.audit-env/bin/python -c "import site; print(site.getsitepackages()[0])")
-          python -m pip_audit --strict --progress-spinner=off --path "$AUDIT_SITE"
+          python -m pip_audit --strict --progress-spinner=off --skip-editable --path "$AUDIT_SITE"
       - name: Generate reproducible CycloneDX SBOM
         run: >-
           cyclonedx-py environment .audit-env
