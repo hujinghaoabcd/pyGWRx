@@ -108,4 +108,4 @@ These safeguards apply across the family, but they are not a substitute for mode
 - use spatially blocked or temporally ordered validation for transfer claims;
 - record the exact pyGWRx version and full estimator configuration.
 
-The evidence-reviewed manuals now cover fifteen models: GWR, MGWR, RGWR, STWR, GTWR, GWGLM, GWLasso, MixedGWR, GWPCA, GWDA, GWSS, ScalableGWR, LCRGWR, SGWR, SGTWR, and MGTWR. The remaining manuals cover scalable/inference and original pyGWRx research models.
+The evidence-reviewed manuals now cover fifteen models: GWR, MGWR, RGWR, STWR, GTWR, GWGLM, GWLasso, MixedGWR, GWPCA, GWDA, GWSS, LCRGWR, SGWR, SGTWR, and MGTWR. The remaining manuals cover scalable/inference and original pyGWRx research models.
