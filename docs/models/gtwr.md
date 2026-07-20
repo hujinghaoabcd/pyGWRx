@@ -2,174 +2,312 @@
 
 <div class="model-hero" markdown>
 
-**Family:** Row-wise spatiotemporal regression
-**Install:** `pip install -e ".[all]"`
-**Required data:** X, y, coordinates, and row-wise times
-**Primary operations:** fit, score, predict, predict_result
-**New-location capability:** Validated at new space-time targets; causal filtering is available when configured.
+**Task:** continuous-response local regression with one observation-level time coordinate per row  
+**Core mechanism:** define one combined space-time distance, then fit local weighted regressions  
+**Required inputs:** `X`, `y`, spatial `coords`, and row-wise `times`  
+**Independent-target prediction:** supported at new coordinates and times
 
 </div>
 
 [API reference](../api/models/gtwr.md){ .md-button .md-button--primary }
-[Runnable source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/05_gtwr.py){ .md-button }
-[Choose a model](../getting-started/choosing-a-model.md){ .md-button }
+[STWR manual](stwr.md){ .md-button }
+[MGTWR manual](mgtwr.md){ .md-button }
 
-## Why this model exists
+## What GTWR is for
 
-Use GTWR when coefficients vary jointly over space and continuous or row-wise time, and neighbourhoods should be defined by a combined space-time distance.
+GTWR extends GWR by allowing proximity to depend jointly on spatial separation and temporal separation. Each row has its own coordinate and time. A local regression at target $(s_i,t_i)$ uses observations that are near under the selected combined distance.
 
-!!! note "One-sentence idea"
-    GTWR extends GWR by replacing purely spatial distance with a configurable space-time distance. The space-time balance therefore directly controls which observations become local neighbours.
+pyGWRx provides two distance formulations.
 
-## Statistical formulation
+### GWmodel-compatible distance
 
-pyGWRx supports a GWmodel-style combination,
+With `distance_combination="gwmodel"`,
 
 $$
-d_{ij}^{ST}=\lambda d_{ij}^{S}+(1-\lambda)d_{ij}^{T}
-+2\sqrt{\lambda(1-\lambda)d_{ij}^{S}d_{ij}^{T}}\cos(\xi),
+d_{st}=\lambda d_s+(1-\lambda)d_t
++2\sqrt{\lambda(1-\lambda)d_s d_t}\cos(\xi).
 $$
 
-and a scaled Euclidean alternative. The resulting $d_{ij}^{ST}$ is passed to the selected kernel. With `causal=True`, observations later than the focal time receive zero weight.
+- `lambda_st=1` produces the spatial component;
+- `lambda_st=0` produces the temporal component;
+- intermediate values combine both;
+- `ksi` controls the interaction term through its angle in radians.
 
-## How pyGWRx fits the model
+This formulation follows `GWmodel::st.dist`. Spatial and temporal units directly affect the result, so coordinate scale and time scale must be documented.
 
-1. Normalize or convert the time vector according to `time_unit`.
-2. Compute spatial and temporal distance components.
-3. Apply or search the space-time balance parameter and kernel bandwidth.
-4. Build local space-time weights, optionally excluding future observations.
-5. Solve local regressions and calculate time-aware diagnostics.
-6. For new targets, recompute space-time weights using their coordinates and times.
+### Euclidean space-time distance
 
-## Constructor and important controls
+With `distance_combination="euclidean"`,
 
-```python
-GTWR(kernel: 'Union[str, Callable[[np.ndarray, float], np.ndarray]]' = 'bisquare', bandwidth: 'Union[float, int, str, None]' = 'cv', bandwidth_method: 'str' = 'cv', adaptive: 'bool' = False, bandwidth_range: 'Optional[Tuple[float, float]]' = None, lambda_st: 'Union[float, str]' = 0.05, lambda_range: 'Tuple[float, float]' = (0.0, 1.0), lambda_grid_size: 'int' = 11, ksi: 'float' = 0.0, distance_combination: 'str' = 'gwmodel', tau: 'float' = 1.0, causal: 'bool' = False, time_unit: 'str' = 'auto', optimization_method: 'str' = 'golden_section', search_grid_size: 'int' = 25, search_tol: 'float' = 1e-05, search_max_iter: 'int' = 100, fit_intercept: 'bool' = True, distance_metric: 'str' = 'euclidean', sigma2_v1: 'bool' = False verbose: 'bool' = False) -> 'None'
+$$
+d_{st}=\sqrt{d_s^2+\tau d_t^2}.
+$$
+
+`tau` determines the contribution of temporal distance. Larger `tau` makes a given temporal difference more distant. `lambda_st` and `ksi` are not the scientific scale controls for this branch.
+
+## GTWR, STWR, and MGTWR are different models
+
+| Model | Data organisation | Time mechanism | Number of scales | Target prediction |
+|---|---|---|---|---|
+| GTWR | One row per observation with one time value | Combined spatial and absolute temporal distance | One shared bandwidth; one balance/temporal-scale setting | Supported |
+| [`STWR`](stwr.md) | Ordered lists of stage-specific datasets | Stage intervals plus response-value variation rate | One current spatial bandwidth, `alpha`, `theta`, and stage count | Latest-stage only |
+| [`MGTWR`](mgtwr.md) | One row per observation with numeric time | Euclidean space-time distance per coefficient | One spatial bandwidth and one `tau` per fitted parameter | Not exposed |
+
+Use GTWR when row-wise time and one common space-time neighbourhood are appropriate. Do not reshape arbitrary stage data into GTWR merely because the class accepts a time column.
+
+## Causal versus symmetric time
+
+The published/default GWmodel distance uses absolute temporal differences. Consequently, with `causal=False`, an observation later than a calibration or prediction time can contribute if it is close in absolute time.
+
+Set `causal=True` for history-only forecasting. Future training observations relative to each target are assigned an extremely large temporal distance and effectively excluded.
+
+!!! warning "`causal=False` can leak future information"
+    The default is retained for compatibility with standard retrospective GTWR. It is not appropriate for forecasting claims unless future observations are already excluded by the training design.
+
+## Time input
+
+`times` may be:
+
+- finite numeric values;
+- pandas/Python/NumPy datetime-like values.
+
+For numeric time, pyGWRx does **not** rescale values. A difference of 1 means whatever unit the user defined.
+
+For datetime-like time, `time_unit` controls conversion to elapsed numeric values relative to a fitted origin:
+
+```text
+seconds, minutes, hours, days, weeks, or auto
 ```
 
-The API page documents every parameter and fitted attribute. In practice, start by deciding the **data contract**, **neighbourhood definition**, **selection criterion**, and **prediction/inference goal** before tuning secondary controls.
+`auto` chooses a stable unit from the training span. Prediction datetimes are converted using the fitted origin and fitted unit. Do not mix numeric training times with datetime prediction times.
 
-| Decision | Questions to answer |
-|---|---|
-| Data | Are rows independent observations, ordered stages, classes, counts, or multivariate features? |
-| Distance | Are coordinates projected? Is time or contextual similarity part of the neighbourhood? |
-| Bandwidth | Fixed distance or adaptive neighbours? Supplied value or selected criterion? |
-| Inference | Are local uncertainty, non-stationarity tests, or only prediction required? |
-| Validation | Does the split respect spatial and, where relevant, temporal dependence? |
+## Installation
 
-## Complete runnable example
+```bash
+pip install pygwrx
+```
 
-The following is the exact maintained example used by the API-coverage checks.
+## Self-contained example
 
 ```python
-# SPDX-FileCopyrightText: 2026 Jinghao Hu
-# SPDX-License-Identifier: MIT
+import numpy as np
+import pandas as pd
 
-"""Fit and predict with geographically and temporally weighted regression."""
+from pygwrx import GTWR
 
-from pygwrx import GTWR, GTWRPredictionResult
-from _common import print_model_result, temporal_regression
+rng = np.random.default_rng(99)
+n = 90
+coords = rng.uniform(0.0, 100.0, size=(n, 2))
+times = pd.date_range("2024-01-01", periods=n, freq="12h")
+time_index = np.arange(n, dtype=float) / 2.0
 
-X, y, coords, times = temporal_regression()
-model = GTWR(kernel="bisquare", bandwidth=24, adaptive=True, lambda_st=0.3).fit(
-    X, y, coords, times
+X = pd.DataFrame(
+    {
+        "access": rng.normal(size=n),
+        "density": rng.normal(size=n),
+    }
 )
-print_model_result(model)
-print("score=", model.score(X, y, coords, times=times))
-result = model.predict_result(X.iloc[:3], coords.iloc[:3], times[:3])
-assert isinstance(result, GTWRPredictionResult)
+
+beta_access = 0.8 + 0.006 * coords[:, 0] + 0.015 * time_index
+beta_density = -0.7 + 0.004 * coords[:, 1]
+y = (
+    3.0
+    + beta_access * X["access"].to_numpy()
+    + beta_density * X["density"].to_numpy()
+    + rng.normal(0.0, 0.35, size=n)
+)
+
+model = GTWR(
+    kernel="bisquare",
+    bandwidth="aicc",
+    adaptive=True,
+    distance_combination="gwmodel",
+    lambda_st="auto",
+    lambda_grid_size=9,
+    causal=True,
+    time_unit="days",
+).fit(
+    X,
+    y,
+    coords,
+    times,
+    compute_hat_matrix=False,
+)
+
+print("bandwidth:", model.bandwidth_)
+print("lambda:", model.lambda_st_)
+print("time unit:", model.time_unit_)
+print(model.to_frame().head())
+
+X_new = pd.DataFrame({"access": [0.4], "density": [-0.2]})
+coords_new = np.array([[60.0, 45.0]])
+times_new = pd.to_datetime(["2024-02-20"])
+
+result = model.predict_result(X_new, coords_new, times_new)
 print(result.to_frame())
 ```
 
-Run it from the `examples/models` directory or through `python examples/run_all.py`.
-
-## Reading the fitted result
-
-**Main outputs:** Space-time coefficient surfaces, `lambda_st_`/time-scaling state, fitted values, residuals, diagnostics, `to_frame()`, and `GTWRPredictionResult`.
-
-Available high-level methods detected in the current class are: `fit()`, `score()`, `predict()`, `predict_result()`, `summary()`, `to_frame()`.
-
-A safe inspection sequence is:
+## Constructor
 
 ```python
-# 1. Human-readable overview
-print(model.summary()) if hasattr(model, "summary") else None
-
-# 2. Location-indexed table when supported
-frame = model.to_frame() if hasattr(model, "to_frame") else None
-
-# 3. Explicitly inspect the model-specific state
-print([name for name in vars(model) if name.endswith("_")])
+GTWR(
+    kernel="bisquare",
+    bandwidth="cv",
+    bandwidth_method="cv",
+    adaptive=False,
+    bandwidth_range=None,
+    lambda_st=0.05,
+    lambda_range=(0.0, 1.0),
+    lambda_grid_size=11,
+    ksi=0.0,
+    distance_combination="gwmodel",
+    tau=1.0,
+    causal=False,
+    time_unit="auto",
+    optimization_method="golden_section",
+    search_grid_size=25,
+    search_tol=1e-5,
+    search_max_iter=100,
+    fit_intercept=True,
+    distance_metric="euclidean",
+    sigma2_v1=False,
+    verbose=False,
+)
 ```
 
-Do not assume that every model exposes the same outputs. Regression, classification, transformation, descriptive-statistics, and inference models have different result semantics.
+## Constructor parameters
 
-## Diagnostics and interpretation
+### Space-time distance
 
-Examine coefficient slices, temporal trajectories, temporal residual patterns, selected balance parameters, and leakage-safe validation splits.
+| Parameter | Default | Meaning | Guidance |
+|---|---:|---|---|
+| `distance_combination` | `"gwmodel"` | Selects GWmodel generalized distance or Euclidean space-time distance. | Do not compare fitted parameters across formulations without holding spatial/time units fixed. |
+| `lambda_st` | `0.05` | GWmodel spatial-temporal balance in `[0,1]`, or `"auto"`. | Applies to the GWmodel formulation. Automatic mode evaluates a deterministic lambda grid and selects bandwidth jointly for each candidate. |
+| `lambda_range` | `(0,1)` | Bounds for automatic lambda candidates. | Restrict only with scientific justification. Boundary selection suggests the model is approaching a predominantly spatial or temporal distance. |
+| `lambda_grid_size` | `11` | Number of lambda candidates. | Larger grids improve resolution but multiply bandwidth searches. |
+| `ksi` | `0.0` | GWmodel interaction angle in `[0, pi]`. | It is an angle in radians, not a temporal decay. `cos(ksi)` changes the sign and magnitude of the cross term. |
+| `tau` | `1.0` | Non-negative Euclidean temporal scale. | `tau=0` removes temporal distance. Its numerical meaning depends on both coordinate and time units. |
+| `causal` | `False` | Excludes observations later than each regression target when true. | Use true for forecasting and temporally ordered evaluation. |
+| `time_unit` | `"auto"` | Datetime conversion unit. | Numeric times remain unchanged. Record the resolved `time_unit_`. |
 
-The common diagnostics layer can be used where the fitted model provides the required fields:
+### Kernel and search
+
+| Parameter | Default | Meaning and guidance |
+|---|---:|---|
+| `kernel` | `"bisquare"` | Kernel applied to combined space-time distance. |
+| `bandwidth` | `"cv"` | Numeric value, `"cv"`, `"aicc"`, or `None`. `"adaptive"` is rejected; use `adaptive=True`. |
+| `bandwidth_method` | `"cv"` | Criterion when `bandwidth=None`; only CV and AICc are substantive GTWR criteria. `"aic"` is normalised to AICc in selection. |
+| `adaptive` | `False` | Numeric bandwidth is a nearest-neighbour count in combined distance when true. |
+| `bandwidth_range` | `None` | Optional search bounds. Adaptive lower support must exceed design requirements. |
+| `optimization_method` | `"golden_section"` | Grid, golden section, or Brent. Brent applies to fixed bandwidths. |
+| `search_grid_size` | `25` | Fixed-bandwidth grid candidates when grid search is used. |
+| `search_tol` | `1e-5` | Continuous search tolerance. |
+| `search_max_iter` | `100` | Maximum search iterations. |
+| `distance_metric` | `"euclidean"` | Spatial distance metric; affects only $d_s$. |
+| `fit_intercept` | `True` | Fits a local space-time intercept. |
+| `sigma2_v1` | `False` | Residual variance denominator. Default false matches the GWmodel-style `n - 2 trace(S) + trace(S'S)` convention. |
+| `verbose` | `False` | Prints lambda/bandwidth selection and fit progress. |
+
+## Fitting
 
 ```python
-from pygwrx.diagnostics import diagnostics_frame, local_diagnostic_frame
-
-print(diagnostics_frame([model], labels=["GTWR"]))
-try:
-    print(local_diagnostic_frame(model).head())
-except (AttributeError, NotImplementedError, ValueError) as exc:
-    print("This model exposes a different diagnostic contract:", exc)
+model.fit(
+    X,
+    y,
+    coords,
+    times,
+    compute_hat_matrix=True,
+    compute_local_r2=True,
+    compute_inference=True,
+    compute_hat_matrix_flag=None,
+    verbose=None,
+)
 ```
 
-See [Diagnostics and inference](../guides/diagnostics.md) for model-aware checks and interpretation rules.
+Smoother traces, influence, information criteria, and residual variance are computed even when the full hat matrix is not retained. Set `compute_hat_matrix=False` for larger samples.
 
-## Recommended visual checks
+The class stores full spatial, temporal, and combined training distance matrices. Each is approximately `8 × n²` bytes. Standard GTWR can therefore become memory intensive even when `hat_matrix_` is disabled.
 
+## Prediction
 
-<div class="figure-grid" markdown>
+```python
+pred = model.predict(X_new, coords_new, times_new)
+result = model.predict_result(X_new, coords_new, times_new)
+params = model.get_local_parameters(coords_new, times_new)
+```
 
-<figure markdown>
-  ![18 gtwr slices](../assets/figures/specialized/18_gtwr_slices.png){ loading=lazy }
-  <figcaption>18 Gtwr Slices</figcaption>
-</figure>
+Prediction recomputes target-to-training space-time distances and locally recalibrates coefficients. With `causal=True`, only training rows at or before each target time can receive ordinary temporal distance.
 
-<figure markdown>
-  ![19 gtwr trajectory](../assets/figures/specialized/19_gtwr_trajectory.png){ loading=lazy }
-  <figcaption>19 Gtwr Trajectory</figcaption>
-</figure>
+A target earlier than most training observations may have insufficient effective support. Forecasting validation should train only on historically available rows and move the origin forward in time.
 
-<figure markdown>
-  ![20 gtwr residuals](../assets/figures/specialized/20_gtwr_residuals.png){ loading=lazy }
-  <figcaption>20 Gtwr Residuals</figcaption>
-</figure>
+## Main fitted attributes
 
-</div>
+| Attribute | Meaning |
+|---|---|
+| `bandwidth_` | Selected fixed combined distance or adaptive neighbour count. |
+| `lambda_st_` | Fitted GWmodel balance parameter. |
+| `tau_`, `ksi_` | Resolved Euclidean temporal scale and GWmodel angle. |
+| `time_unit_`, `time_origin_` | Fitted time-conversion state. |
+| `times_train_` | Numeric times after validation/conversion. |
+| `spatial_distance_matrix_` | Pairwise spatial distances. |
+| `temporal_distance_matrix_` | Pairwise temporal distances after causal treatment where applicable. |
+| `spatiotemporal_distance_matrix_` | Combined training distance matrix. |
+| `lambda_selection_history_` | Lambda, bandwidth, and score records. |
+| `bandwidth_selection_result_`, `bandwidth_score_` | Optimizer details and final selection score. |
+| `coef_`, `intercept_`, `fitted_values_`, `residuals_` | Local regression results. |
+| `influence_`, `standardized_residuals_`, `cooks_distance_` | Smoother-based influence diagnostics. |
+| `coef_se_`, `coef_t_`, `intercept_se_`, `intercept_t_` | Local inference arrays when enabled. |
 
+## Interpretation and validation
 
-The figures are generated from deterministic examples and are illustrative; they are not benchmark claims.
+1. Standardise the scientific meaning of spatial and temporal units before fitting.
+2. Compare GWR and GTWR using the same response and predictors.
+3. Inspect lambda/tau boundary behaviour and bandwidth support.
+4. Compare `causal=False` retrospective fit with a strictly causal forecasting design where relevant.
+5. Map coefficient changes over both space and time rather than only space.
+6. Examine residuals within temporal slices and spatial regions.
+7. Use rolling-origin or temporally ordered validation, ideally combined with spatial blocks.
+
+A better in-sample AICc does not demonstrate forecasting skill. Symmetric GTWR can use future observations unless the data split or `causal=True` prevents it.
 
 ## Common mistakes
 
-- Mixing incompatible spatial and temporal units without checking scaling.
-- Random train/test splits that leak future information.
-- Leaving `causal=False` for a forecasting interpretation.
-- Treating time as periodic without explicitly encoding periodicity.
+| Mistake | Correction |
+|---|---|
+| Treating GTWR as stage-based STWR | GTWR requires one time per row and uses direct time distance. |
+| Mixing datetime and numeric times across fit/predict | Use one input kind consistently. |
+| Ignoring resolved time units | Record `time_unit_`; unit changes alter lambda/tau interpretation. |
+| Using `causal=False` for forecasting | Enable causal mode and use ordered training windows. |
+| Interpreting `lambda_st` under Euclidean distance | Use `tau` as the Euclidean temporal scale. |
+| Comparing tau values after changing coordinate or time units | Tau is unit-dependent. |
+| Using `bandwidth="adaptive"` | Set `adaptive=True` and supply/select a valid bandwidth. |
+| Disabling the hat matrix but assuming all quadratic memory is removed | Three pairwise distance matrices are still stored. |
+| Using random cross-validation | Use temporal ordering and spatial separation appropriate to deployment. |
 
-## What to report in a paper or technical report
+## What to report
 
-- Time representation and unit.
-- Space-time distance formula, lambda/tau/ksi, and causal setting.
-- Bandwidth-selection procedure.
-- Temporal validation strategy.
-- Coefficient and residual evolution through time.
+Report:
+
+- row-wise time definition and units;
+- datetime conversion and resolved `time_unit_`;
+- coordinate reference system and spatial metric;
+- distance formulation and complete lambda/ksi or tau specification;
+- causal setting;
+- kernel, fixed/adaptive bandwidth, search criterion and bounds;
+- selected lambda and bandwidth history when automatic;
+- residual variance convention;
+- influence, residual, and local inference diagnostics;
+- spatial-temporal validation design;
+- memory-related fit switches;
+- pyGWRx version.
 
 ## References
 
-- [Huang, Wu & Barry (2010), *Geographically and temporally weighted regression for modeling spatio-temporal variation in house prices*](https://doi.org/10.1080/13658810802672469)
+- Huang, B., Wu, B., & Barry, M. (2010). Geographically and temporally weighted regression for modeling spatio-temporal variation in house prices. *International Journal of Geographical Information Science*, 24(3), 383–401. [`10.1080/13658810802672469`](https://doi.org/10.1080/13658810802672469)
 
 ## Related documentation
 
-- [Detailed API for `GTWR`](../api/models/gtwr.md)
-- [Maintained example source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/05_gtwr.py)
-- [Kernels and bandwidths](../guides/kernels-and-bandwidths.md)
-- [Prediction and result objects](../guides/prediction-and-results.md)
-- [Complete Chinese model guide](../zh/models/gtwr.md)
+- [Generated GTWR API](../api/models/gtwr.md)
+- [STWR](stwr.md)
+- [MGTWR](mgtwr.md)
+- [Spatiotemporal data](../guides/spatiotemporal-data.md)
