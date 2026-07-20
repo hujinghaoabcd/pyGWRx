@@ -6236,6 +6236,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#start-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start here
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#capability-matrix" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6247,10 +6258,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#recommended-progression" class="md-nav__link">
+  <a href="#documentation-evidence-audit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Recommended progression
+        Documentation evidence audit
       
     </span>
   </a>
@@ -6258,10 +6269,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#shared-interpretation-rules" class="md-nav__link">
+  <a href="#rewrite-standard-for-every-model-page" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Shared interpretation rules
+        Rewrite standard for every model page
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#shared-minimum-safeguards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shared minimum safeguards
       
     </span>
   </a>
@@ -6376,178 +6398,373 @@
 
 
 <h1 id="model-handbook">Model handbook<a class="headerlink" href="#model-handbook" title="Permanent link">&para;</a></h1>
-<p>pyGWRx exposes 19 supported public model classes. They share a consistent <strong>fit → inspect → diagnose</strong> style, but they do not all solve the same task and they do not all support independent-target prediction.</p>
+<p>pyGWRx exposes 19 public model classes. They share a consistent Python interface where that is scientifically appropriate, but they do <strong>not</strong> solve the same task. This handbook is being rewritten from primary papers, maintained reference implementations, the current pyGWRx source, and regression tests. The goal is to make each page useful to a reader who has never used the model before.</p>
 <div class="admonition warning">
-<p class="admonition-title">Choose by scientific question, not by model count</p>
-<p>Begin with the simplest model that matches the response distribution, time structure, neighbourhood concept, and inference goal. More flexible models introduce more tuning parameters, identification risks, and validation requirements.</p>
+<p class="admonition-title">Do not choose a model from its name alone</p>
+<p>Start from the response type, the scientific question, the assumed neighbourhood, the role of time, and the required inference. A more flexible model is not automatically a better model.</p>
 </div>
+<h2 id="start-here">Start here<a class="headerlink" href="#start-here" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Your question</th>
+<th>Start with</th>
+<th>Move to another model when...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Does a continuous-response relationship vary over space?</td>
+<td><a href="gwr/"><code>GWR</code></a></td>
+<td>Different predictors appear to operate at different scales: compare <a href="mgwr/"><code>MGWR</code></a>.</td>
+</tr>
+<tr>
+<td>Do predictors operate at different spatial scales?</td>
+<td><a href="mgwr/"><code>MGWR</code></a></td>
+<td>Some effects should be explicitly global: use <a href="mixed-gwr/"><code>MixedGWR</code></a>.</td>
+</tr>
+<tr>
+<td>Are local estimates distorted by response outliers?</td>
+<td><a href="rgwr/"><code>RGWR</code></a></td>
+<td>The problem is local predictor collinearity rather than response outliers: use <a href="lcr-gwr/"><code>LCRGWR</code></a>.</td>
+</tr>
+<tr>
+<td>Are local coefficients unstable because predictors are correlated?</td>
+<td><a href="lcr-gwr/"><code>LCRGWR</code></a></td>
+<td>Local variable selection is the main goal: use <a href="gw-lasso/"><code>GWLasso</code></a>.</td>
+</tr>
+<tr>
+<td>Is the response Poisson, Bernoulli, or Gaussian?</td>
+<td><a href="gwglm/"><code>GWGLM</code></a></td>
+<td>The response is a class label and class-specific local distributions are required: use <a href="gwda/"><code>GWDA</code></a>.</td>
+</tr>
+<tr>
+<td>Do relationships vary in both space and time?</td>
+<td><a href="gtwr/"><code>GTWR</code></a></td>
+<td>Data are organised into ordered stages and response-change rates define temporal influence: use <a href="stwr/"><code>STWR</code></a>.</td>
+</tr>
+<tr>
+<td>Do coefficients have different spatial and temporal scales?</td>
+<td><a href="mgtwr/"><code>MGTWR</code></a></td>
+<td>Attribute similarity should also influence neighbourhoods: compare <a href="sgtwr/"><code>SGTWR</code></a>.</td>
+</tr>
+<tr>
+<td>Are geographically distant but contextually similar observations relevant?</td>
+<td><a href="sgwr/"><code>SGWR</code></a></td>
+<td>Time is also required: use <a href="sgtwr/"><code>SGTWR</code></a>.</td>
+</tr>
+<tr>
+<td>Is the goal local multivariate exploration rather than response prediction?</td>
+<td><a href="gwss/"><code>GWSS</code></a> or <a href="gwpca/"><code>GWPCA</code></a></td>
+<td>A categorical response is present: use <a href="gwda/"><code>GWDA</code></a>.</td>
+</tr>
+<tr>
+<td>Is the sample too large for conventional GWR calibration?</td>
+<td><a href="scalable-gwr/"><code>ScalableGWR</code></a></td>
+<td>Exact conventional local regression is still computationally feasible: retain GWR as the reference.</td>
+</tr>
+<tr>
+<td>Is formal coefficient non-stationarity testing required?</td>
+<td><a href="bootstrap-gwr/"><code>BootstrapGWR</code></a></td>
+<td>The goal is prediction rather than a bootstrap test: fit a regression model directly.</td>
+</tr>
+<tr>
+<td>Should the neighbourhood geometry itself be learned?</td>
+<td><a href="lg-gwr/"><code>LGGWR</code></a></td>
+<td>Coefficients are expected to be piecewise smooth with abrupt connected boundaries: use <a href="gr-gwr/"><code>GRGWR</code></a>.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="capability-matrix">Capability matrix<a class="headerlink" href="#capability-matrix" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>Model</th>
-<th>Family</th>
+<th>Task</th>
 <th>Required data</th>
-<th>New-location capability</th>
-<th>Extra</th>
+<th>Independent-target operation</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><a href="gwr/"><code>GWR</code></a></td>
-<td>Classic local regression</td>
+<td>Single-scale local Gaussian regression</td>
 <td>X, y, coordinates</td>
-<td>Validated local re-calibration at new coordinates.</td>
-<td><code>base</code></td>
+<td><code>predict()</code> and <code>predict_result()</code> recalibrate local coefficients at target coordinates.</td>
 </tr>
 <tr>
 <td><a href="mgwr/"><code>MGWR</code></a></td>
-<td>Multiscale local regression</td>
+<td>Multiscale local Gaussian regression</td>
 <td>X, y, coordinates</td>
-<td>Independent-target prediction is intentionally unavailable in the current validated API.</td>
-<td><code>base</code></td>
+<td>Not exposed; use calibration-location results.</td>
 </tr>
 <tr>
 <td><a href="rgwr/"><code>RGWR</code></a></td>
-<td>Robust local regression</td>
+<td>Robust local Gaussian regression</td>
 <td>X, y, coordinates</td>
-<td>Validated local prediction using the fitted robust calibration state.</td>
-<td><code>base</code></td>
+<td>Supported from the fitted robust state.</td>
 </tr>
 <tr>
 <td><a href="stwr/"><code>STWR</code></a></td>
 <td>Stage-based spatiotemporal regression</td>
-<td>Lists of X, y, and coordinates by stage, plus time intervals</td>
-<td>Prediction for the current/latest stage using the fitted historical-stage weighting structure.</td>
-<td><code>base</code></td>
+<td>Lists of X, y and coordinates by stage, plus intervals</td>
+<td>Latest-stage prediction under the fitted historical-stage weighting structure.</td>
 </tr>
 <tr>
 <td><a href="gtwr/"><code>GTWR</code></a></td>
 <td>Row-wise spatiotemporal regression</td>
-<td>X, y, coordinates, and row-wise times</td>
-<td>Validated at new space-time targets; causal filtering is available when configured.</td>
-<td><code>base</code></td>
+<td>X, y, coordinates, row-wise times</td>
+<td>Supported at new space-time targets.</td>
 </tr>
 <tr>
 <td><a href="gwglm/"><code>GWGLM</code></a></td>
-<td>Generalized local regression</td>
-<td>X, response, coordinates; optional exposure for Poisson</td>
-<td>Validated for Gaussian means, binomial probabilities, and Poisson means.</td>
-<td><code>base</code></td>
+<td>Local Gaussian, Poisson or Bernoulli regression</td>
+<td>X, response, coordinates; optional Poisson exposure/offset</td>
+<td>Conditional means or probabilities at new targets.</td>
 </tr>
 <tr>
 <td><a href="gw-lasso/"><code>GWLasso</code></a></td>
-<td>Locally regularized regression</td>
+<td>Local penalised regression and variable selection</td>
 <td>X, y, coordinates</td>
-<td>Validated local prediction with the learned local penalties and scaling state.</td>
-<td><code>ml</code></td>
+<td>Supported with fitted scaling and local penalties.</td>
 </tr>
 <tr>
 <td><a href="mixed-gwr/"><code>MixedGWR</code></a></td>
-<td>Semiparametric global-local regression</td>
-<td>X, y, coordinates, and global/local variable assignments</td>
-<td>Validated using global coefficients and re-estimated local components.</td>
-<td><code>base</code></td>
+<td>Global-local semiparametric regression</td>
+<td>X, y, coordinates and variable partition</td>
+<td>Supported with global and recalibrated local components.</td>
 </tr>
 <tr>
 <td><a href="gwpca/"><code>GWPCA</code></a></td>
 <td>Local multivariate transformation</td>
 <td>Multivariate X and coordinates</td>
-<td>Not a response predictor; <code>transform()</code> returns local component scores.</td>
-<td><code>ml</code></td>
+<td><code>transform()</code> returns local component scores; it is not response prediction.</td>
 </tr>
 <tr>
 <td><a href="gwda/"><code>GWDA</code></a></td>
 <td>Local spatial classification</td>
 <td>X, class labels, coordinates</td>
-<td>Validated class labels and local class probabilities.</td>
-<td><code>base</code></td>
+<td>Class labels and local probabilities.</td>
 </tr>
 <tr>
 <td><a href="gwss/"><code>GWSS</code></a></td>
 <td>Local descriptive statistics</td>
 <td>Multivariate X and coordinates</td>
-<td>Not applicable; this is a local-statistics estimator.</td>
-<td><code>base</code></td>
+<td>Statistics may be evaluated at summary coordinates; there is no response prediction.</td>
 </tr>
 <tr>
 <td><a href="scalable-gwr/"><code>ScalableGWR</code></a></td>
-<td>Approximate scalable local regression</td>
+<td>Polynomial-kernel approximation for large samples</td>
 <td>X, y, coordinates</td>
-<td>Validated using the fitted scalable kernel approximation.</td>
-<td><code>base</code></td>
+<td>Supported through compressed neighbour moments.</td>
 </tr>
 <tr>
 <td><a href="lcr-gwr/"><code>LCRGWR</code></a></td>
-<td>Collinearity-compensated local regression</td>
+<td>Local ridge compensation for collinearity</td>
 <td>X, y, coordinates</td>
-<td>Validated local prediction with fitted or locally adjusted ridge terms.</td>
-<td><code>base</code></td>
+<td>Supported using fitted or locally adjusted ridge terms.</td>
 </tr>
 <tr>
 <td><a href="bootstrap-gwr/"><code>BootstrapGWR</code></a></td>
-<td>Spatial inference</td>
+<td>Parametric test of coefficient non-stationarity</td>
 <td>X, y, coordinates</td>
-<td>Not applicable; the estimator performs coefficient-variability inference.</td>
-<td><code>base</code></td>
+<td>Not applicable; this is an inference procedure.</td>
 </tr>
 <tr>
 <td><a href="sgwr/"><code>SGWR</code></a></td>
-<td>Geography-plus-similarity regression</td>
-<td>X, y, coordinates, and similarity-variable specification</td>
-<td>Validated by recomputing geographic and attribute-similarity weights for targets.</td>
-<td><code>base</code></td>
+<td>Geographic-plus-attribute-similarity regression</td>
+<td>X, y, coordinates and similarity variables</td>
+<td>Supported by recomputing both weight components.</td>
 </tr>
 <tr>
 <td><a href="sgtwr/"><code>SGTWR</code></a></td>
-<td>Geography-time-similarity regression</td>
-<td>X, y, coordinates, times, and similarity variables</td>
-<td>Validated at target space-time points with optional causal filtering.</td>
-<td><code>base</code></td>
+<td>Space-time-plus-similarity regression</td>
+<td>X, y, coordinates, times and similarity variables</td>
+<td>Supported at target space-time points.</td>
 </tr>
 <tr>
 <td><a href="mgtwr/"><code>MGTWR</code></a></td>
 <td>Multiscale spatiotemporal regression</td>
-<td>X, y, coordinates, times; optional per-column bandwidths and taus</td>
-<td>Independent-target prediction is intentionally unavailable in the current validated API.</td>
-<td><code>base</code></td>
+<td>X, y, coordinates and times</td>
+<td>Not exposed; use calibration-location results.</td>
 </tr>
 <tr>
 <td><a href="lg-gwr/"><code>LGGWR</code></a></td>
-<td>Original research model</td>
-<td>X, y, coordinates, and contextual attributes</td>
-<td>Validated using the learned geometry transform and target attributes.</td>
-<td><code>base</code></td>
+<td>Learned latent-neighbourhood regression</td>
+<td>X, y, coordinates and context attributes</td>
+<td>Supported with the learned geometry.</td>
 </tr>
 <tr>
 <td><a href="gr-gwr/"><code>GRGWR</code></a></td>
-<td>Original research model</td>
-<td>X, y, coordinates, regime count, and connectivity settings</td>
-<td>Validated using learned regime structure and target assignment logic.</td>
-<td><code>ml</code></td>
+<td>Connected-regime, piecewise local regression</td>
+<td>X, y, coordinates</td>
+<td>Supported through target regime assignment and local fitting.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="recommended-progression">Recommended progression<a class="headerlink" href="#recommended-progression" title="Permanent link">&para;</a></h2>
+<h2 id="documentation-evidence-audit">Documentation evidence audit<a class="headerlink" href="#documentation-evidence-audit" title="Permanent link">&para;</a></h2>
+<p>Each model page must distinguish three things:</p>
 <ol>
-<li><strong>Continuous response:</strong> begin with <a href="gwr/"><code>GWR</code></a>.</li>
-<li><strong>Different spatial scales:</strong> compare <a href="mgwr/"><code>MGWR</code></a>.</li>
-<li><strong>Outliers or local collinearity:</strong> consider <a href="rgwr/"><code>RGWR</code></a> or <a href="lcr-gwr/"><code>LCRGWR</code></a>.</li>
-<li><strong>Non-Gaussian response:</strong> use <a href="gwglm/"><code>GWGLM</code></a> or <a href="gwda/"><code>GWDA</code></a>.</li>
-<li><strong>Time:</strong> choose row-wise <a href="gtwr/"><code>GTWR</code></a>, stage-based <a href="stwr/"><code>STWR</code></a>, or multiscale <a href="mgtwr/"><code>MGTWR</code></a>.</li>
-<li><strong>Alternative neighbourhoods:</strong> use <a href="sgwr/"><code>SGWR</code></a>, <a href="sgtwr/"><code>SGTWR</code></a>, or research model <a href="lg-gwr/"><code>LGGWR</code></a>.</li>
-<li><strong>Discrete spatial mechanisms:</strong> evaluate research model <a href="gr-gwr/"><code>GRGWR</code></a>.</li>
-<li><strong>Exploration/inference rather than prediction:</strong> use <a href="gwss/"><code>GWSS</code></a>, <a href="gwpca/"><code>GWPCA</code></a>, or <a href="bootstrap-gwr/"><code>BootstrapGWR</code></a>.</li>
+<li><strong>Published method:</strong> what the cited paper actually defines.</li>
+<li><strong>Reference implementation:</strong> behaviour established by maintained author or community software where relevant.</li>
+<li><strong>pyGWRx contract:</strong> the parameters, defaults, outputs, extensions and limitations in the current package.</li>
 </ol>
-<h2 id="shared-interpretation-rules">Shared interpretation rules<a class="headerlink" href="#shared-interpretation-rules" title="Permanent link">&para;</a></h2>
+<p>The table below is the rewrite control sheet. “Primary evidence” is not a claim that pyGWRx reproduces every option in that source; model pages must state differences explicitly.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Primary evidence</th>
+<th>pyGWRx correspondence that must be documented</th>
+<th>Rewrite status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GWR</td>
+<td>Brunsdon, Fotheringham &amp; Charlton (1996), DOI <a href="https://doi.org/10.1111/j.1538-4632.1996.tb00936.x"><code>10.1111/j.1538-4632.1996.tb00936.x</code></a></td>
+<td>Gaussian local WLS; fixed/adaptive bandwidths; CV/AIC/AICc/BIC; target-location recalibration; optional stored hat matrix.</td>
+<td><strong>Rewritten in this batch.</strong></td>
+</tr>
+<tr>
+<td>MGWR</td>
+<td>Fotheringham, Yang &amp; Kang (2017), DOI <a href="https://doi.org/10.1080/24694452.2017.1352480"><code>10.1080/24694452.2017.1352480</code></a>; Oshan et al. (2019), DOI <a href="https://doi.org/10.3390/ijgi8060269"><code>10.3390/ijgi8060269</code></a></td>
+<td>Additive backfitting; one bandwidth per fitted parameter; exact smoother traces; no independent-target prediction.</td>
+<td><strong>Rewritten in this batch.</strong></td>
+</tr>
+<tr>
+<td>RGWR</td>
+<td>Harris, Fotheringham &amp; Juggins (2010), DOI <a href="https://doi.org/10.1080/00045600903550378"><code>10.1080/00045600903550378</code></a>; <code>GWmodel::gwr.robust</code></td>
+<td>Iterative automatic downweighting and filtered one-refit modes; robust weights are not ridge penalties.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>STWR</td>
+<td>Que et al. (2020), DOI <a href="https://doi.org/10.5194/gmd-13-6149-2020"><code>10.5194/gmd-13-6149-2020</code></a>; STWR v1.0 archive</td>
+<td>Ordered stages; response-change-rate temporal effect; <code>alpha</code>, <code>theta</code> and recent-stage count have model-specific meanings.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>GTWR</td>
+<td>Huang, Wu &amp; Barry (2010), DOI <a href="https://doi.org/10.1080/13658810802672469"><code>10.1080/13658810802672469</code></a>; <code>GWmodel::st.dist</code> comparison</td>
+<td>GWmodel-style distance by default; Euclidean space-time alternative; optional causal filtering is a pyGWRx extension.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>GWGLM</td>
+<td>Nakaya et al. (2005), DOI <a href="https://doi.org/10.1002/sim.2129"><code>10.1002/sim.2129</code></a>; maintained GWR/MGWR software conventions</td>
+<td>Gaussian, Poisson and Bernoulli families; Poisson exposure/offset; Bernoulli-only binomial contract; local IWLS convergence.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>GWLasso</td>
+<td>Wheeler (2009), DOI <a href="https://doi.org/10.1068/a40256"><code>10.1068/a40256</code></a>; current <code>GWlasso</code> workflow</td>
+<td>Local standardisation; unpenalised intercept; local or fixed alpha; local variable-selection outputs.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>MixedGWR</td>
+<td>Brunsdon, Fotheringham &amp; Charlton (1999), DOI <a href="https://doi.org/10.1111/0022-4146.00146"><code>10.1111/0022-4146.00146</code></a>; Mei, He &amp; Fang (2004), DOI <a href="https://doi.org/10.1111/j.1085-9489.2004.00331.x"><code>10.1111/j.1085-9489.2004.00331.x</code></a></td>
+<td>User-specified global/local partition; partial-regression implementation; intercept can be global or local.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>GWPCA</td>
+<td>Harris, Brunsdon &amp; Charlton (2011), DOI <a href="https://doi.org/10.1080/13658816.2011.554838"><code>10.1080/13658816.2011.554838</code></a>; <code>GWmodel::gwpca</code></td>
+<td>Basic local weighted SVD; global centring/scaling followed by local centring; optional scores; not a regression model.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>GWDA</td>
+<td>Brunsdon, Fotheringham &amp; Charlton (2007), DOI <a href="https://doi.org/10.1111/j.1538-4632.2007.00709.x"><code>10.1111/j.1538-4632.2007.00709.x</code></a>; <code>GWmodel::gwda</code></td>
+<td>WLDA/WQDA; local means/covariances/priors; pyGWRx uses the standard Gaussian log-determinant probability formulation.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>GWSS</td>
+<td>Brunsdon, Fotheringham &amp; Charlton (2002), DOI <a href="https://doi.org/10.1016/S0198-9715(01)00009-6"><code>10.1016/S0198-9715(01)00009-6</code></a>; <code>GWmodel::gwss</code></td>
+<td>Local moment and optional quantile statistics; one shared selected bandwidth; descriptive output rather than prediction.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>ScalableGWR</td>
+<td>Murakami et al. (2021), DOI <a href="https://doi.org/10.1080/24694452.2020.1774350"><code>10.1080/24694452.2020.1774350</code></a></td>
+<td>Published ScaGWR polynomial-kernel estimator; fixed neighbour count Q; optimised scale and global penalty; no full distance matrix.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>LCRGWR</td>
+<td>Wheeler (2007), DOI <a href="https://doi.org/10.1068/a38325"><code>10.1068/a38325</code></a>; <code>GWmodel::gwr.lcr</code></td>
+<td>Local condition-number diagnosis; threshold-triggered ridge compensation; several pre/post-penalty condition-number outputs.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>BootstrapGWR</td>
+<td>Harris et al. (2017), DOI <a href="https://doi.org/10.1016/j.spasta.2017.07.006"><code>10.1016/j.spasta.2017.07.006</code></a>; <code>GWmodel::gwr.bootstrap</code></td>
+<td>Parametric bootstrap under the MLR null only; coefficient-wise and localised tests; optional bandwidth reselection.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>SGWR</td>
+<td>Lessani &amp; Li (2024), DOI <a href="https://doi.org/10.1080/13658816.2024.2342319"><code>10.1080/13658816.2024.2342319</code></a></td>
+<td>Convex combination of geographic and attribute-similarity weights; training-based similarity standardisation; AICc alpha selection.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>SGTWR</td>
+<td>Li et al. (2025), DOI <a href="https://doi.org/10.3390/su172310773"><code>10.3390/su172310773</code></a></td>
+<td>Space-time Gaussian component plus SGWR similarity component; deterministic AICc candidate search replaces the paper's genetic algorithm.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>MGTWR</td>
+<td>Wu et al. (2019), DOI <a href="https://doi.org/10.1080/13658816.2018.1545158"><code>10.1080/13658816.2018.1545158</code></a></td>
+<td>Variable-specific spatial bandwidths and temporal scales; self-contained additive backfitting; no independent-target prediction.</td>
+<td>Source verified; rewrite pending.</td>
+</tr>
+<tr>
+<td>LGGWR</td>
+<td><strong>Original pyGWRx research model</strong>; project mathematical specification, implementation, tests and monograph</td>
+<td>Learned joint or separable latent geometry; scale-identification constraints; alternating geometry and bandwidth optimisation. It must not be presented as an established external method.</td>
+<td>Internal evidence verified; dedicated research-model page pending.</td>
+</tr>
+<tr>
+<td>GRGWR</td>
+<td><strong>Original pyGWRx research model</strong>; project mathematical specification, implementation, tests and monograph</td>
+<td>Connected regime discovery from an initial coefficient field; piecewise-smooth local fitting; conditional AICc excludes discrete search complexity.</td>
+<td>Internal evidence verified; dedicated research-model page pending.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="rewrite-standard-for-every-model-page">Rewrite standard for every model page<a class="headerlink" href="#rewrite-standard-for-every-model-page" title="Permanent link">&para;</a></h2>
+<p>A completed page must contain model-specific versions of all items below:</p>
 <ul>
-<li>A local coefficient is a conditional association under a chosen neighbourhood, not an automatic causal effect.</li>
-<li>Bandwidth, kernel, distance units, and local effective sample size are part of the model specification.</li>
-<li>Map uncertainty, local collinearity, influence, and residuals alongside coefficient surfaces.</li>
-<li>Use spatially blocked or temporally ordered validation when the intended use requires spatial or temporal transfer.</li>
-<li>Treat 0.x APIs and original research models as evolving; record the exact package version and configuration.</li>
+<li>the scientific problem and response type;</li>
+<li>conditions under which the model should and should not be used;</li>
+<li>a comparison with the nearest alternatives;</li>
+<li>a self-contained example that works after <code>pip install pygwrx</code> and does not import repository helpers;</li>
+<li>the exact constructor signature from the current source;</li>
+<li>a parameter table explaining meaning, selection strategy and failure modes;</li>
+<li>separate <code>fit()</code>, <code>predict()</code>, <code>transform()</code> or inference-method arguments as applicable;</li>
+<li>fitted attributes and their shapes;</li>
+<li>interpretation rules tied to the model, not generic GWR advice;</li>
+<li>computational and memory implications;</li>
+<li>implementation differences from the paper or reference software;</li>
+<li>common errors and reporting requirements;</li>
+<li>primary references and a link to the generated API page.</li>
 </ul>
-<p>See <a href="../getting-started/choosing-a-model/">Choosing a model</a>, <a href="../guides/diagnostics/">Diagnostics</a>, and the <a href="../zh/models/">Chinese model handbook</a>.</p>
+<h2 id="shared-minimum-safeguards">Shared minimum safeguards<a class="headerlink" href="#shared-minimum-safeguards" title="Permanent link">&para;</a></h2>
+<p>These safeguards apply across the family, but they are not a substitute for model-specific guidance:</p>
+<ul>
+<li>establish an appropriate global or simpler baseline first;</li>
+<li>use projected coordinates for ordinary planar distance, or deliberately select a geographic distance metric;</li>
+<li>examine bandwidth boundaries and effective local sample size;</li>
+<li>inspect local collinearity, influential observations and residual spatial structure;</li>
+<li>distinguish exploratory coefficient maps from causal claims;</li>
+<li>use spatially blocked or temporally ordered validation for transfer claims;</li>
+<li>record the exact pyGWRx version and full estimator configuration.</li>
+</ul>
+<p>The detailed pages for <a href="gwr/"><code>GWR</code></a> and <a href="mgwr/"><code>MGWR</code></a> are the first evidence-reviewed manuals. The next rewrite batch covers robust, collinearity-remedial, penalised and mixed models.</p>
 
 
 
