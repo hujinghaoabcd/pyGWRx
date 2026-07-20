@@ -2,161 +2,385 @@
 
 <div class="model-hero" markdown>
 
-**Family:** Approximate scalable local regression
-**Install:** `pip install -e ".[all]"`
-**Required data:** X, y, coordinates
-**Primary operations:** fit, predict, predict_result
-**New-location capability:** Validated using the fitted scalable kernel approximation.
+**Task:** large-sample continuous-response local regression using the published ScaGWR approximation  
+**Core mechanism:** compress Q-nearest-neighbour polynomial-kernel cross-products once, then optimise two global approximation parameters  
+**Required inputs:** predictor matrix `X`, numeric response `y`, and coordinates `coords`  
+**Independent-target prediction:** supported through the same compressed polynomial-kernel estimator
 
 </div>
 
 [API reference](../api/models/scalable-gwr.md){ .md-button .md-button--primary }
-[Runnable source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/12_scalable_gwr.py){ .md-button }
-[Choose a model](../getting-started/choosing-a-model.md){ .md-button }
+[GWR manual](gwr.md){ .md-button }
+[Performance guide](../guides/performance-and-reproducibility.md){ .md-button }
 
-## Why this model exists
+## What ScalableGWR actually is
 
-Use ScalableGWR when standard GWR’s repeated dense distance and local-matrix operations are too expensive for the target sample size.
+ScalableGWR implements the ScaGWR estimator introduced by Murakami and colleagues. It is not ordinary GWR with a smaller distance matrix, and it is not exact GWR evaluated on only a random subset.
 
-!!! note "One-sentence idea"
-    ScalableGWR compresses neighbourhood cross-products into a finite polynomial-kernel representation and optimizes a small set of global approximation parameters.
+Conventional GWR repeatedly builds location-specific weighted cross-products. ScaGWR instead:
 
-## Statistical formulation
+1. finds a fixed number \(Q\) of nearest neighbours for every evaluation location;
+2. represents a continuous Gaussian or exponential kernel by a finite polynomial basis;
+3. pre-compresses local \(X^\top W X\), \(X^\top W y\), and inference moments for each basis term;
+4. optimises only a global kernel-scale parameter and a global shrinkage parameter;
+5. assembles local systems from the compressed moments without revisiting all pairwise distances.
 
-For a fixed number of neighbours, local cross-products can be pre-aggregated over polynomial basis terms,
+For a fixed predictor count, polynomial degree, and neighbour count, this avoids an \(n\times n\) distance matrix and gives the algorithm its approximately linear sample-size scaling.
+
+## Polynomial-kernel approximation
+
+For each target \(i\), neighbour \(j\), and basis term \(r\), pyGWRx forms a transformed base-kernel value \(\phi_r(d_{ij})\) and precomputes
 
 $$
-A_{i,q}=\sum_{j\in\mathcal N(i)}\phi_q(r_{ij})x_jx_j^\top,\qquad
-b_{i,q}=\sum_{j\in\mathcal N(i)}\phi_q(r_{ij})x_jy_j.
+A_{i,r}=\sum_{j\in\mathcal N_Q(i)}\phi_r(d_{ij})x_jx_j^\top,
+\qquad
+b_{i,r}=\sum_{j\in\mathcal N_Q(i)}\phi_r(d_{ij})x_jy_j.
 $$
 
-A fitted combination of these basis terms rapidly assembles each local normal equation without storing a full dense distance matrix.
+The fitted `scale_` determines non-negative basis coefficients that sum to one. The assembled local system is
 
-## How pyGWRx fits the model
+$$
+\left\{\sum_r c_r A_{i,r}+\lambda X^\top X\right\}\beta_i
+=
+\sum_r c_r b_{i,r}+\lambda X^\top y,
+$$
 
-1. Query a bounded number of neighbours per location.
-2. Normalize neighbour distances and compute polynomial basis terms.
-3. Pre-aggregate local matrix and vector components.
-4. Apply or optimize scale, penalty, and kernel-combination parameters.
-5. Solve local systems from the compressed representation.
-6. Reuse the approximation for target-location prediction.
+where `penalty_` is \(\lambda\ge 0\).
 
-## Constructor and important controls
+The penalty is not a conventional local ridge term toward zero. It adds the global OLS cross-products and therefore shrinks unstable local estimates toward the global relationship. `numerical_jitter`, by contrast, is a separate diagonal stabiliser added directly to every local system.
+
+## When to use ScalableGWR
+
+Use it when:
+
+- the response is continuous and a Gaussian local linear model is appropriate;
+- standard GWR's quadratic distance/matrix cost is prohibitive;
+- a polynomial-kernel approximation is acceptable;
+- the nearest-neighbour count \(Q\) can be fixed in advance or sensitivity-tested;
+- target-location coefficients and predictions are required at large scale.
+
+Do not select it merely because its class name contains “Scalable”. It estimates a different approximation model from conventional GWR.
+
+| Situation | Better starting point |
+|---|---|
+| Exact conventional GWR remains computationally feasible | Fit [`GWR`](gwr.md) as the principal reference. |
+| Different predictors require different scales | [`MGWR`](mgwr.md), with a much higher computational cost. |
+| Local collinearity is the primary issue | [`LCRGWR`](lcr-gwr.md) or [`GWLasso`](gw-lasso.md). |
+| A compact bisquare/tricube kernel is scientifically required | Current ScalableGWR supports only continuous Gaussian and exponential base kernels. |
+| A fixed-distance rather than Q-neighbour approximation is required | Use conventional GWR; ScaGWR fixes an adaptive neighbour count. |
+
+## Critical terminology: `bandwidth` is Q
+
+In this class, `bandwidth` means the number of nearest neighbours \(Q\). It is always an integer and `adaptive` is always true internally.
+
+`optimize_bandwidth=True` is retained as the public parameter name, but it does **not** optimise Q. It optimises:
+
+- `scale_`: the global polynomial-basis mixing scale;
+- `penalty_`: the global OLS-shrinkage strength.
+
+The fitted neighbour count remains:
 
 ```python
-ScalableGWR(bandwidth: 'int' = 100, kernel: 'str' = 'gaussian', polynomial: 'int' = 4, criterion: 'str' = 'cv', optimize_bandwidth: 'bool' = True, scale: 'Optional[float]' = None, penalty: 'Optional[float]' = None, fit_intercept: 'bool' = True, sample_size: 'Optional[int]' = None, random_state: 'Optional[int]' = None, optimizer_maxiter: 'int' = 200, numerical_jitter: 'float' = 0.0, verbose: 'bool' = False) -> 'None'
+model.bandwidth_ == model.bandwidth
 ```
 
-The API page documents every parameter and fitted attribute. In practice, start by deciding the **data contract**, **neighbourhood definition**, **selection criterion**, and **prediction/inference goal** before tuning secondary controls.
+A complete sensitivity analysis must therefore refit several Q values explicitly.
 
-| Decision | Questions to answer |
-|---|---|
-| Data | Are rows independent observations, ordered stages, classes, counts, or multivariate features? |
-| Distance | Are coordinates projected? Is time or contextual similarity part of the neighbourhood? |
-| Bandwidth | ScaGWR neighbour count Q, polynomial degree, and fixed or optimized scale/penalty? |
-| Inference | Are local uncertainty, non-stationarity tests, or only prediction required? |
-| Validation | Does the split respect spatial and, where relevant, temporal dependence? |
+## Installation
 
-## Complete runnable example
+```bash
+pip install pygwrx
+```
 
-The following is the exact maintained example used by the API-coverage checks.
+## Self-contained example
 
 ```python
-# SPDX-FileCopyrightText: 2026 Jinghao Hu
-# SPDX-License-Identifier: MIT
-
-"""Fit scalable GWR with a fixed multiscale-kernel approximation."""
+import numpy as np
+import pandas as pd
 
 from pygwrx import ScalableGWR
-from _common import print_model_result, spatial_regression
 
-X, y, coords = spatial_regression(n=54, p=2)
+rng = np.random.default_rng(161)
+n = 2500
+coords = rng.uniform(0.0, 1000.0, size=(n, 2))
+X = pd.DataFrame(
+    {
+        "income": rng.normal(size=n),
+        "access": rng.normal(size=n),
+        "density": rng.normal(size=n),
+    }
+)
+
+beta_income = 0.8 + 0.0012 * coords[:, 0]
+beta_access = -1.1 + 0.0008 * coords[:, 1]
+y = (
+    3.0
+    + beta_income * X["income"].to_numpy()
+    + beta_access * X["access"].to_numpy()
+    + 0.5 * X["density"].to_numpy()
+    + rng.normal(0.0, 0.4, size=n)
+)
+
 model = ScalableGWR(
-    bandwidth=24, optimize_bandwidth=False, polynomial=4, random_state=0
+    bandwidth=120,          # fixed Q-neighbour count
+    kernel="gaussian",
+    polynomial=4,
+    criterion="cv",
+    optimize_bandwidth=True,
+    sample_size=600,        # calibration targets only; all rows remain neighbours
+    random_state=42,
 ).fit(X, y, coords)
-print_model_result(model)
-print("predictions=", model.predict(X.iloc[:3], coords.iloc[:3]))
+
+print("Q:", model.bandwidth_)
+print("scale:", model.scale_)
+print("global shrinkage penalty:", model.penalty_)
+print("full-data CV RMSE:", model.cv_score_)
+print(model.summary())
+print(model.to_frame().head())
+
+X_new = pd.DataFrame(
+    {
+        "income": [0.2, -0.4],
+        "access": [0.9, 0.1],
+        "density": [0.0, 0.5],
+    }
+)
+coords_new = np.array([[250.0, 300.0], [750.0, 650.0]])
+
+prediction = model.predict_result(
+    X_new,
+    coords_new,
+    return_standard_errors=True,
+)
+print(prediction.to_frame())
 ```
 
-Run it from the `examples/models` directory or through `python examples/run_all.py`.
+`sample_size` reduces only the number of target locations used to optimise `scale` and `penalty` under CV. All training rows remain available as neighbours and in the global shrinkage term. The final fit, full-data CV RMSE, coefficients, and inference use all observations.
 
-## Reading the fitted result
-
-**Main outputs:** Approximate local coefficients, fitted values, residuals, optimized kernel parameters, summaries, prediction results, and `to_frame()`.
-
-Available high-level methods detected in the current class are: `fit()`, `predict()`, `predict_result()`, `summary()`, `to_frame()`.
-
-A safe inspection sequence is:
+## Constructor
 
 ```python
-# 1. Human-readable overview
-print(model.summary()) if hasattr(model, "summary") else None
-
-# 2. Location-indexed table when supported
-frame = model.to_frame() if hasattr(model, "to_frame") else None
-
-# 3. Explicitly inspect the model-specific state
-print([name for name in vars(model) if name.endswith("_")])
+ScalableGWR(
+    bandwidth=100,
+    kernel="gaussian",
+    polynomial=4,
+    criterion="cv",
+    optimize_bandwidth=True,
+    scale=None,
+    penalty=None,
+    fit_intercept=True,
+    sample_size=None,
+    random_state=None,
+    optimizer_maxiter=200,
+    numerical_jitter=0.0,
+    verbose=False,
+)
 ```
 
-Do not assume that every model exposes the same outputs. Regression, classification, transformation, descriptive-statistics, and inference models have different result semantics.
+## Constructor parameters
 
-## Diagnostics and interpretation
+### Approximation structure
 
-Benchmark approximation error against standard GWR on a manageable subset, report runtime and memory, and test sensitivity to neighbour count and polynomial order.
+| Parameter | Default | Meaning | How to use and what can go wrong |
+|---|---:|---|---|
+| `bandwidth` | `100` | Fixed number \(Q\) of nearest neighbours used to construct compressed local moments. | Must be at least 2, smaller than `n_samples`, and greater than the number of design columns. It is not automatically selected. Small Q increases locality and instability; large Q increases work and smoothness. |
+| `kernel` | `"gaussian"` | Continuous base kernel, `gaussian`/`gau` or `exponential`/`exp`. | Compact kernels are not supported because the published polynomial construction targets continuous kernels. |
+| `polynomial` | `4` | Positive polynomial degree; the implementation stores `polynomial + 1` basis terms. | Higher degree increases compressed-moment memory and computation. It may improve approximation flexibility but does not guarantee better transfer performance. |
+| `fit_intercept` | `True` | Adds a spatially varying intercept to the design. | Do not add a constant predictor manually. Constant predictor columns are rejected even when the intercept is disabled. |
 
-The common diagnostics layer can be used where the fitted model provides the required fields:
+### Scale and global shrinkage
+
+| Parameter | Default | Meaning and guidance |
+|---|---:|---|
+| `optimize_bandwidth` | `True` | Optimises `scale` and `penalty` with L-BFGS-B in log space. | The name does not mean Q is optimised. Set false for a fully fixed ScaGWR specification. |
+| `scale` | `None` | Positive fixed scale when optimisation is disabled, or initial value when enabled. | `None` starts from 1.0. The fitted value controls polynomial-basis coefficients, not a coordinate-distance bandwidth. |
+| `penalty` | `None` | Non-negative global OLS-shrinkage value, fixed or used as optimiser start. | `None` starts from 0.01. A larger value pulls local systems more strongly toward the global cross-products. It is distinct from `numerical_jitter`. |
+| `criterion` | `"cv"` | Optimisation objective: leave-one-out residual sum of squares or ScaGWR AICc. | CV excludes each calibration target from its Q-neighbour set. AICc uses in-sample compressed moments and smoother trace. Compare criteria only under the same Q and polynomial structure. |
+| `optimizer_maxiter` | `200` | Maximum L-BFGS-B iterations. | A non-converged optimiser with a finite solution emits a warning. Inspect `optimization_result_` rather than assuming convergence. |
+| `numerical_jitter` | `0.0` | Non-negative diagonal value added after the published global penalty term. | Use only for explicit numerical stabilisation. Positive values alter the estimator and must be reported separately from `penalty_`. |
+
+### Calibration subsampling
+
+| Parameter | Default | Meaning and guidance |
+|---|---:|---|
+| `sample_size` | `None` | Random number of target sites used to optimise scale/penalty under CV. | All observations still contribute as neighbours and to global moments. It is ignored with AICc and triggers a warning. Minimum is 2. |
+| `random_state` | `None` | Seed for selecting calibration targets when `sample_size<n`. | Set for reproducibility and repeat with alternative seeds to assess calibration stability. |
+| `verbose` | `False` | Prints final Q, scale, penalty, and CV RMSE. |
+
+## How the base bandwidth is derived
+
+ScalableGWR internally calculates `base_bandwidth_` from the median distance to a reference neighbour rank:
+
+- reference rank is `min(50, Q) - 1` among leave-one-out neighbours;
+- Gaussian base bandwidth is reference distance divided by `sqrt(3)`;
+- exponential base bandwidth is reference distance divided by 3.
+
+This value anchors the polynomial basis. It is not a user-selected final bandwidth and should not be confused with Q or `scale_`.
+
+Duplicated coordinates are allowed only when the data still contain positive neighbour distances from which this reference can be derived. Completely coincident coordinates raise an error.
+
+## Fitting
 
 ```python
-from pygwrx.diagnostics import diagnostics_frame, local_diagnostic_frame
-
-print(diagnostics_frame([model], labels=["ScalableGWR"]))
-try:
-    print(local_diagnostic_frame(model).head())
-except (AttributeError, NotImplementedError, ValueError) as exc:
-    print("This model exposes a different diagnostic contract:", exc)
+model.fit(X, y, coords)
 ```
 
-See [Diagnostics and inference](../guides/diagnostics.md) for model-aware checks and interpretation rules.
+The fit always performs the following:
 
-## Recommended visual checks
+- validates and stores the complete training design;
+- builds a `cKDTree`, not a full pairwise distance matrix;
+- calibrates or fixes scale and penalty;
+- computes final coefficients for every training location;
+- calculates standard errors, t values, p values, smoother traces, effective degrees of freedom, AIC/AICc, R², adjusted R², and full-data LOOCV RMSE.
 
+There are no switches for disabling inference. Memory is dominated by Q-neighbour indices/distances and compressed arrays rather than \(n^2\) matrices.
 
-<div class="figure-grid" markdown>
+Approximate compressed cross-product storage scales as
 
-<figure markdown>
-  ![10 scalable kernel](../assets/figures/specialized/10_scalable_kernel.png){ loading=lazy }
-  <figcaption>10 Scalable Kernel</figcaption>
-</figure>
+$$
+O\{n(P+1)k^2\},
+$$
 
-</div>
+where \(P\) is polynomial degree and \(k\) is the design-column count. Neighbour data scale as \(O(nQ)\). A large predictor count can therefore still be expensive even when sample scaling is linear.
 
+## Prediction and coefficient-only evaluation
 
-The figures are generated from deterministic examples and are illustrative; they are not benchmark claims.
+```python
+pred = model.predict(X_new, coords_new)
+result = model.predict_result(
+    X_new,
+    coords_new,
+    return_standard_errors=False,
+)
+```
+
+`predict_result()` also accepts `X=None` to estimate target coefficients without predictions:
+
+```python
+coefficient_surface = model.predict_result(
+    None,
+    coords_new,
+    return_standard_errors=True,
+)
+```
+
+When `X=None`, the returned coefficient matrix is valid, but `predictions` is `None`. Target standard errors require squared compressed moments and extra computation.
+
+Prediction uses exactly Q nearest training observations plus the fitted global penalty term. It does not rebuild or optimise `scale_` and `penalty_` for each target.
+
+## Main fitted attributes
+
+| Attribute | Meaning |
+|---|---|
+| `bandwidth_` | Fixed Q-neighbour count. |
+| `base_bandwidth_` | Reference distance scale used by the polynomial basis. |
+| `scale_` | Fitted or fixed global polynomial-basis scale. |
+| `penalty_` | Fitted or fixed global OLS-shrinkage strength. |
+| `optimization_result_` | SciPy L-BFGS-B result, or `None` when optimisation is disabled. |
+| `coefficients_` | Full local parameter matrix including intercept when fitted. |
+| `coef_`, `intercept_` | Local slopes and intercepts. |
+| `standard_errors_`, `t_values_`, `p_values_` | Local inference arrays. |
+| `trace_S_`, `trace_StS_` | ScaGWR smoother traces. |
+| `effective_n_params_` | `2 trace(S) - trace(S'S)`. |
+| `effective_df_` | `n - effective_n_params_`. |
+| `sigma_` | Residual standard deviation using effective residual degrees of freedom. |
+| `cv_score_` | Full-sample LOOCV RMSE, regardless of calibration subsampling. |
+| `aic_`, `aicc_`, `r2_`, `adjusted_r2_` | Global fit diagnostics. |
+| `global_cross_product_`, `global_response_product_` | Global OLS moments used by the shrinkage term. |
+
+`to_frame()` includes coordinates, observed/fitted/residual values, every coefficient, standard error, t statistic, and p value.
+
+## Interpreting scale and penalty
+
+### Scale
+
+`scale_` changes the relative polynomial-basis coefficients. It should not be reported as metres, kilometres, or neighbour count. Its meaning is conditional on:
+
+- base kernel;
+- polynomial degree;
+- internally derived `base_bandwidth_`;
+- fixed Q.
+
+### Penalty
+
+`penalty_` controls borrowing from the global OLS cross-products. A large value can stabilise local systems and make coefficient surfaces more global. It is an empirical-Bayes-style global shrinkage component of ScaGWR, not evidence that spatial non-stationarity is absent.
+
+### Q sensitivity
+
+Because Q is fixed outside optimisation, repeat the complete fit over several plausible neighbour counts. Track:
+
+- CV RMSE and AICc;
+- scale and penalty;
+- coefficient stability;
+- optimiser convergence;
+- prediction performance under spatial blocks;
+- runtime and memory.
+
+## ScalableGWR versus conventional GWR
+
+| Feature | ScalableGWR | GWR |
+|---|---|---|
+| Distance storage | KD-tree Q-neighbour queries | Conventional pairwise/local distance operations |
+| Neighbour count | Fixed Q, manually selected | Fixed distance or adaptive count automatically selectable |
+| Kernel | Polynomial approximation to Gaussian/exponential | Direct Gaussian, bisquare, exponential, tricube, boxcar, or callable |
+| Global shrinkage | Published penalty toward global OLS moments | None in standard GWR |
+| Scale optimisation | Two global approximation parameters | Geographic bandwidth criterion |
+| Exact equality | Approximation estimator | Conventional local weighted least squares |
+| Large-n use | Designed for it | Can become quadratic in time/memory |
+
+A benchmark should compare both predictive accuracy and coefficient recovery, not runtime alone.
 
 ## Common mistakes
 
-- Assuming scalability means identical results to exact GWR.
-- Using too few neighbours or too low a polynomial order.
-- Reporting speed without approximation error.
-- Applying the method to small datasets where complexity is unnecessary.
+| Mistake | Correction |
+|---|---|
+| Saying `optimize_bandwidth=True` selects Q | It optimises scale and penalty only; refit Q explicitly. |
+| Interpreting `scale_` as a distance bandwidth | It controls polynomial-basis mixing and has no direct coordinate unit. |
+| Treating `penalty_` as ordinary ridge-to-zero | It adds global OLS cross-products and shrinks toward the global relationship. |
+| Using `numerical_jitter` without reporting it | It is a separate diagonal modification of every local system. |
+| Setting `bandwidth >= n` | Q must be smaller than sample size because CV needs non-self neighbours. |
+| Setting Q barely above the design size | Increase Q to provide stable local support and sensitivity-test it. |
+| Using constant predictor columns | They are rejected; remove them and let `fit_intercept` handle the intercept. |
+| Assuming `sample_size` reduces the final fitted dataset | It only subsamples CV calibration targets; final fitting and diagnostics use all rows. |
+| Using `sample_size` with AICc | It is ignored. |
+| Claiming exact equivalence to GWR | ScaGWR is a polynomial-kernel approximation with global shrinkage. |
+| Ignoring optimiser warnings | Inspect `optimization_result_` and test starting values/Q. |
 
-## What to report in a paper or technical report
+## Recommended validation workflow
 
-- Sample size and computational environment.
-- Neighbour count, polynomial order, scale, and penalty.
-- Optimization criterion.
-- Runtime/memory and comparison with standard GWR.
-- Prediction and approximation sensitivity.
+1. Fit conventional GWR on a manageable subset or smaller benchmark dataset.
+2. Choose several Q values larger than the design dimension.
+3. Fit ScalableGWR under CV and/or AICc for each Q.
+4. Inspect optimiser convergence, scale, penalty, and base bandwidth.
+5. Compare coefficient surfaces with exact GWR where feasible.
+6. Use spatially blocked target prediction.
+7. Repeat calibration subsampling with several seeds when `sample_size` is used.
+8. Report speed, peak memory, accuracy, and approximation differences together.
+
+## What to report
+
+Report:
+
+- sample size, predictor count, and coordinate system;
+- fixed Q and its sensitivity analysis;
+- base kernel and polynomial degree;
+- criterion and whether calibration targets were subsampled;
+- random seed and sample size;
+- optimiser start values, iteration limit, convergence status, fitted scale, and fitted penalty;
+- `base_bandwidth_`;
+- numerical jitter;
+- effective parameters, CV RMSE, AICc, and coefficient uncertainty;
+- comparison with conventional GWR;
+- spatial validation, runtime, and memory measurements;
+- pyGWRx version.
 
 ## References
 
-- [Murakami et al. (2020), *Scalable GWR: A Linear-Time Algorithm for Large-Scale GWR with Polynomial Kernels*](https://doi.org/10.1080/24694452.2020.1774350)
+- Murakami, D., Yoshida, T., Seya, H., Griffith, D. A., & Yamagata, Y. (2021). Scalable GWR: A Linear-Time Algorithm for Large-Scale Geographically Weighted Regression with Polynomial Kernels. *Annals of the American Association of Geographers*, 111(2), 459–480. [`10.1080/24694452.2020.1774350`](https://doi.org/10.1080/24694452.2020.1774350)
 
 ## Related documentation
 
-- [Detailed API for `ScalableGWR`](../api/models/scalable-gwr.md)
-- [Maintained example source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/12_scalable_gwr.py)
-- [Kernels and bandwidths](../guides/kernels-and-bandwidths.md)
+- [Generated ScalableGWR API](../api/models/scalable-gwr.md)
+- [Standard GWR](gwr.md)
+- [Performance and reproducibility](../guides/performance-and-reproducibility.md)
 - [Prediction and result objects](../guides/prediction-and-results.md)
-- [Complete Chinese model guide](../zh/models/scalable-gwr.md)
