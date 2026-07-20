@@ -2,169 +2,430 @@
 
 <div class="model-hero" markdown>
 
-**Family:** Multiscale local regression
-**Install:** `pip install -e ".[all]"`
-**Required data:** X, y, coordinates
-**Primary operations:** fit, score, calibration-location results
-**New-location capability:** Independent-target prediction is intentionally unavailable in the current validated API.
+**Task:** continuous-response local additive regression with coefficient-specific spatial scales  
+**Core assumption:** the intercept and each predictor may operate at a different bandwidth  
+**Required inputs:** predictor matrix `X`, numeric response `y`, coordinates `coords`  
+**Independent-target prediction:** intentionally not exposed in the current validated API
 
 </div>
 
 [API reference](../api/models/mgwr.md){ .md-button .md-button--primary }
-[Runnable source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/02_mgwr.py){ .md-button }
-[Choose a model](../getting-started/choosing-a-model.md){ .md-button }
+[GWR manual](gwr.md){ .md-button }
+[Kernels and bandwidths](../guides/kernels-and-bandwidths.md){ .md-button }
 
-## Why this model exists
+## Why MGWR exists
 
-Use MGWR when predictors plausibly operate at different spatial scales and a single shared GWR bandwidth would hide those differences.
+Standard GWR estimates all local coefficients with one shared bandwidth. That assumption means every relationship is forced to vary over the same spatial scale. MGWR relaxes it by assigning a separate bandwidth to every fitted parameter, including the intercept when an intercept is fitted.
 
-!!! note "One-sentence idea"
-    MGWR gives every design column—including the intercept when fitted—its own spatial bandwidth. Large bandwidths indicate broad or near-global processes; small bandwidths indicate more local variation.
-
-## Statistical formulation
-
-The model remains additive,
+For predictors $x_{ij}$, MGWR represents the response as
 
 $$
-y_i=\sum_{k=0}^{p} x_{ik}\beta_k(s_i)+\varepsilon_i,
+y_i = \beta_0(s_i) + \sum_{j=1}^{p} x_{ij}\beta_j(s_i) + \varepsilon_i,
 $$
 
-but coefficient $k$ is updated with its own weight matrix $W_{ik}(h_k)$. Backfitting cycles through partial residuals, searches or applies $h_k$, and updates one coefficient surface at a time until the surfaces and residual sum of squares stabilize.
+but each coefficient surface $\beta_j(s)$ is smoothed with its own bandwidth $b_j$. The model is calibrated through additive backfitting: one coefficient contribution is updated from a partial residual while the other contributions are held fixed, and the process repeats until the score of change converges.
 
-## How pyGWRx fits the model
+This distinction is substantive rather than cosmetic. A small bandwidth suggests a relationship supported at a relatively local scale; a large bandwidth suggests broad-scale or nearly global variation. The bandwidth is part of the scientific result, not merely a tuning parameter.
 
-1. Initialize coefficients and variable-specific bandwidths, usually from a GWR-scale solution.
-2. Construct the partial residual for one design column.
-3. Search or apply that column’s bandwidth.
-4. Update the local coefficient surface for the selected column.
-5. Repeat across columns and backfitting iterations until convergence.
-6. Combine component smoothers to obtain diagnostics and optional inference.
+## Use MGWR when
 
-## Constructor and important controls
+- a continuous-response linear model is appropriate;
+- theory or preliminary evidence suggests that predictors operate at different spatial scales;
+- the scale of each relationship is itself an important result;
+- standard GWR appears to over-localise some coefficients and over-smooth others;
+- calibration-location coefficient surfaces and multiscale diagnostics are the primary outputs.
 
-```python
-MGWR(kernel: 'Union[str, Callable[[np.ndarray, float], np.ndarray]]' = 'bisquare', bandwidths: 'BandwidthInput' = None, bandwidth_method: 'str' = 'aicc', adaptive: 'bool' = True, bandwidth_range: 'BandwidthRange' = None, bandwidth_ranges: 'BandwidthRanges' = None, init_bandwidth: 'Optional[Bandwidth]' = None, optimization_method: 'str' = 'golden_section', search_tol: 'float' = 1e-06, search_max_iter: 'int' = 200, max_iter: 'int' = 200, tol: 'float' = 1e-05, rss_score: 'bool' = False, bws_same_times: 'int' = 5, fit_intercept: 'bool' = True, distance_metric: 'str' = 'euclidean', sigma2_v1: 'bool' = True verbose: 'bool' = False) -> 'None'
+## Do not make MGWR the first choice when
+
+| Situation | Better action or model |
+|---|---|
+| The global linear model and GWR have not yet been examined | Begin with a global model and [`GWR`](gwr.md). |
+| New-location prediction is the main production requirement | Use a model with a validated target prediction operator, such as GWR, or design a separate validation workflow. |
+| Some effects are known to be exactly global rather than merely broad-scale | Use [`MixedGWR`](mixed-gwr.md) with an explicit global/local partition. |
+| The response is non-Gaussian | Use [`GWGLM`](gwglm.md); the current MGWR class is Gaussian. |
+| Response outliers or local collinearity dominate the analysis | Diagnose those problems first; consider [`RGWR`](rgwr.md), [`LCRGWR`](lcr-gwr.md) or [`GWLasso`](gw-lasso.md). |
+| The dataset is very large | MGWR backfitting and exact smoother diagnostics can be expensive. Reduce the design, test on a representative subset, or use a scalable alternative where scientifically acceptable. |
+
+!!! important "MGWR is not GWR with a list of arbitrary neighbourhoods"
+    The variable-specific bandwidths are coupled through additive backfitting. Each term is estimated from partial residuals that depend on the other terms, so bandwidths and coefficient surfaces must be interpreted as one fitted system.
+
+## Published method and pyGWRx scope
+
+The 2017 MGWR method formalised the idea that different processes can operate at different geographic scales. The widely used Python `mgwr` implementation later documented a backfitting-based software workflow. pyGWRx follows the same central model structure while defining its own explicit public contract:
+
+- Gaussian additive coefficient-specific local regressions;
+- one bandwidth for the intercept and one for every predictor when `fit_intercept=True`;
+- manual shared, manual variable-specific, or automatically selected bandwidths;
+- fixed-distance or adaptive-neighbour bandwidth semantics;
+- CV, AIC, AICc or BIC bandwidth criteria;
+- stored bandwidth and convergence histories;
+- exact smoother traces and variable-specific effective parameter counts;
+- optional local covariance, standard-error and t-statistic computation;
+- no independent-target `predict()` contract.
+
+The absence of target prediction is deliberate. A stable, validated operator for independently supplied locations is not currently part of the package contract. Use `fitted_values_` for calibration-location estimates and evaluate transfer with a refitted spatial holdout workflow rather than calling `predict()`.
+
+## Installation
+
+```bash
+pip install pygwrx
 ```
 
-The API page documents every parameter and fitted attribute. In practice, start by deciding the **data contract**, **neighbourhood definition**, **selection criterion**, and **prediction/inference goal** before tuning secondary controls.
+## Input data contract
 
-| Decision | Questions to answer |
-|---|---|
-| Data | Are rows independent observations, ordered stages, classes, counts, or multivariate features? |
-| Distance | Are coordinates projected? Is time or contextual similarity part of the neighbourhood? |
-| Bandwidth | Fixed distance or adaptive neighbours? Supplied value or selected criterion? |
-| Inference | Are local uncertainty, non-stationarity tests, or only prediction required? |
-| Validation | Does the split respect spatial and, where relevant, temporal dependence? |
+| Input | Shape | Meaning | MGWR-specific concern |
+|---|---:|---|---|
+| `X` | `(n, p)` | Numeric predictors | Predictor order determines the order of slope bandwidths. DataFrame columns are strongly recommended. |
+| `y` | `(n,)` | Continuous numeric response | Must align row-by-row with `X` and `coords`. |
+| `coords` | `(n, d)`; normally `(n, 2)` | Locations used for spatial distances | Distance units define fixed bandwidth units. Use projected coordinates or deliberately select Haversine distance. |
 
-## Complete runnable example
+When `fit_intercept=True` and `X` has columns `income` and `access`, the fitted parameter order is:
 
-The following is the exact maintained example used by the API-coverage checks.
+```text
+[Intercept, income, access]
+```
+
+Therefore a manual bandwidth vector must contain three values in exactly that order.
+
+## Self-contained example: automatic multiscale selection
 
 ```python
-# SPDX-FileCopyrightText: 2026 Jinghao Hu
-# SPDX-License-Identifier: MIT
-
-"""Fit MGWR with fixed variable-specific bandwidths."""
+import numpy as np
+import pandas as pd
 
 from pygwrx import MGWR
-from _common import print_model_result, spatial_regression
 
-X, y, coords = spatial_regression(n=48, p=2)
-model = MGWR(bandwidths=[24, 26, 28], adaptive=True, max_iter=8, tol=0.5).fit(
-    X, y, coords, compute_inference=True
+rng = np.random.default_rng(7)
+n = 72
+coords = rng.uniform(0.0, 100.0, size=(n, 2))
+
+X = pd.DataFrame(
+    {
+        "local_driver": rng.normal(size=n),
+        "broad_driver": rng.normal(size=n),
+    }
 )
-print_model_result(model)
-try:
-    model.predict(X.iloc[:2], coords.iloc[:2])
-except NotImplementedError as exc:
-    print("Expected MGWR prediction limitation:", exc)
+
+# One coefficient changes quickly with x; the other changes gradually with y.
+beta_local = 0.8 + 0.9 * np.sin(coords[:, 0] / 13.0)
+beta_broad = -1.2 + 0.006 * coords[:, 1]
+y = (
+    3.5
+    + beta_local * X["local_driver"].to_numpy()
+    + beta_broad * X["broad_driver"].to_numpy()
+    + rng.normal(0.0, 0.30, size=n)
+)
+
+model = MGWR(
+    kernel="bisquare",
+    bandwidths=None,          # select one bandwidth per fitted parameter
+    bandwidth_method="aicc",
+    adaptive=True,
+    max_iter=100,
+    tol=1e-5,
+).fit(
+    X,
+    y,
+    coords,
+    compute_hat_matrix=False,
+    store_partial_hat_matrices=False,
+    compute_inference=True,
+    n_chunks=2,
+)
+
+parameter_names = ["Intercept", *X.columns]
+for name, bandwidth, enp in zip(
+    parameter_names,
+    model.bandwidths_,
+    model.effective_params_by_variable_,
+):
+    print(f"{name:>12}: bandwidth={bandwidth}, ENP={enp:.3f}")
+
+print("converged:", model.converged_)
+print("iterations:", model.n_iter_)
+print(model.to_frame().head())
 ```
 
-Run it from the `examples/models` directory or through `python examples/run_all.py`.
+Automatic MGWR selection is substantially more expensive than one GWR fit because it repeatedly searches and updates coefficient-specific smoothers. Begin with a modest predictor set and inspect convergence before scaling up.
 
-## Reading the fitted result
+## Self-contained example: fixed bandwidth vector
 
-**Main outputs:** `bandwidths_`, variable-specific coefficient surfaces, convergence information, fitted values, residuals, diagnostics, optional inference, and `to_frame()`.
-
-Available high-level methods detected in the current class are: `fit()`, `score()`, `predict()`, `summary()`, `to_frame()`.
-
-A safe inspection sequence is:
+Manual bandwidths are useful for reproducing a published specification, sensitivity analysis, or separating coefficient fitting from bandwidth search.
 
 ```python
-# 1. Human-readable overview
-print(model.summary()) if hasattr(model, "summary") else None
+from pygwrx import MGWR
 
-# 2. Location-indexed table when supported
-frame = model.to_frame() if hasattr(model, "to_frame") else None
+manual = MGWR(
+    kernel="bisquare",
+    adaptive=True,
+    # Intercept, local_driver, broad_driver
+    bandwidths=[50, 24, 60],
+    init_bandwidth=40,
+    max_iter=100,
+    tol=1e-5,
+).fit(
+    X,
+    y,
+    coords,
+    compute_hat_matrix=False,
+    store_partial_hat_matrices=False,
+    compute_inference=False,
+)
 
-# 3. Explicitly inspect the model-specific state
-print([name for name in vars(model) if name.endswith("_")])
+print(manual.bandwidths_)
+print(manual.converged_)
 ```
 
-Do not assume that every model exposes the same outputs. Regression, classification, transformation, descriptive-statistics, and inference models have different result semantics.
+A scalar `bandwidths=40` is accepted and repeats the same value for every parameter. That is mainly useful for controlled comparisons; it removes the central multiscale advantage and should not be described as automatically calibrated MGWR.
 
-## Diagnostics and interpretation
-
-Interpret bandwidths together with coefficient surfaces. Check whether any bandwidth sticks to a search boundary, whether backfitting converged, and whether highly correlated predictors produce unstable scale estimates.
-
-The common diagnostics layer can be used where the fitted model provides the required fields:
+## Constructor
 
 ```python
-from pygwrx.diagnostics import diagnostics_frame, local_diagnostic_frame
-
-print(diagnostics_frame([model], labels=["MGWR"]))
-try:
-    print(local_diagnostic_frame(model).head())
-except (AttributeError, NotImplementedError, ValueError) as exc:
-    print("This model exposes a different diagnostic contract:", exc)
+MGWR(
+    kernel="bisquare",
+    bandwidths=None,
+    bandwidth_method="aicc",
+    adaptive=True,
+    bandwidth_range=None,
+    bandwidth_ranges=None,
+    init_bandwidth=None,
+    optimization_method="golden_section",
+    search_tol=1e-6,
+    search_max_iter=200,
+    max_iter=200,
+    tol=1e-5,
+    rss_score=False,
+    bws_same_times=5,
+    fit_intercept=True,
+    distance_metric="euclidean",
+    sigma2_v1=True,
+    verbose=False,
+)
 ```
 
-See [Diagnostics and inference](../guides/diagnostics.md) for model-aware checks and interpretation rules.
+## Constructor parameters
 
-## Recommended visual checks
+### Neighbourhood and bandwidth specification
 
+| Parameter | Default | Meaning | How to choose and what can go wrong |
+|---|---:|---|---|
+| `kernel` | `"bisquare"` | Common kernel shape used for every coefficient-specific smoother. | Bisquare is compact and makes local sample support explicit. Gaussian/exponential tails use every observation with decreasing weight. Kernel sensitivity should be checked after the main bandwidth specification is stable. |
+| `bandwidths` | `None` | Final manual bandwidth specification. `None` requests variable-specific selection; a scalar repeats across parameters; a sequence supplies one value per fitted parameter. | With an intercept, sequence length must equal `p + 1`. Adaptive values must be integer neighbour counts. A wrong order assigns the intended scale to the wrong coefficient. |
+| `bandwidth_method` | `"aicc"` | Criterion for the initial GWR bandwidth and coefficient-specific searches. | Supported: CV, AIC, AICc and BIC. Keep the criterion fixed when comparing bandwidth patterns. AICc is the default because effective complexity matters strongly in local smoothers. |
+| `adaptive` | `True` | Interprets all spatial bandwidths as nearest-neighbour counts instead of coordinate distances. | Often appropriate for uneven sampling density. Raw fixed and adaptive bandwidth values are not comparable. |
+| `bandwidth_range` | `None` | Common lower and upper search bounds for all parameters. | Useful for preventing unsupported extremely local fits. It is overridden parameter-by-parameter where `bandwidth_ranges` is supplied. |
+| `bandwidth_ranges` | `None` | One search interval per fitted parameter. | The list order includes the intercept. Use only when domain knowledge supports parameter-specific limits; restrictive ranges can force boundary solutions. |
+| `init_bandwidth` | `None` | Shared bandwidth for the initial GWR that starts backfitting. | `None` selects it automatically. A sensible manual value can improve reproducibility and speed, but it does not replace the final `bandwidths_`. |
+| `optimization_method` | `"golden_section"` | One-dimensional search method used inside scale selection. | Grid search is useful for transparent sensitivity checks; continuous methods can be faster for fixed bandwidths. |
+| `search_tol` | `1e-6` | Numerical resolution target for each bandwidth search. | Smaller values increase search precision and cost. It is distinct from the outer backfitting `tol`. |
+| `search_max_iter` | `200` | Maximum iterations for each one-dimensional bandwidth search. | Increase only when searches fail to settle; inspect boundary behaviour before merely raising the limit. |
 
-<div class="figure-grid" markdown>
+### Backfitting and inference configuration
 
-<figure markdown>
-  ![09 mgwr bandwidths](../assets/figures/core/09_mgwr_bandwidths.png){ loading=lazy }
-  <figcaption>09 Mgwr Bandwidths</figcaption>
-</figure>
+| Parameter | Default | Meaning | How to choose and what can go wrong |
+|---|---:|---|---|
+| `max_iter` | `200` | Maximum additive backfitting iterations. | A reached limit sets `converged_=False` and emits a warning. Do not report final bandwidths as stable without checking convergence. |
+| `tol` | `1e-5` | Outer score-of-change convergence tolerance. | Smaller values demand tighter convergence and more work. Avoid very loose values solely to make an example run quickly in research analysis. |
+| `rss_score` | `False` | Uses relative RSS change when true; otherwise uses smooth-function change. | Keep the default for the standard coefficient-surface convergence check unless reproducing an RSS-based specification. Report the choice. |
+| `bws_same_times` | `5` | Allows stopping repeated bandwidth searches after the complete bandwidth vector is unchanged for this many iterations. | Set to `0` to disable this shortcut. An unchanged bandwidth vector does not by itself prove that coefficient contributions are fully converged; inspect both histories. |
+| `fit_intercept` | `True` | Fits a spatially varying intercept with its own bandwidth. | Do not add a constant column to `X`. When disabled, all bandwidth-vector lengths decrease by one. |
+| `distance_metric` | `"euclidean"` | Spatial distance definition shared by all coefficient smoothers. | Use projected coordinates for planar distance or Haversine for longitude/latitude. A metric change alters every fitted scale. |
+| `sigma2_v1` | `True` | Residual-variance denominator used for local inference. | Keep consistent across compared models. `False` uses the alternative denominator involving both `trace(S)` and `trace(S'S)`. |
+| `verbose` | `False` | Prints initial bandwidth and backfitting progress. | Enable when diagnosing slow scale searches or convergence. |
 
-<figure markdown>
-  ![11 gwr mgwr comparison](../assets/figures/core/11_gwr_mgwr_comparison.png){ loading=lazy }
-  <figcaption>11 Gwr Mgwr Comparison</figcaption>
-</figure>
+## Fitting
 
-</div>
+```python
+model.fit(
+    X,
+    y,
+    coords,
+    compute_hat_matrix=False,
+    store_partial_hat_matrices=False,
+    compute_inference=True,
+    n_chunks=1,
+    verbose=None,
+)
+```
 
+| Fit argument | Default | Meaning and practical guidance |
+|---|---:|---|
+| `compute_hat_matrix` | `False` | Retains the complete final `n × n` smoother matrix. Leave false unless matrix entries are explicitly required. Exact traces are still computed. |
+| `store_partial_hat_matrices` | `False` | Retains an `n × n` smoother matrix for every fitted parameter. This can be extremely memory intensive. It is not required for ordinary coefficient, ENP or inference output. |
+| `compute_inference` | `True` | Computes local covariance diagonals, standard errors and t statistics. Exact smoother traces and effective parameter counts are computed regardless. |
+| `n_chunks` | `1` | Divides the exact smoother calculation by columns to reduce peak working memory. | Increase for larger `n` when memory is constrained. Chunking changes memory scheduling, not the mathematical result. |
+| `verbose` | `None` | Optional per-fit override of constructor verbosity. |
 
-The figures are generated from deterministic examples and are illustrative; they are not benchmark claims.
+### Memory implications
 
-## Common mistakes
+For $q$ fitted parameters, storing partial smoother matrices requires approximately
 
-- Reading a bandwidth as an exact physical process scale without sensitivity analysis.
-- Using narrow search bounds that force boundary solutions.
-- Assuming `predict()` supports independent new targets; the current method rejects that operation.
-- Comparing coefficient surfaces without accounting for their different effective scales.
+$$
+8n^2q\ \text{bytes}
+$$
 
-## What to report in a paper or technical report
+before array overhead. With `n=5,000` and `q=6`, this is about 1.2 GB. The full hat matrix adds another roughly 200 MB. Leave both storage switches false unless a downstream method explicitly requires the matrices.
 
-- Each coefficient’s bandwidth and unit.
-- Initialization, search ranges, convergence tolerance, and iterations.
-- AICc/CV and effective parameter count.
-- Whether inference was computed and how uncertainty was handled.
-- Why multiscale structure is preferable to standard GWR.
+Chunking does not remove the computational cost of exact inference, but it can reduce peak temporary memory.
+
+## Reading the result
+
+### Bandwidth attributes
+
+| Attribute | Meaning |
+|---|---|
+| `bandwidths_` | Final coefficient-specific bandwidth vector. This is the main multiscale result. |
+| `initial_bandwidth_` | Shared GWR bandwidth used to initialise backfitting. |
+| `bandwidth_` | Compatibility field equal to `initial_bandwidth_`; **it is not the final MGWR bandwidth vector**. |
+| `bandwidth_history_` | Bandwidth vector recorded at each backfitting iteration. |
+| `convergence_history_` | Score of change at each iteration. |
+| `n_iter_` | Number of completed iterations. |
+| `converged_` | Whether the stopping criterion was met before `max_iter`. |
+
+### Coefficients, contributions and inference
+
+| Attribute | Shape | Interpretation |
+|---|---:|---|
+| `intercept_` | `(n,)` | Local intercept surface when fitted. |
+| `coef_` | `(n, p)` | Local slope surfaces. |
+| `parameter_contributions_` | `(n, q)` | Additive contribution of every fitted parameter to each fitted response. Their row-wise sum is `fitted_values_`. |
+| `fitted_values_` | `(n,)` | Calibration-location fitted responses. |
+| `residuals_` | `(n,)` | Calibration residuals. |
+| `effective_params_by_variable_` | `(q,)` | Effective model complexity assigned to each coefficient surface. `ENP_j_` is an alias. |
+| `parameter_standard_errors_` | `(n, q)` or `None` | Local standard errors when inference is enabled. |
+| `parameter_t_values_` | `(n, q)` or `None` | Local coefficient-to-SE ratios. Multiple local comparisons still require caution. |
+| `adjusted_alpha_by_variable_` | `(q,)` or `None` | Variable-specific adjusted significance levels where available. |
+| `critical_t_values_` | `(q,)` or `None` | Corresponding variable-specific critical values. |
+| `diagnostics_` | dictionary | Fit, information-criterion and exact smoother diagnostics. |
+
+`to_frame()` exports location-indexed coefficients, fitted values, residuals and available inference fields. Always pair the table with the ordered parameter names used to interpret `bandwidths_` and `effective_params_by_variable_`.
+
+## How to interpret MGWR bandwidths
+
+### Small bandwidth
+
+A smaller bandwidth indicates a coefficient surface estimated from a more local neighbourhood. It may represent a genuinely local process, but it may also reflect noise, collinearity, boundary effects or a search-range constraint.
+
+### Large bandwidth
+
+A large bandwidth indicates a broad-scale relationship. In an adaptive model, a bandwidth close to the sample size often suggests a nearly global effect, but it is not mathematically identical to declaring the coefficient constant. Use MixedGWR when an exactly global coefficient is part of the model specification.
+
+### Intercept bandwidth
+
+The intercept absorbs spatially varying baseline structure not explained by slopes. A small intercept bandwidth alongside broad slope bandwidths can indicate missing local context. It should not be ignored simply because the substantive interest lies in predictor coefficients.
+
+### Boundary bandwidths
+
+For every parameter, check whether the selected bandwidth equals its lower or upper bound. Boundary selection may indicate:
+
+- an insufficient search interval;
+- inadequate information to identify the scale;
+- pressure toward a global effect;
+- an unstable extremely local fit.
+
+Do not rank variables by raw bandwidth alone when their uncertainty and effective complexity differ.
+
+## Convergence checks
+
+Run these checks after every automatic fit:
+
+```python
+print("converged:", model.converged_)
+print("iterations:", model.n_iter_)
+print("final score:", model.convergence_history_[-1])
+print("bandwidth history:")
+print(model.bandwidth_history_)
+```
+
+A scientifically usable result should have:
+
+- `converged_ == True`, or a clearly justified sensitivity analysis when it is false;
+- a decreasing or stabilising convergence history;
+- stable final bandwidths across nearby initial values or reasonable search settings;
+- no unexplained boundary solutions;
+- coefficient surfaces that remain interpretable under plausible kernel and criterion choices.
+
+## Prediction limitation
+
+The current class intentionally raises `NotImplementedError` for independent-target prediction. This prevents a user from applying an unvalidated shortcut to target locations.
+
+For calibration-location evaluation:
+
+```python
+fitted = model.fitted_values_
+residuals = model.residuals_
+```
+
+For spatial transfer assessment, split the data by spatial blocks, refit MGWR on each training partition, and evaluate predictions through a separately defined and validated workflow. Do not present in-sample fitted values as out-of-area predictive performance.
+
+## GWR versus MGWR
+
+| Question | GWR | MGWR |
+|---|---|---|
+| Number of spatial bandwidths | One shared bandwidth | One per fitted parameter |
+| Calibration | Independent multivariate local regressions | Coupled additive backfitting |
+| Main scientific output | Local coefficient surfaces under one scale | Local coefficient surfaces **and** their variable-specific scales |
+| Computational cost | Lower | Substantially higher due to repeated searches and exact multiscale inference |
+| Target prediction in pyGWRx | Supported | Not exposed |
+| Best use | Transparent baseline and single-scale exploration | Explicit investigation of process-specific spatial scales |
+
+MGWR should normally be compared with GWR using the same response, predictors, coordinate treatment, kernel family and validation design. Better AICc alone is not sufficient; the selected scales and coefficient surfaces must also be stable and scientifically credible.
+
+## Common mistakes and corrections
+
+| Mistake | Consequence | Correction |
+|---|---|---|
+| Supplying two bandwidths for two predictors while fitting an intercept | The class expects three values and raises an error. | Include the intercept bandwidth first or set `fit_intercept=False`. |
+| Interpreting `model.bandwidth_` as the MGWR result | It stores the initial shared GWR scale for compatibility. | Use `model.bandwidths_`. |
+| Treating a sample-sized bandwidth as proof of an exactly constant coefficient | Broad smoothing is not the same as an explicit global parameter. | Compare with MixedGWR or a global restriction. |
+| Reporting bandwidths without convergence status | The vector may be an unfinished backfitting state. | Report `converged_`, `n_iter_` and sensitivity to initial/search settings. |
+| Enabling partial hat-matrix storage by default | Memory use grows as `n² × q`. | Keep `store_partial_hat_matrices=False` unless essential. |
+| Calling `predict()` | Independent-target prediction is intentionally unavailable. | Use calibration outputs or a refitted spatial holdout workflow. |
+| Using a large predictor set without collinearity checks | Backfitting can produce unstable or difficult-to-identify scales. | Reduce redundant predictors and inspect local/global collinearity. |
+| Comparing bandwidths across different coordinate units or metrics | Scale values no longer have the same meaning. | Hold the coordinate and distance specification fixed. |
+| Interpreting coefficient maps without ENP and uncertainty | Smoothness and effective complexity differ by variable. | Examine `effective_params_by_variable_`, SE/t fields and adjusted critical values. |
+
+## Recommended analysis sequence
+
+1. Fit a global linear baseline.
+2. Fit standard GWR and diagnose bandwidth, residuals, influence and collinearity.
+3. Fit MGWR with automatic bandwidths and conservative matrix-storage settings.
+4. Check convergence and every bandwidth boundary.
+5. Compare GWR and MGWR information criteria under the same specification.
+6. Examine each variable's bandwidth, ENP, coefficient distribution and uncertainty together.
+7. Repeat with plausible initial bandwidths, search ranges or kernels to assess stability.
+8. Validate transfer claims with spatially structured refitting.
+
+## What to report
+
+A reproducible MGWR analysis should include:
+
+- all data preparation and coordinate information required for GWR;
+- kernel and fixed/adaptive semantics;
+- bandwidth criterion and optimisation method;
+- common and variable-specific search ranges;
+- initial bandwidth;
+- final bandwidth vector with parameter order and units;
+- convergence tolerance, iteration count and convergence status;
+- `rss_score` and `bws_same_times` settings;
+- effective parameter count by variable;
+- inference and matrix-storage switches;
+- AICc/CV comparison with global regression and GWR;
+- coefficient, residual, influence and collinearity diagnostics;
+- boundary and sensitivity analysis;
+- explicit acknowledgement that independent-target prediction was not used;
+- pyGWRx version.
 
 ## References
 
-- [Fotheringham, Yang & Kang (2017), *Multiscale Geographically Weighted Regression (MGWR)*](https://doi.org/10.1080/24694452.2017.1352480)
-- [Comber et al. (2022), *A route map for the informed application of GWR*](https://doi.org/10.1111/gean.12316)
+- Fotheringham, A. S., Yang, W., & Kang, W. (2017). Multiscale Geographically Weighted Regression (MGWR). *Annals of the American Association of Geographers*, 107(6), 1247–1265. [`10.1080/24694452.2017.1352480`](https://doi.org/10.1080/24694452.2017.1352480)
+- Oshan, T. M., Li, Z., Kang, W., Wolf, L. J., & Fotheringham, A. S. (2019). mgwr: A Python Implementation of Multiscale Geographically Weighted Regression for Investigating Process Spatial Heterogeneity and Scale. *ISPRS International Journal of Geo-Information*, 8(6), 269. [`10.3390/ijgi8060269`](https://doi.org/10.3390/ijgi8060269)
+- Comber, A. et al. (2022). A route map for the informed application of Geographically Weighted Regression. *Geographical Analysis*, 55, 155–178. [`10.1111/gean.12316`](https://doi.org/10.1111/gean.12316)
 
 ## Related documentation
 
-- [Detailed API for `MGWR`](../api/models/mgwr.md)
-- [Maintained example source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/02_mgwr.py)
+- [Generated `MGWR` API](../api/models/mgwr.md)
+- [Standard GWR manual](gwr.md)
+- [Mixed GWR manual](mixed-gwr.md)
 - [Kernels and bandwidths](../guides/kernels-and-bandwidths.md)
-- [Prediction and result objects](../guides/prediction-and-results.md)
-- [Complete Chinese model guide](../zh/models/mgwr.md)
+- [Diagnostics and inference](../guides/diagnostics.md)
