@@ -2,167 +2,309 @@
 
 <div class="model-hero" markdown>
 
-**Family:** Robust local regression
-**Install:** `pip install -e ".[all]"`
-**Required data:** X, y, coordinates
-**Primary operations:** fit, score, predict, predict_result
-**New-location capability:** Validated local prediction using the fitted robust calibration state.
+**Task:** continuous-response local regression resistant to high-residual observations  
+**Core mechanism:** multiply each spatial kernel by an observation-level robust residual weight  
+**Required inputs:** predictor matrix `X`, numeric response `y`, coordinates `coords`  
+**Independent-target prediction:** supported using the final robust calibration weights
 
 </div>
 
 [API reference](../api/models/rgwr.md){ .md-button .md-button--primary }
-[Runnable source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/03_rgwr.py){ .md-button }
-[Choose a model](../getting-started/choosing-a-model.md){ .md-button }
+[GWR manual](gwr.md){ .md-button }
+[Diagnostics guide](../guides/diagnostics.md){ .md-button }
 
-## Why this model exists
+## What problem RGWR solves
 
-Use RGWR when a small number of response outliers or high-residual observations would otherwise contaminate many overlapping local regressions.
+Every observation participates in many overlapping GWR calibrations. A response outlier can therefore distort not only the coefficient estimate at its own location but also many neighbouring coefficient estimates. RGWR reduces that contamination by combining ordinary spatial weights with a second observation-level weight derived from residual behaviour.
 
-!!! note "One-sentence idea"
-    RGWR multiplies geographical kernel weights by observation-level robust weights derived from residuals. Outlying observations progressively contribute less to every local fit they influence.
-
-## Statistical formulation
-
-At iteration $t$, the effective weight is
+At focal location $s_i$, observation $j$ receives
 
 $$
-\widetilde w_{ij}^{(t)}=w_{ij}^{G}r_j^{(t)},
+w_{ij}^{\mathrm{effective}}=w_{ij}^{\mathrm{spatial}}r_j,
 $$
 
-where $w_{ij}^{G}$ is the geographical kernel weight and $r_j^{(t)}\in[0,1]$ is a robust residual weight. The local solver remains weighted least squares, but the residual weights are updated until convergence.
+where $r_j\in[0,1]$ is shared across all local regressions. A low robust weight means that the observation contributes less wherever it falls inside a spatial neighbourhood.
 
-## How pyGWRx fits the model
+RGWR is a response-outlier remedy. It is not a substitute for diagnosing local predictor collinearity, incorrect response distributions, omitted variables or spatially structured residuals.
 
-1. Fit an initial GWR.
-2. Compute standardized or studentized residuals.
-3. Convert residual magnitudes to robust weights using the configured cut points.
-4. Multiply robust and geographic weights and refit the local regressions.
-5. Repeat until the robust weights or coefficients stabilize, or use filter mode for extreme observations.
-6. Retain the final weights and convergence history for diagnosis.
+## When to use RGWR
 
-## Constructor and important controls
+Use RGWR when:
 
-```python
-RGWR(kernel: 'Union[str, Callable[[np.ndarray, float], np.ndarray]]' = 'gaussian', bandwidth: 'Union[float, int, str, None]' = 'cv', bandwidth_method: 'str' = 'cv', adaptive: 'bool' = False, bandwidth_range: 'Optional[Tuple[float, float]]' = None, optimization_method: 'str' = 'golden_section', fit_intercept: 'bool' = True, distance_metric: 'str' = 'euclidean', sigma2_v1: 'bool' = True, method: 'str' = 'automatic', max_iter: 'int' = 20, tol: 'float' = 1e-05, cut1: 'float' = 2.0, cut2: 'float' = 3.0, cut_filter: 'float' = 3.0 verbose: 'bool' = False) -> 'None'
-```
+- the response is continuous and Gaussian local regression is otherwise appropriate;
+- a small number of observations have unusually large residuals;
+- ordinary GWR coefficient surfaces change markedly when those observations are removed;
+- measurement error, recording anomalies or rare response events could contaminate neighbouring fits;
+- the robust-weight map is itself useful for auditing the data.
 
-The API page documents every parameter and fitted attribute. In practice, start by deciding the **data contract**, **neighbourhood definition**, **selection criterion**, and **prediction/inference goal** before tuning secondary controls.
+Do not use RGWR as the automatic default merely because residuals are imperfect. When broad model misspecification causes many large residuals, robust downweighting can conceal the problem rather than solve it.
 
-| Decision | Questions to answer |
+| Main problem | More appropriate response |
 |---|---|
-| Data | Are rows independent observations, ordered stages, classes, counts, or multivariate features? |
-| Distance | Are coordinates projected? Is time or contextual similarity part of the neighbourhood? |
-| Bandwidth | Fixed distance or adaptive neighbours? Supplied value or selected criterion? |
-| Inference | Are local uncertainty, non-stationarity tests, or only prediction required? |
-| Validation | Does the split respect spatial and, where relevant, temporal dependence? |
+| Correlated local predictors | [`LCRGWR`](lcr-gwr.md) or [`GWLasso`](gw-lasso.md) |
+| Count or binary response | [`GWGLM`](gwglm.md) |
+| Different predictor scales | [`MGWR`](mgwr.md) |
+| A known global/local coefficient partition | [`MixedGWR`](mixed-gwr.md) |
+| Spatial transfer prediction rather than coefficient robustness | Validate GWR and RGWR with spatial holdouts; do not rely on in-sample fit alone. |
 
-## Complete runnable example
+## The two robust methods
 
-The following is the exact maintained example used by the API-coverage checks.
+pyGWRx implements the two classical procedures exposed by `GWmodel::gwr.robust`.
+
+### `method="automatic"`
+
+1. Fit an initial ordinary GWR and retain its selected bandwidth.
+2. Divide residual magnitudes by the root mean squared residual.
+3. Convert those scores to robust weights:
+   - score $\leq$ `cut1`: weight 1;
+   - `cut1` < score $\leq$ `cut2`: smooth bisquare transition;
+   - score > `cut2`: weight 0.
+4. Refit every local regression using spatial weight × robust weight.
+5. Repeat until relative MSE change is no greater than `tol` or `max_iter` is reached.
+
+This method can partially downweight an observation before assigning zero weight.
+
+### `method="filtered"`
+
+1. Fit an initial ordinary GWR with the full hat matrix.
+2. Calculate GWmodel-style studentised residuals.
+3. Set the weight to zero when `abs(studentised residual) >= cut_filter`; otherwise retain weight 1.
+4. Refit once.
+
+This method performs a single hard filtering step. It is easier to audit but more sensitive to the selected cutoff.
+
+!!! important "Bandwidth selection precedes robust reweighting"
+    The bandwidth is selected from the initial ordinary GWR and then retained during robust fitting. The final robust weights do not trigger a second automatic bandwidth search.
+
+## Installation
+
+```bash
+pip install pygwrx
+```
+
+## Self-contained example
 
 ```python
-# SPDX-FileCopyrightText: 2026 Jinghao Hu
-# SPDX-License-Identifier: MIT
-
-"""Fit robust GWR in automatic down-weighting mode."""
-
 import numpy as np
+import pandas as pd
+
 from pygwrx import RGWR
-from _common import print_model_result, spatial_regression
 
-X, y, coords = spatial_regression()
-y = y.copy()
-y[[2, 20]] += np.array([5.0, -4.0])
-model = RGWR(bandwidth=24, adaptive=True, max_iter=8).fit(X, y, coords)
-print_model_result(model)
-print("robust_weights=", model.robust_weights_[:8])
-print("predictions=", model.predict(X.iloc[:3], coords.iloc[:3]))
+rng = np.random.default_rng(12)
+n = 70
+coords = rng.uniform(0.0, 100.0, size=(n, 2))
+X = pd.DataFrame(
+    {
+        "income": rng.normal(size=n),
+        "access": rng.normal(size=n),
+    }
+)
+
+beta = 1.0 + 0.01 * coords[:, 0]
+y = (
+    3.0
+    + beta * X["income"].to_numpy()
+    - 0.8 * X["access"].to_numpy()
+    + rng.normal(0.0, 0.35, size=n)
+)
+
+# Inject two large response anomalies.
+y[[8, 51]] += np.array([8.0, -7.0])
+
+model = RGWR(
+    kernel="bisquare",
+    bandwidth="aicc",
+    adaptive=True,
+    method="automatic",
+    cut1=2.0,
+    cut2=3.0,
+    max_iter=20,
+    tol=1e-5,
+).fit(
+    X,
+    y,
+    coords,
+    compute_hat_matrix=False,
+)
+
+print("bandwidth:", model.bandwidth_)
+print("robust refits:", model.n_iter_)
+print("converged:", model.converged_)
+print("zero-weight observations:", np.flatnonzero(model.outlier_mask_))
+print(model.to_frame().sort_values("robust_weight").head())
 ```
 
-Run it from the `examples/models` directory or through `python examples/run_all.py`.
-
-## Reading the fitted result
-
-**Main outputs:** GWR-style coefficients and diagnostics plus `robust_weights_`, outlier indicators, convergence history, predictions, and result tables.
-
-Available high-level methods detected in the current class are: `fit()`, `score()`, `predict()`, `predict_result()`, `summary()`, `to_frame()`.
-
-A safe inspection sequence is:
+For an auditable hard-filter alternative:
 
 ```python
-# 1. Human-readable overview
-print(model.summary()) if hasattr(model, "summary") else None
+filtered = RGWR(
+    kernel="bisquare",
+    bandwidth=model.bandwidth_,
+    adaptive=True,
+    method="filtered",
+    cut_filter=3.0,
+).fit(X, y, coords, compute_hat_matrix=False)
 
-# 2. Location-indexed table when supported
-frame = model.to_frame() if hasattr(model, "to_frame") else None
-
-# 3. Explicitly inspect the model-specific state
-print([name for name in vars(model) if name.endswith("_")])
+print(filtered.to_frame().sort_values("initial_studentized_residual").tail())
 ```
 
-Do not assume that every model exposes the same outputs. Regression, classification, transformation, descriptive-statistics, and inference models have different result semantics.
+Filtered RGWR internally stores the initial full hat matrix long enough to calculate its studentised residuals even when the final `compute_hat_matrix=False`.
 
-## Diagnostics and interpretation
-
-Map and list down-weighted observations, compare standard GWR and RGWR surfaces, and determine whether apparent spatial non-stationarity was driven by a few observations.
-
-The common diagnostics layer can be used where the fitted model provides the required fields:
+## Constructor
 
 ```python
-from pygwrx.diagnostics import diagnostics_frame, local_diagnostic_frame
-
-print(diagnostics_frame([model], labels=["RGWR"]))
-try:
-    print(local_diagnostic_frame(model).head())
-except (AttributeError, NotImplementedError, ValueError) as exc:
-    print("This model exposes a different diagnostic contract:", exc)
+RGWR(
+    kernel="gaussian",
+    bandwidth="cv",
+    bandwidth_method="cv",
+    adaptive=False,
+    bandwidth_range=None,
+    optimization_method="golden_section",
+    fit_intercept=True,
+    distance_metric="euclidean",
+    sigma2_v1=True,
+    method="automatic",
+    max_iter=20,
+    tol=1e-5,
+    cut1=2.0,
+    cut2=3.0,
+    cut_filter=3.0,
+    verbose=False,
+)
 ```
 
-See [Diagnostics and inference](../guides/diagnostics.md) for model-aware checks and interpretation rules.
+## Constructor parameters
 
-## Recommended visual checks
+### Spatial GWR parameters
 
+| Parameter | Default | Meaning and use |
+|---|---:|---|
+| `kernel` | `"gaussian"` | Spatial kernel. Compact kernels make the interaction between neighbourhood support and zero robust weights especially visible. |
+| `bandwidth` | `"cv"` | Numeric fixed/adaptive bandwidth or CV/AIC/AICc/BIC token. Selection uses the initial standard GWR only. |
+| `bandwidth_method` | `"cv"` | Criterion used when `bandwidth=None`. |
+| `adaptive` | `False` | Numeric bandwidth is a neighbour count when true and a coordinate distance when false. |
+| `bandwidth_range` | `None` | Optional automatic search bounds. Inspect whether the selected initial-GWR bandwidth reaches a bound. |
+| `optimization_method` | `"golden_section"` | `"golden_section"`, `"brent"` or `"grid"`. |
+| `fit_intercept` | `True` | Fits a local intercept. Do not add a manual constant column. |
+| `distance_metric` | `"euclidean"` | Defines spatial proximity. Coordinate and bandwidth units must be consistent. |
+| `sigma2_v1` | `True` | Final robust-GWR residual variance convention used for standard errors. |
 
-<div class="figure-grid" markdown>
+See the [GWR manual](gwr.md) for detailed fixed/adaptive bandwidth and distance guidance.
 
-<figure markdown>
-  ![01 rgwr weights](../assets/figures/specialized/01_rgwr_weights.png){ loading=lazy }
-  <figcaption>01 Rgwr Weights</figcaption>
-</figure>
+### Robust parameters
 
-<figure markdown>
-  ![02 rgwr convergence](../assets/figures/specialized/02_rgwr_convergence.png){ loading=lazy }
-  <figcaption>02 Rgwr Convergence</figcaption>
-</figure>
+| Parameter | Default | Meaning | Selection guidance and failure mode |
+|---|---:|---|---|
+| `method` | `"automatic"` | Chooses iterative smooth downweighting or one-step hard filtering. | Use automatic when gradual influence reduction is preferred. Use filtered when a clear residual cutoff and one auditable refit are required. Compare both in sensitivity analysis when conclusions depend on a few observations. |
+| `max_iter` | `20` | Maximum robust refits for automatic RGWR. | Increase only after checking that convergence history is steadily decreasing. Filtered RGWR always performs one robust refit. |
+| `tol` | `1e-5` | Relative MSE-change stopping tolerance for automatic RGWR. | A smaller value demands tighter convergence. Always report `converged_`; reaching `max_iter` generates a warning. |
+| `cut1` | `2.0` | Automatic score below which an observation keeps full weight. | Lower values start downweighting more observations. Excessively low values can remove normal residual variation. Must be non-negative. |
+| `cut2` | `3.0` | Automatic score above which robust weight becomes zero. | Must be greater than `cut1`. Lower values reject more observations and can leave too little effective local support. |
+| `cut_filter` | `3.0` | Absolute studentised-residual cutoff for filtered RGWR. | Smaller values remove more observations. Inspect the actual studentised-residual distribution rather than treating 3 as universally correct. |
+| `verbose` | `False` | Prints automatic relative-MSE progress. | Useful for convergence diagnosis. |
 
-</div>
+## Fitting
 
+```python
+model.fit(
+    X,
+    y,
+    coords,
+    compute_hat_matrix=True,
+    compute_local_r2=True,
+    compute_inference=True,
+    compute_hat_matrix_flag=None,
+    verbose=None,
+)
+```
 
-The figures are generated from deterministic examples and are illustrative; they are not benchmark claims.
+The fit arguments have the same meaning as GWR, with two qualifications:
+
+- `compute_hat_matrix` controls storage of the **final robust** smoother matrix;
+- filtered RGWR temporarily requires the initial full GWR matrix regardless of that final storage setting.
+
+Robust filtering can fail with `RuntimeError` when too few observations retain positive weight for the number of design columns. The correct response is to inspect the data, increase bandwidth, reduce predictors or relax robust thresholds—not to suppress the error.
+
+## Main fitted attributes
+
+| Attribute | Meaning |
+|---|---|
+| `robust_method_` | Final normalised method name. |
+| `robust_weights_` | Final observation-level weights in `[0, 1]`. |
+| `downweighted_mask_` | Observations with weight below 1. |
+| `outlier_mask_` | Observations with final weight equal to zero. |
+| `n_iter_` | Number of robust refits after the initial GWR. |
+| `converged_` | Automatic tolerance reached, or true after the filtered one-refit procedure. |
+| `weight_history_` | All robust weight vectors, beginning with all ones. |
+| `mse_history_` | Initial and successive robust-fit MSE values. |
+| `convergence_history_` | Relative MSE changes for automatic RGWR. |
+| `initial_fitted_values_`, `initial_residuals_` | Ordinary GWR state before robust weighting. |
+| `initial_diagnostics_` | Initial GWR diagnostics for direct before/after comparison. |
+| `initial_studentized_residuals_` | Initial filtered-method residual scores; `None` for automatic RGWR. |
+| `robust_residual_scores_` | Final residuals divided by root MSE. |
+| `coef_`, `intercept_`, `fitted_values_`, `residuals_` | Final robust local model results. |
+
+`to_frame()` appends `robust_weight`, `downweighted`, `robust_outlier`, robust residual score and, for filtered RGWR, the initial studentised residual.
+
+## Prediction semantics
+
+RGWR inherits GWR target-location recalibration. The target spatial kernel is multiplied by the **final training-observation robust weights**. Prediction therefore preserves the fitted assessment of which calibration observations were unreliable.
+
+```python
+pred = model.predict(X_new, coords_new)
+result = model.predict_result(X_new, coords_new)
+```
+
+This does not identify outliers in the new target response because target responses are not supplied. A prediction workflow must separately monitor target-domain anomalies and data drift.
+
+## Interpretation workflow
+
+1. Fit ordinary GWR with the same spatial specification.
+2. Identify large residuals, leverage and Cook's distance.
+3. Investigate data quality and scientific plausibility before downweighting.
+4. Fit RGWR and compare initial versus final coefficient surfaces.
+5. Map robust weights and the number of zero/downweighted observations.
+6. Check automatic convergence or filtered threshold sensitivity.
+7. Examine whether local conclusions depend on a small set of removed observations.
+8. Validate GWR and RGWR using the same spatial holdouts.
+
+A lower robust MSE is not sufficient evidence that the model is preferable: downweighting changes the fitting objective. The important questions are whether influential anomalies were handled transparently and whether substantive surfaces became more stable.
 
 ## Common mistakes
 
-- Using robustness to hide data-quality problems.
-- Choosing cut points after inspecting the desired result.
-- Assuming down-weighted observations are automatically erroneous.
-- Ignoring the effect of bandwidth on how far an outlier’s influence propagates.
+| Mistake | Correction |
+|---|---|
+| Calling every low robust weight a data error | Treat it as an influence signal; investigate the observation and local model. |
+| Using RGWR to fix predictor collinearity | Use local condition-number diagnostics and LCRGWR/GWLasso. |
+| Selecting bandwidth after removing residual outliers without reporting it | pyGWRx intentionally selects from the initial GWR; report that workflow. |
+| Lowering `cut2` until coefficient maps look smooth | Predefine or sensitivity-test thresholds; do not tune by preferred visual outcome. |
+| Ignoring `converged_=False` | Inspect `convergence_history_`, adjust iteration settings and report instability. |
+| Comparing final RGWR diagnostics with GWR as if the objective were unchanged | Include initial diagnostics, robust weights and held-out validation. |
+| Forgetting that one zero-weight observation affects many local fits | Map its neighbourhood influence and compare surfaces before/after robust fitting. |
 
-## What to report in a paper or technical report
+## What to report
 
-- Robust method and cut points.
-- Number and locations of down-weighted observations.
-- Convergence criterion and iteration count.
-- Sensitivity relative to standard GWR.
-- Whether substantive conclusions change after robust fitting.
+Report all ordinary GWR spatial settings plus:
+
+- robust method;
+- `cut1`, `cut2` or `cut_filter`;
+- iteration limit, tolerance, iterations completed and convergence status;
+- number and spatial distribution of downweighted and zero-weight observations;
+- minimum/summary robust weights;
+- comparison of initial and final diagnostics and coefficient surfaces;
+- threshold sensitivity;
+- investigation of flagged observations;
+- spatial validation design;
+- pyGWRx version.
 
 ## References
 
-- [Harris, Fotheringham & Juggins (2010), *Robust Geographically Weighted Regression*](https://doi.org/10.1080/00045600903550378)
+- Harris, P., Fotheringham, A. S., & Juggins, S. (2010). Robust geographically weighted regression: a technique for quantifying spatial relationships between freshwater acidification critical loads and catchment attributes. *Annals of the Association of American Geographers*, 100(2), 286–306. [`10.1080/00045600903550378`](https://doi.org/10.1080/00045600903550378)
+- Lu, B., Harris, P., Charlton, M., & Brunsdon, C. (2014). The GWmodel R package: further topics for exploring spatial heterogeneity using geographically weighted models. *Geo-spatial Information Science*, 17(2), 85–101. [`10.1080/10095020.2014.917453`](https://doi.org/10.1080/10095020.2014.917453)
 
 ## Related documentation
 
-- [Detailed API for `RGWR`](../api/models/rgwr.md)
-- [Maintained example source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/03_rgwr.py)
-- [Kernels and bandwidths](../guides/kernels-and-bandwidths.md)
-- [Prediction and result objects](../guides/prediction-and-results.md)
-- [Complete Chinese model guide](../zh/models/rgwr.md)
+- [Generated RGWR API](../api/models/rgwr.md)
+- [Standard GWR](gwr.md)
+- [LCRGWR](lcr-gwr.md)
+- [Diagnostics and inference](../guides/diagnostics.md)
