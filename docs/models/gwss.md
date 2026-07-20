@@ -2,165 +2,270 @@
 
 <div class="model-hero" markdown>
 
-**Family:** Local descriptive statistics
-**Install:** `pip install -e ".[all]"`
-**Required data:** Multivariate X and coordinates
-**Primary operations:** fit, select_bandwidth, summary
-**New-location capability:** Not applicable; this is a local-statistics estimator.
+**Task:** exploratory local descriptive statistics for one or more numeric variables  
+**Core mechanism:** calculate weighted moments, pairwise associations, and optional quantiles at each summary location  
+**Required inputs:** numeric data matrix `X` and observation coordinates `coords`  
+**Evaluation away from observations:** supported through `summary_coords`; this is not response prediction
 
 </div>
 
 [API reference](../api/models/gwss.md){ .md-button .md-button--primary }
-[Runnable source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/11_gwss.py){ .md-button }
-[Choose a model](../getting-started/choosing-a-model.md){ .md-button }
+[GWPCA manual](gwpca.md){ .md-button }
+[Model selection guide](../getting-started/choosing-a-model.md){ .md-button }
 
-## Why this model exists
+## What GWSS is for
 
-Use GWSS before modelling to examine how means, dispersion, covariance, correlation, and optional quantiles vary across space.
+GWSS describes how a variable distribution or pairwise association changes across space before a regression, classification, or dimension-reduction model is imposed. It can reveal:
 
-!!! note "One-sentence idea"
-    GWSS applies the same geographic weighting principle as GWR, but computes descriptive statistics instead of response-model coefficients.
+- spatial variation in local level and dispersion;
+- regions with asymmetric local distributions;
+- changing pairwise covariance and correlation;
+- differences between Pearson and rank association;
+- local median and interquartile structure that is less driven by extremes.
 
-## Statistical formulation
+GWSS does not estimate response coefficients, make class predictions, or test causality. It is an exploratory local-statistics estimator.
 
-A local weighted mean is
+## Statistics calculated
 
-$$
-\bar x_i=\frac{\sum_jw_{ij}x_j}{\sum_jw_{ij}},
-$$
+For every summary location and variable, pyGWRx can calculate:
 
-and local covariance/correlation follow from the weighted centered products. With quantile mode, weighted local distribution summaries are also computed.
+| Attribute | Statistic | Interpretation caution |
+|---|---|---|
+| `local_mean_` | Normalised weighted mean | Sensitive to extreme observations and bandwidth. |
+| `local_var_` | Normalised weighted second central moment | This moment definition is not the same denominator used by pairwise covariance. |
+| `local_std_` | Square root of local variance | In original variable units. |
+| `local_skewness_` | Weighted third central moment divided by local SD cubed | Undefined when local SD is zero. |
+| `local_cv_` | Local SD divided by local mean | Unstable or undefined near a zero mean; often inappropriate for variables that can be negative. |
+| `local_median_` | Weighted median | Available only with `quantile=True`. |
+| `local_iqr_` | Weighted Q3 minus Q1 | Available only with `quantile=True`. |
+| `local_qi_` | `(2 median - Q3 - Q1) / IQR` | Signed quantile imbalance under the GWmodel definition; undefined when IQR is zero. |
+| `local_cov_` | Unbiased weighted pairwise covariance | Stored in a dictionary keyed by variable-index pairs. |
+| `local_corr_` | Weighted Pearson correlation | Sensitive to local outliers and nonlinearity. |
+| `local_corr_spearman_` | Weighted correlation of globally ranked variables | Captures monotonic association; ranking is calculated over the full dataset before local weighting. |
 
-## How pyGWRx fits the model
+The implementation follows `GWmodel::gwss` conventions. In particular, univariate local variance uses a normalized weighted moment, whereas pairwise covariance uses the unbiased denominator `1 - sum(w²)`.
 
-1. Validate numeric variables and coordinates.
-2. Apply or select a bandwidth.
-3. Build local geographic weights.
-4. Compute local means, variances, standard deviations, covariance, and correlation.
-5. Optionally compute weighted quantiles.
-6. Export location-indexed statistics for mapping or downstream model design.
+## When to use GWSS
 
-## Constructor and important controls
+Use GWSS when:
 
-```python
-GWSS(kernel: 'str | Any' = 'bisquare', bandwidth: 'float | int | None' = None, adaptive: 'bool' = False, quantile: 'bool' = False, verbose: 'bool' = False) -> 'None'
+- exploring a multivariate spatial dataset before modelling;
+- deciding whether global summaries hide important local variation;
+- checking where predictor distributions or correlations change;
+- comparing mean-based and quantile-based local structure;
+- selecting candidate variables or regions for further investigation.
+
+Do not use local correlations as evidence that one variable causes another. Overlapping spatial windows create smooth-looking maps even under weak evidence.
+
+| Goal | More appropriate method |
+|---|---|
+| Estimate a continuous response relationship | [`GWR`](gwr.md), [`MGWR`](mgwr.md), or another regression model |
+| Classify observations | [`GWDA`](gwda.md) |
+| Summarise local multivariate dimensions | [`GWPCA`](gwpca.md) |
+| Formal hypothesis testing of local statistics | Requires a dedicated inferential or permutation design not exposed by this class. |
+
+## Coordinate and distance assumptions
+
+GWSS currently uses the shared Euclidean distance utility and does not expose `distance_metric`. Supply projected coordinates in meaningful planar units. A fixed bandwidth then has the same unit as those coordinates.
+
+`summary_coords` may differ from observation coordinates. Each summary location receives weights over the original observations, allowing a regular grid or selected reporting points. It does not create new observations or interpolate raw variables.
+
+## Installation
+
+```bash
+pip install pygwrx
 ```
 
-The API page documents every parameter and fitted attribute. In practice, start by deciding the **data contract**, **neighbourhood definition**, **selection criterion**, and **prediction/inference goal** before tuning secondary controls.
-
-| Decision | Questions to answer |
-|---|---|
-| Data | Are rows independent observations, ordered stages, classes, counts, or multivariate features? |
-| Distance | Are coordinates projected? Is time or contextual similarity part of the neighbourhood? |
-| Bandwidth | Fixed distance or adaptive neighbours? Supplied value or selected criterion? |
-| Inference | Are local uncertainty, non-stationarity tests, or only prediction required? |
-| Validation | Does the split respect spatial and, where relevant, temporal dependence? |
-
-## Complete runnable example
-
-The following is the exact maintained example used by the API-coverage checks.
+## Self-contained example
 
 ```python
-# SPDX-FileCopyrightText: 2026 Jinghao Hu
-# SPDX-License-Identifier: MIT
-
-"""Compute geographically weighted summary statistics."""
+import numpy as np
+import pandas as pd
 
 from pygwrx import GWSS
-from _common import spatial_regression
 
-X, _, coords = spatial_regression(n=48, p=3)
-model = GWSS(bandwidth=24, adaptive=True, quantile=True).fit(X, coords)
+rng = np.random.default_rng(77)
+n = 100
+coords = rng.uniform(0.0, 100.0, size=(n, 2))
+
+X = pd.DataFrame(
+    {
+        "income": 40.0 + 0.20 * coords[:, 0] + rng.normal(0.0, 5.0, size=n),
+        "access": 70.0 - 0.25 * coords[:, 1] + rng.normal(0.0, 6.0, size=n),
+        "density": np.exp(1.5 + 0.008 * coords[:, 0] + rng.normal(0.0, 0.25, size=n)),
+    }
+)
+
+# Evaluate on a small reporting grid rather than only at observations.
+grid_axis = np.linspace(10.0, 90.0, 5)
+summary_coords = np.array(
+    [(x, y) for y in grid_axis for x in grid_axis],
+    dtype=float,
+)
+
+model = GWSS(
+    kernel="bisquare",
+    bandwidth=None,       # automatically select one shared mean-CV bandwidth
+    adaptive=True,
+    quantile=True,
+).fit(
+    X,
+    coords,
+    summary_coords=summary_coords,
+)
+
+print("selected neighbours:", model.bandwidth_)
 print(model.summary())
-print("local_means_shape=", model.local_mean_.shape)
-print("local_correlation_pairs=", sorted(model.local_corr_))
-print("first_correlation_shape=", next(iter(model.local_corr_.values())).shape)
+result = model.to_dataframe()
+print(result.head())
 ```
 
-Run it from the `examples/models` directory or through `python examples/run_all.py`.
-
-## Reading the fitted result
-
-**Main outputs:** `local_mean_`, local variance/standard deviation, local covariance and correlation collections, optional quantiles, summaries, and tabular outputs.
-
-Available high-level methods detected in the current class are: `fit()`, `select_bandwidth()`, `summary()`.
-
-A safe inspection sequence is:
+For a median-oriented bandwidth, select it explicitly and refit:
 
 ```python
-# 1. Human-readable overview
-print(model.summary()) if hasattr(model, "summary") else None
-
-# 2. Location-indexed table when supported
-frame = model.to_frame() if hasattr(model, "to_frame") else None
-
-# 3. Explicitly inspect the model-specific state
-print([name for name in vars(model) if name.endswith("_")])
+selector = GWSS(kernel="bisquare", adaptive=True, quantile=True)
+median_bw = selector.select_bandwidth(X, coords, statistic="median")
+median_model = GWSS(
+    kernel="bisquare",
+    bandwidth=median_bw,
+    adaptive=True,
+    quantile=True,
+).fit(X, coords, summary_coords=summary_coords)
 ```
 
-Do not assume that every model exposes the same outputs. Regression, classification, transformation, descriptive-statistics, and inference models have different result semantics.
-
-## Diagnostics and interpretation
-
-Treat GWSS as exploratory. Compare bandwidths, inspect effective local sample sizes, and avoid over-interpreting noisy local correlation where variation is low.
-
-The common diagnostics layer can be used where the fitted model provides the required fields:
+## Constructor
 
 ```python
-from pygwrx.diagnostics import diagnostics_frame, local_diagnostic_frame
-
-print(diagnostics_frame([model], labels=["GWSS"]))
-try:
-    print(local_diagnostic_frame(model).head())
-except (AttributeError, NotImplementedError, ValueError) as exc:
-    print("This model exposes a different diagnostic contract:", exc)
+GWSS(
+    kernel="bisquare",
+    bandwidth=None,
+    adaptive=False,
+    quantile=False,
+    verbose=False,
+)
 ```
 
-See [Diagnostics and inference](../guides/diagnostics.md) for model-aware checks and interpretation rules.
+## Constructor parameters
 
-## Recommended visual checks
+| Parameter | Default | Meaning | How to use and what can go wrong |
+|---|---:|---|---|
+| `kernel` | `"bisquare"` | Converts Euclidean distance to local weights. | Compact support makes local summaries easy to interpret but may create insufficient effective support. Gaussian/exponential kernels use all observations with decaying weight. |
+| `bandwidth` | `None` | Positive fixed distance, adaptive integer neighbour count, or automatic selection when `None`. | `fit()` with `None` always selects one shared bandwidth using mean-based leave-one-out CV, even when `quantile=True`. Select a median bandwidth separately when that is the target statistic. |
+| `adaptive` | `False` | Numeric bandwidth is a neighbour count when true. | Useful under uneven sampling density. Adaptive bandwidth must be an integer of at least 2 and no larger than sample size. |
+| `quantile` | `False` | Adds local median, IQR, and quantile imbalance. | Increases computation, especially during median bandwidth selection. Use for skewed or outlier-prone variables. |
+| `verbose` | `False` | Prints the number of fitted summary locations. |
 
+No `distance_metric`, per-variable bandwidth, missing-value handling, or inferential p-value parameter is exposed.
 
-<div class="figure-grid" markdown>
+## Bandwidth selection
 
-<figure markdown>
-  ![11 gwss mean](../assets/figures/specialized/11_gwss_mean.png){ loading=lazy }
-  <figcaption>11 Gwss Mean</figcaption>
-</figure>
+```python
+bandwidth = model.select_bandwidth(
+    X,
+    coords,
+    statistic="mean",  # or "median"
+)
+```
 
-<figure markdown>
-  ![12 gwss correlation](../assets/figures/specialized/12_gwss_correlation.png){ loading=lazy }
-  <figcaption>12 Gwss Correlation</figcaption>
-</figure>
+The selector returns one shared bandwidth for all variables and all reported statistics.
 
-</div>
+The criterion compares each full local mean/median with its leave-one-out counterpart and sums squared changes over observations and variables. It follows the GWmodel mean/median CV convention; it is not a regression prediction error.
 
+- Adaptive selection exhaustively checks integer neighbour counts from 2 to `n`.
+- Fixed selection uses bounded scalar optimisation between `max_distance / 5000` and `max_distance`.
+- `statistic="median"` is available only through an explicit selector call; `fit(bandwidth=None)` uses `"mean"`.
 
-The figures are generated from deterministic examples and are illustrative; they are not benchmark claims.
+A bandwidth that stabilises local means may not be ideal for correlations, skewness, or quantiles. Treat the selected value as a common exploratory scale and conduct sensitivity analysis.
+
+## Fitting
+
+```python
+model.fit(
+    X,
+    coords,
+    summary_coords=None,
+)
+```
+
+| Argument | Meaning |
+|---|---|
+| `X` | One-dimensional arrays are accepted and reshaped to one variable; DataFrame names are preserved. Missing and infinite values are rejected. |
+| `coords` | Observation coordinates aligned row-by-row with `X`. |
+| `summary_coords` | Optional locations where statistics are evaluated. When omitted, observation coordinates are used. Coordinate dimension must match `coords`. |
+
+All variables share one weight matrix `weights_` with shape `(n_summary_locations, n_observations)`. Storing it requires roughly `8 × m × n` bytes before overhead. A very dense reporting grid can therefore be memory intensive.
+
+## Outputs and export
+
+`to_dataframe()`—not `to_frame()`—returns GWmodel-compatible columns:
+
+- `x`, `y` summary coordinates;
+- `<variable>_LM`, `_LSD`, `_LVar`, `_LSKe`, `_LCV`;
+- optional `<variable>_Median`, `_IQR`, `_QI`;
+- `Cov_left.right`, `Corr_left.right`, and `Spearman_rho_left.right`.
+
+Main fitted state:
+
+| Attribute | Shape/type |
+|---|---|
+| `coords_data_` | Observation coordinates. |
+| `coords_summary_` | Evaluation coordinates. |
+| `weights_` | `(m, n)` normalized weight matrix. |
+| `var_names_` | Variable names used by export. |
+| `local_mean_`, `local_var_`, `local_std_`, `local_skewness_`, `local_cv_` | `(m, p)` arrays. |
+| `local_median_`, `local_iqr_`, `local_qi_` | `(m, p)` arrays or `None`. |
+| `local_cov_`, `local_corr_`, `local_corr_spearman_` | Dictionaries keyed by `(j, k)`, each value length `m`. |
+| `bandwidth_` | Shared fixed distance or adaptive neighbour count. |
+
+## Interpretation workflow
+
+1. Inspect global distributions, units, missingness, and transformations first.
+2. Fit GWSS at a scientifically interpretable bandwidth.
+3. Map local means/medians and dispersion together.
+4. Compare Pearson and Spearman association maps.
+5. Inspect effective neighbourhood support and boundary regions.
+6. Repeat at larger and smaller plausible bandwidths.
+7. Use findings to motivate—not automatically determine—subsequent model specification.
+
+Spatial patterns in local statistics are partly induced by overlapping kernels. Adjacent summary locations are not independent estimates.
 
 ## Common mistakes
 
-- Using local correlations as causal evidence.
-- Ignoring that local statistics are smoothed and overlapping.
-- Computing quantiles with too few effective observations.
-- Selecting variables after inspecting many local maps without multiplicity awareness.
+| Mistake | Correction |
+|---|---|
+| Calling `to_frame()` | Use `to_dataframe()`. |
+| Treating `summary_coords` as new predicted data | They are locations for weighted summaries of the original observations. |
+| Using longitude/latitude directly | Project coordinates; distance is Euclidean. |
+| Interpreting `local_cv_` near zero means | CV becomes unstable or undefined; inspect mean and SD separately. |
+| Assuming `quantile=True` selects a median bandwidth | `fit()` still uses mean CV when bandwidth is `None`. Select median bandwidth explicitly. |
+| Comparing correlations without local variance/support | Correlation can be undefined or unstable when local variance is tiny. |
+| Treating pairwise correlation maps as hypothesis tests | No p-values or multiple-testing procedure is provided. |
+| Using a separate “optimal” bandwidth for every plotted statistic without disclosure | The current class stores one shared bandwidth; report sensitivity clearly. |
 
-## What to report in a paper or technical report
+## What to report
 
-- Variables and transformations.
-- Kernel and bandwidth.
-- Whether quantiles were calculated.
-- Effective neighbourhood size and sensitivity.
-- Which local statistics were mapped and why.
+Report:
+
+- variables, units, transformations, and sample size;
+- coordinate reference system;
+- kernel and fixed/adaptive bandwidth semantics;
+- manual or mean/median CV selection and selected bandwidth;
+- observation versus summary-location design;
+- whether quantiles were calculated;
+- local statistic definitions, especially variance/covariance denominators;
+- bandwidth sensitivity and boundary effects;
+- treatment of undefined CV, skewness, or correlation values;
+- exploratory rather than inferential status;
+- pyGWRx version.
 
 ## References
 
-- [Brunsdon, Fotheringham & Charlton (2002), *Geographically weighted summary statistics*](https://doi.org/10.1016/S0198-9715(01)00009-6)
+- Brunsdon, C., Fotheringham, A. S., & Charlton, M. E. (2002). Geographically weighted summary statistics—a framework for localised exploratory data analysis. *Computers, Environment and Urban Systems*, 26(6), 501–524. [`10.1016/S0198-9715(01)00009-6`](https://doi.org/10.1016/S0198-9715(01)00009-6)
+- Gollini, I., Lu, B., Charlton, M., Brunsdon, C., & Harris, P. (2015). GWmodel: An R Package for Exploring Spatial Heterogeneity Using Geographically Weighted Models. *Journal of Statistical Software*, 63(17). [`10.18637/jss.v063.i17`](https://doi.org/10.18637/jss.v063.i17)
 
 ## Related documentation
 
-- [Detailed API for `GWSS`](../api/models/gwss.md)
-- [Maintained example source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/11_gwss.py)
-- [Kernels and bandwidths](../guides/kernels-and-bandwidths.md)
-- [Prediction and result objects](../guides/prediction-and-results.md)
-- [Complete Chinese model guide](../zh/models/gwss.md)
+- [Generated GWSS API](../api/models/gwss.md)
+- [GWPCA](gwpca.md)
+- [GWDA](gwda.md)
+- [Model selection](../getting-started/choosing-a-model.md)
