@@ -40,14 +40,14 @@ jobs:
           )
           path.write_text(text, encoding="utf-8")
 
-          # Current handoff: replace the obsolete compatibility decision with the new state.
+          # Current handoff: record the consolidated hierarchy without retaining an alias.
           path = Path("HANDOFF_NEXT_CONVERSATION.md")
           text = path.read_text(encoding="utf-8")
           text = text.replace(
               "2. The former `BaseGWR` implementation layer has been removed.\n"
               "3. `BaseGWR = BaseSpatialRegressor` remains only as a backward-compatibility identity alias during the 0.1.x cycle.\n"
               "4. New source, examples, and documentation must use `BaseSpatialRegressor`, not `BaseGWR`.",
-              "2. The former GWR-specific base implementation layer and the deprecated `BaseGWR` compatibility alias have been removed.\n"
+              "2. The former GWR-specific base implementation layer and its compatibility alias have been removed.\n"
               "3. `BaseSpatialRegressor` is the only public GWR-family regression base class.\n"
               "4. New source, examples, and documentation must use `BaseSpatialRegressor`.",
           )
@@ -55,11 +55,12 @@ jobs:
               "`BaseSpatialRegressor` now contains the kernel, bandwidth, local prediction, and shared GWR-family state formerly held by `BaseGWR`.\n\n"
               "Compatibility remains:\n\n"
               "```python\nBaseGWR = BaseSpatialRegressor\n```",
-              "`BaseSpatialRegressor` contains the kernel, bandwidth, local prediction, and shared GWR-family state from the former GWR-specific base layer. The deprecated compatibility alias has now been removed.",
+              "`BaseSpatialRegressor` contains the kernel, bandwidth, local prediction, and shared GWR-family state from the former GWR-specific base layer. The compatibility alias has been removed.",
           )
-          text = text.replace("`BaseGWR`", "`BaseSpatialRegressor`")
+          text = text.replace("`BaseGWR`", "the former compatibility alias")
           text = text.replace("174/174", "173/173")
           text = text.replace("174 public", "173 public")
+          text = text.replace("174 APIs", "173 APIs")
           path.write_text(text, encoding="utf-8")
 
           # Hand-maintained pages that embed the base-class example.
@@ -73,7 +74,7 @@ jobs:
               text = text.replace("# BaseGWR remains an identity alias for backward compatibility.\nassert BaseGWR is BaseSpatialRegressor\n\n", "")
               path.write_text(text, encoding="utf-8")
 
-          # Current overview pages: only API-count wording is changed.
+          # Current overview pages: synchronize API-count wording.
           for name in (
               "docs/index.md",
               "docs/examples/index.md",
@@ -86,6 +87,7 @@ jobs:
               text = path.read_text(encoding="utf-8")
               text = text.replace("174/174", "173/173")
               text = text.replace("174 public API", "173 public API")
+              text = text.replace("174 APIs", "173 APIs")
               text = text.replace("all 174", "all 173")
               text = text.replace("174 个公开 API", "173 个公开 API")
               text = text.replace("174 个公开接口", "173 个公开接口")
@@ -96,12 +98,18 @@ jobs:
           python tools/generate_api_docs.py
           python tools/generate_example_docs.py
           python examples/validate_coverage.py
+      - name: Check current public tree for stale BaseGWR references
+        run: |
+          if git grep -n "BaseGWR" -- src tests examples docs tools README.md README.zh.md PROJECT_STRUCTURE.md HANDOFF_NEXT_CONVERSATION.md ':!docs/project/**' ':!archive/**'; then
+            echo "Unexpected current BaseGWR reference remains"
+            exit 1
+          fi
       - name: Commit regenerated files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src/pygwrx/models/mgwr.py HANDOFF_NEXT_CONVERSATION.md docs examples
           if ! git diff --cached --quiet; then
-            git commit -m "Regenerate docs after BaseGWR removal"
+            git commit -m "Finalize BaseGWR cleanup consistency"
             git push origin HEAD:remove-basegwr
           fi
