@@ -64,11 +64,11 @@ pyGWRx/
 | Namespace | Public symbols | Example coverage |
 |---|---:|---:|
 | `pygwrx.models` | 26 | 26/26 |
-| `pygwrx.core` | 52 | 52/52 |
+| `pygwrx.core` | 51 | 51/51 |
 | `pygwrx.diagnostics` | 23 | 23/23 |
 | `pygwrx.plotting` | 56 | 56/56 |
 | `pygwrx.io` | 17 | 17/17 |
-| **Total** | **174** | **174/174** |
+| **Total** | **173** | **173/173** |
 
 `pygwrx.models` contains 19 estimators and seven public prediction-result classes. Unsupported experimental prototypes and inactive global configuration code are deliberately excluded from this tree.
 
@@ -77,7 +77,7 @@ pyGWRx/
 
 - `docs/models/` and `docs/zh/models/`: 19 detailed model manuals in English and Chinese.
 - `docs/guides/` and `docs/zh/guides/`: task-oriented function and workflow guides.
-- `docs/api/`: generated reference for all 174 public API symbols.
+- `docs/api/`: generated reference for all 173 public API symbols.
 - `docs/examples/`: generated detailed catalog of all 45 runnable examples.
 - `docs/theory/`: algorithm encyclopedia, references, and original-model monographs.
 - `tools/generate_api_docs.py`: API and coverage generator.
