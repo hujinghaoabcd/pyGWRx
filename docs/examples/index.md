@@ -10,7 +10,7 @@ The example suite is both user documentation and a release contract. Every publi
 | Plotting | 6 | all 56 public plotting functions |
 | I/O | 4 | datasets, conversions, persistence, and geospatial round trips |
 | Workflows | 3 | end-to-end GWR, model comparison, and space-time comparison |
-| **Total** | **45** | **174/174 public symbols** |
+| **Total** | **45** | **173/173 public symbols** |
 
 ## Install the full example environment
 

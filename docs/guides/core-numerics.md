@@ -284,7 +284,6 @@ import numpy as np
 import pandas as pd
 
 from pygwrx.core import (
-    BaseGWR,
     BaseMultiscaleRegressor,
     BaseSpatialClassifier,
     BaseSpatialEstimator,
@@ -313,7 +312,7 @@ class MeanRegressor(BaseSpatialRegressor):
         return np.full(Xa.shape[0], self.mean_)
 
 
-class TinyGWR(BaseGWR):
+class TinyGWR(BaseSpatialRegressor):
     """Minimal concrete GWR-style regressor."""
 
     def fit(self, X, y, coords, **kwargs):

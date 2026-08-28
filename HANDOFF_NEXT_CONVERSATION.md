@@ -31,9 +31,9 @@ The rewrite must be based on all of the following:
 ## 3. Non-negotiable project decisions
 
 1. `BaseSpatialRegressor` is now the core GWR-family regression base class.
-2. The former `BaseGWR` implementation layer has been removed.
-3. `BaseGWR = BaseSpatialRegressor` remains only as a backward-compatibility identity alias during the 0.1.x cycle.
-4. New source, examples, and documentation must use `BaseSpatialRegressor`, not `BaseGWR`.
+2. The former GWR-specific base implementation layer and the deprecated `BaseSpatialRegressor` compatibility alias have been removed.
+3. `BaseSpatialRegressor` is the only public GWR-family regression base class.
+4. New source, examples, and documentation must use `BaseSpatialRegressor`.
 5. `MGTWR` is self-contained. Never reintroduce `mgtwr==2.0.5` or any other external MGTWR runtime, optional, development, test, reference, CI, documentation, distribution, or SBOM dependency.
 6. MGWR and MGTWR do not expose independent-target prediction. Do not document such prediction as supported.
 7. `summary()` returns terminal-friendly plain-text summaries.
@@ -74,13 +74,7 @@ BaseSpatialEstimator
     └── BaseMultiscaleRegressor
 ```
 
-`BaseSpatialRegressor` now contains the kernel, bandwidth, local prediction, and shared GWR-family state formerly held by `BaseGWR`.
-
-Compatibility remains:
-
-```python
-BaseGWR = BaseSpatialRegressor
-```
+`BaseSpatialRegressor` contains the kernel, bandwidth, local prediction, and shared GWR-family state from the former GWR-specific base layer. The deprecated compatibility alias has now been removed.
 
 The refactor was merged through PR #6 and passed the repository quality gates.
 

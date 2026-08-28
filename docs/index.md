@@ -152,7 +152,7 @@ fig.savefig(&quot;gwr_diagnostics.png&quot;, dpi=200)</code></pre></div>
   <h2>Designed to make assumptions visible</h2>
   <div class="pygx-proof">
     <article><h3>Explicit capability boundaries</h3><p>Prediction, transformation, classification, statistics, and inference are documented as different operations—not presented as interchangeable estimators.</p></article>
-    <article><h3>Examples as a public contract</h3><p>Every public API is mapped to a maintained example, with automated 174/174 coverage validation.</p></article>
+    <article><h3>Examples as a public contract</h3><p>Every public API is mapped to a maintained example, with automated 173/173 coverage validation.</p></article>
     <article><h3>Reproducible engineering</h3><p>Deterministic example data, strict documentation builds, typed result objects, isolated optional dependencies, and reference comparisons where available.</p></article>
   </div>
 </section>

@@ -207,8 +207,8 @@ class MGWR(BaseMultiscaleRegressor):
         if not isinstance(sigma2_v1, (bool, np.bool_)):
             raise TypeError("sigma2_v1 must be boolean.")
 
-        # BaseGWR's single bandwidth is used only to validate and store the
-        # initial GWR setting. Final MGWR scales are exposed as bandwidths_.
+        # The inherited single-bandwidth state is used only for the initial GWR
+        # calibration. Final MGWR scales are exposed through bandwidths_.
         super().__init__(
             kernel=kernel,
             bandwidth=(
