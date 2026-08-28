@@ -57,12 +57,7 @@ The rewrite must be based on all of the following:
 
 ### 4.2 Base hierarchy refactor
 
-The old hierarchy:
-
-```text
-BaseSpatialRegressor
-└── BaseGWR
-```
+The old hierarchy used a GWR-specific compatibility layer beneath `BaseSpatialRegressor`.
 
 was consolidated into:
 

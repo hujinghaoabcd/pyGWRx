@@ -448,6 +448,6 @@ See the [Core API reference](../api/core/index.md), where every symbol includes 
 `BaseSpatialRegressor` is the single shared base for the geographically
 weighted regression family. It owns the common regression state, kernel
 and bandwidth configuration, local parameter computation, prediction
-validation, and result export behavior. `BaseGWR` remains available as
-an identity alias for backward compatibility with pyGWRx 0.1.2 code.
+validation, and result export behavior. The deprecated compatibility alias
+has been removed from the current public API.
 

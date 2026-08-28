@@ -56,7 +56,7 @@ hide:
     <a class="pygx-path" href="api/">
       <span class="pygx-path__number">04 · REFERENCE</span>
       <h3>Inspect the public contract</h3>
-      <p>Browse signatures, parameters, return objects, docstrings, source links, and mapped example code for 174 APIs.</p>
+      <p>Browse signatures, parameters, return objects, docstrings, source links, and mapped example code for 173 APIs.</p>
       <span class="pygx-path__arrow">API reference →</span>
     </a>
   </div>
