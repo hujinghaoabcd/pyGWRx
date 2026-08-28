@@ -3,7 +3,6 @@
     "AICSelector": "examples/core/07_bandwidth_selectors.py",
     "BICSelector": "examples/core/07_bandwidth_selectors.py",
     "BandwidthSelector": "examples/core/07_bandwidth_selectors.py",
-    "BaseGWR": "examples/core/08_base_classes.py",
     "BaseMultiscaleRegressor": "examples/core/08_base_classes.py",
     "BaseSpatialClassifier": "examples/core/08_base_classes.py",
     "BaseSpatialEstimator": "examples/core/08_base_classes.py",
