@@ -17,8 +17,8 @@ from typing import Any, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
-from pygwrx.diagnostics import feature_names as diagnostic_feature_names
 from pygwrx.diagnostics import (
+    feature_names as diagnostic_feature_names,
     parameter_inference,
     parameter_significance,
 )
