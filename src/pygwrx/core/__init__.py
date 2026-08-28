@@ -25,7 +25,6 @@ from pygwrx.core.bandwidth import (
 
 # Base estimator hierarchy
 from pygwrx.core.base import (
-    BaseGWR,
     BaseMultiscaleRegressor,
     BaseSpatialClassifier,
     BaseSpatialEstimator,
@@ -98,7 +97,6 @@ __all__ = [
     # Base estimator hierarchy
     "BaseSpatialEstimator",
     "BaseSpatialRegressor",
-    "BaseGWR",
     "SpatiotemporalMixin",
     "MultiscaleMixin",
     "BaseSpatiotemporalRegressor",
