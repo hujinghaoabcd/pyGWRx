@@ -20,7 +20,6 @@ import numpy as np
 import pandas as pd
 
 from pygwrx.core import (
-    BaseGWR,
     BaseMultiscaleRegressor,
     BaseSpatialClassifier,
     BaseSpatialEstimator,
@@ -151,10 +150,6 @@ class BasicInference(BaseSpatialInference):
     def summary(self):
         self._check_is_fitted()
         return f"n_samples={self.n_samples_}"
-
-
-# BaseGWR remains an identity alias for backward compatibility.
-assert BaseGWR is BaseSpatialRegressor
 
 
 X = pd.DataFrame({"x": [0.0, 1.0, 2.0, 3.0]})

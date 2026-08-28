@@ -60,7 +60,6 @@ GROUPS: dict[str, list[tuple[str, str, list[str]]]] = {
             [
                 "BaseSpatialEstimator",
                 "BaseSpatialRegressor",
-                "BaseGWR",
                 "SpatiotemporalMixin",
                 "MultiscaleMixin",
                 "BaseSpatiotemporalRegressor",

@@ -284,7 +284,6 @@ import numpy as np
 import pandas as pd
 
 from pygwrx.core import (
-    BaseGWR,
     BaseMultiscaleRegressor,
     BaseSpatialClassifier,
     BaseSpatialEstimator,
@@ -313,7 +312,7 @@ class MeanRegressor(BaseSpatialRegressor):
         return np.full(Xa.shape[0], self.mean_)
 
 
-class TinyGWR(BaseGWR):
+class TinyGWR(BaseSpatialRegressor):
     """Minimal concrete GWR-style regressor."""
 
     def fit(self, X, y, coords, **kwargs):
@@ -449,6 +448,6 @@ See the [Core API reference](../api/core/index.md), where every symbol includes 
 `BaseSpatialRegressor` is the single shared base for the geographically
 weighted regression family. It owns the common regression state, kernel
 and bandwidth configuration, local parameter computation, prediction
-validation, and result export behavior. `BaseGWR` remains available as
-an identity alias for backward compatibility with pyGWRx 0.1.2 code.
+validation, and result export behavior. The deprecated compatibility alias
+has been removed from the current public API.
 

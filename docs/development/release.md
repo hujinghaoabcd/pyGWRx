@@ -8,8 +8,7 @@ validation report; do not convert configured-but-unrun checks into pass claims.
 - update `CHANGELOG.md`, `CITATION.cff`, and the versioned release notes;
 - update `DATA_PROVENANCE.md` when any bundled data byte or source snapshot changes;
 - regenerate and verify data hashes;
-- regenerate API and example documentation;
-- verify `BaseGWR` is unchanged when a release explicitly excludes it.
+- regenerate API and example documentation.
 
 ```bash
 python tools/update_data_hashes.py

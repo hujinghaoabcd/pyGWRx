@@ -415,7 +415,7 @@ print("abstract_base=", BandwidthSelector)
 
 **Purpose.** Implement minimal concrete estimators from every public base class/mixin.
 
-**Public APIs exercised.** `BaseGWR`, `BaseMultiscaleRegressor`, `BaseSpatialClassifier`, `BaseSpatialEstimator`, `BaseSpatialInference`, `BaseSpatialRegressor`, `BaseSpatialStatistics`, `BaseSpatialTransformer`, `BaseSpatiotemporalRegressor`, `MultiscaleMixin`, `SpatiotemporalMixin`
+**Public APIs exercised.** `BaseMultiscaleRegressor`, `BaseSpatialClassifier`, `BaseSpatialEstimator`, `BaseSpatialInference`, `BaseSpatialRegressor`, `BaseSpatialStatistics`, `BaseSpatialTransformer`, `BaseSpatiotemporalRegressor`, `MultiscaleMixin`, `SpatiotemporalMixin`
 
 **Environment.** base installation.
 
@@ -448,7 +448,6 @@ import numpy as np
 import pandas as pd
 
 from pygwrx.core import (
-    BaseGWR,
     BaseMultiscaleRegressor,
     BaseSpatialClassifier,
     BaseSpatialEstimator,
@@ -579,10 +578,6 @@ class BasicInference(BaseSpatialInference):
     def summary(self):
         self._check_is_fitted()
         return f"n_samples={self.n_samples_}"
-
-
-# BaseGWR remains an identity alias for backward compatibility.
-assert BaseGWR is BaseSpatialRegressor
 
 
 X = pd.DataFrame({"x": [0.0, 1.0, 2.0, 3.0]})

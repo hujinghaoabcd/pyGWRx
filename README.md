@@ -13,7 +13,7 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-3.11--3.14-174D5B.svg">
   <img alt="Status" src="https://img.shields.io/badge/Status-Alpha-F4B942.svg">
   <img alt="Models" src="https://img.shields.io/badge/Public_models-19-139C5A.svg">
-  <img alt="Public API examples" src="https://img.shields.io/badge/Public_API_examples-174%2F174-087F5B.svg">
+  <img alt="Public API examples" src="https://img.shields.io/badge/Public_API_examples-173%2F173-087F5B.svg">
   <img alt="Examples" src="https://img.shields.io/badge/Runnable_examples-45-2F9E72.svg">
 </p>
 
@@ -47,7 +47,7 @@ The library is designed around five layers:
 - **One documented model family:** classic, multiscale, robust, generalized, temporal, regularized, multivariate, scalable, similarity-based, and research models in one package.
 - **Explicit capability boundaries:** regression, classification, transformation, local statistics, and inference models are not presented as interchangeable predictors.
 - **Complete documentation:** every model page includes theory, equations, fitting steps, parameters, outputs, diagnostics, limitations, reporting guidance, figures, and a full runnable example.
-- **174/174 API-to-example coverage:** every public symbol is mapped to a maintained script and generated API page.
+- **173/173 API-to-example coverage:** every public symbol is mapped to a maintained script and generated API page.
 - **Complete spatial base install:** NumPy, SciPy, pandas, Matplotlib, GeoPandas, and Shapely are installed together so mapping and GeoDataFrame workflows work immediately.
 - **Research reproducibility:** deterministic example data, explicit random seeds, strict documentation builds, and reference-comparison tests where available.
 
@@ -213,7 +213,7 @@ Report coordinate reference system, distance metric, kernel, fixed/adaptive mode
 
 ## Public functions and examples
 
-The project contains **174 public API symbols**:
+The project contains **173 public API symbols**:
 
 | Namespace | Scope |
 |---|---|
@@ -265,7 +265,7 @@ The MkDocs site includes:
 - core, diagnostics, plotting, and I/O function manuals
 - full source for all 45 examples
 - a 47-figure visualization gallery
-- generated API pages for all 174 symbols
+- generated API pages for all 173 symbols
 - complete algorithm encyclopedia and original-model monographs
 - development, testing, release, citation, and API-stability guidance
 
@@ -288,7 +288,7 @@ Version **0.1.2** is an **Alpha research release**. The supported public tree is
 Current stable-suite baseline:
 
 ```text
-363 passed
+365 passed
 ```
 
 The blocking GitHub Actions workflow validates quality gates, minimum dependencies, numerical references, coverage, distributions, and the Windows/Linux/macOS × Python 3.11–3.14 matrix.

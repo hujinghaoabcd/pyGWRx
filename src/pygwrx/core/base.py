@@ -452,10 +452,6 @@ class BaseSpatialRegressor(BaseSpatialEstimator):
         return {"intercept": intercept, "coef": coef, "coords": coords_arr}
 
 
-# Backward-compatible public alias retained for the 0.1.x series.
-BaseGWR = BaseSpatialRegressor
-
-
 class SpatiotemporalMixin:
     times_train_: Optional[np.ndarray] = None
     spatial_bandwidth_: Optional[Union[float, int]] = None
@@ -568,7 +564,6 @@ class BaseSpatialInference(BaseSpatialEstimator):
 __all__ = [
     "BaseSpatialEstimator",
     "BaseSpatialRegressor",
-    "BaseGWR",
     "SpatiotemporalMixin",
     "MultiscaleMixin",
     "BaseSpatiotemporalRegressor",

@@ -32,7 +32,6 @@ This file is generated. Do not edit it manually.
 | `pygwrx.models` | `GRGWRPredictionResult` | class | Detailed GR-GWR predictions at evaluation locations. | [`examples/models/19_gr_gwr.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/19_gr_gwr.py) |
 | `pygwrx.core` | `BaseSpatialEstimator` | class | Root class for all spatial estimators. | [`examples/core/08_base_classes.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/08_base_classes.py) |
 | `pygwrx.core` | `BaseSpatialRegressor` | class | Base class for geographically weighted spatial regressors. | [`examples/core/08_base_classes.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/08_base_classes.py) |
-| `pygwrx.core` | `BaseGWR` | class | Base class for geographically weighted spatial regressors. | [`examples/core/08_base_classes.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/08_base_classes.py) |
 | `pygwrx.core` | `SpatiotemporalMixin` | class | No summary is available. | [`examples/core/08_base_classes.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/08_base_classes.py) |
 | `pygwrx.core` | `MultiscaleMixin` | class | No summary is available. | [`examples/core/08_base_classes.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/08_base_classes.py) |
 | `pygwrx.core` | `BaseSpatiotemporalRegressor` | class | Base for spatiotemporal GWR-family regressors. | [`examples/core/08_base_classes.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/08_base_classes.py) |
