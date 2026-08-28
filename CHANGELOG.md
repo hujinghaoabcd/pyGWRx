@@ -5,6 +5,11 @@ Changelog and the project uses semantic versioning.
 
 ## [Unreleased]
 
+### Removed
+- Removed the deprecated public `BaseGWR` compatibility alias. New code should
+  inherit from or import `BaseSpatialRegressor`; the consolidated spatial
+  regressor hierarchy no longer exposes a duplicate GWR-specific base name.
+
 ## [0.1.2] - 2026-07-19
 
 ### Changed
