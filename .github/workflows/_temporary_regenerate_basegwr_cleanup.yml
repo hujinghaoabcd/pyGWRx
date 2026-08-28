@@ -29,7 +29,6 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          # Source comment: the actual inheritance already uses the consolidated base.
           path = Path("src/pygwrx/models/mgwr.py")
           text = path.read_text(encoding="utf-8")
           text = text.replace(
@@ -40,7 +39,6 @@ jobs:
           )
           path.write_text(text, encoding="utf-8")
 
-          # Current handoff: record the consolidated hierarchy without retaining an alias.
           path = Path("HANDOFF_NEXT_CONVERSATION.md")
           text = path.read_text(encoding="utf-8")
           text = text.replace(
@@ -57,13 +55,16 @@ jobs:
               "```python\nBaseGWR = BaseSpatialRegressor\n```",
               "`BaseSpatialRegressor` contains the kernel, bandwidth, local prediction, and shared GWR-family state from the former GWR-specific base layer. The compatibility alias has been removed.",
           )
+          text = text.replace(
+              "The old hierarchy:\n\n```text\nBaseSpatialRegressor\n└── BaseGWR\n```",
+              "The old hierarchy used a GWR-specific compatibility layer beneath `BaseSpatialRegressor`.",
+          )
           text = text.replace("`BaseGWR`", "the former compatibility alias")
           text = text.replace("174/174", "173/173")
           text = text.replace("174 public", "173 public")
           text = text.replace("174 APIs", "173 APIs")
           path.write_text(text, encoding="utf-8")
 
-          # Hand-maintained pages that embed the base-class example.
           for name in ("docs/guides/core-numerics.md", "docs/examples/core.md"):
               path = Path(name)
               text = path.read_text(encoding="utf-8")
@@ -72,9 +73,14 @@ jobs:
               text = text.replace("class TinyGWR(BaseGWR):", "class TinyGWR(BaseSpatialRegressor):")
               text = text.replace("    # BaseGWR remains an identity alias for backward compatibility.\n    assert BaseGWR is BaseSpatialRegressor\n    \n", "")
               text = text.replace("# BaseGWR remains an identity alias for backward compatibility.\nassert BaseGWR is BaseSpatialRegressor\n\n", "")
+              text = text.replace(
+                  "validation, and result export behavior. `BaseGWR` remains available as\n"
+                  "an identity alias for backward compatibility with pyGWRx 0.1.2 code.",
+                  "validation, and result export behavior. The deprecated compatibility alias\n"
+                  "has been removed from the current public API.",
+              )
               path.write_text(text, encoding="utf-8")
 
-          # Current overview pages: synchronize API-count wording.
           for name in (
               "docs/index.md",
               "docs/examples/index.md",
