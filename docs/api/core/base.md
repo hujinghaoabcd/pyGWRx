@@ -1,6 +1,6 @@
 # Base classes
 
-This page documents **11** public symbols. Each entry includes its purpose, import path, full API docstring, and the maintained example that exercises it.
+This page documents **10** public symbols. Each entry includes its purpose, import path, full API docstring, and the maintained example that exercises it.
 
 [Conceptual guide](../../guides/core-numerics.md){ .md-button }
 
@@ -30,20 +30,6 @@ Base class for geographically weighted spatial regressors.
 | Maintained example | [`examples/core/08_base_classes.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/08_base_classes.py) |
 
 ::: pygwrx.core.BaseSpatialRegressor
-
-
-## `BaseGWR`
-
-Base class for geographically weighted spatial regressors.
-
-| Property | Value |
-|---|---|
-| Type | `class` |
-| Import | `from pygwrx.core import BaseGWR` |
-| Signature | `BaseGWR(kernel: 'KernelLike' = 'gaussian', bandwidth: 'BandwidthLike' = 'cv', bandwidth_method: 'str' = 'cv', fit_intercept: 'bool' = True, distance_metric: 'str' = 'euclidean', adaptive: 'bool' = False, bandwidth_range: 'Optional[Tuple[float, float]]' = None, optimization_method: 'str' = 'golden_section', random_state: 'Optional[int]' = None, verbose: 'bool' = False) -> 'None'` |
-| Maintained example | [`examples/core/08_base_classes.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/08_base_classes.py) |
-
-::: pygwrx.core.BaseGWR
 
 
 ## `SpatiotemporalMixin`
@@ -185,7 +171,6 @@ Root class for all spatial estimators.
     import pandas as pd
     
     from pygwrx.core import (
-        BaseGWR,
         BaseMultiscaleRegressor,
         BaseSpatialClassifier,
         BaseSpatialEstimator,
@@ -316,10 +301,6 @@ Root class for all spatial estimators.
         def summary(self):
             self._check_is_fitted()
             return f"n_samples={self.n_samples_}"
-    
-    
-    # BaseGWR remains an identity alias for backward compatibility.
-    assert BaseGWR is BaseSpatialRegressor
     
     
     X = pd.DataFrame({"x": [0.0, 1.0, 2.0, 3.0]})
