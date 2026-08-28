@@ -11,7 +11,7 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-3.11--3.14-174D5B.svg">
   <img alt="Status" src="https://img.shields.io/badge/Status-Alpha-F4B942.svg">
   <img alt="Models" src="https://img.shields.io/badge/Public_models-19-139C5A.svg">
-  <img alt="Public API examples" src="https://img.shields.io/badge/Public_API_examples-174%2F174-087F5B.svg">
+  <img alt="Public API examples" src="https://img.shields.io/badge/Public_API_examples-173%2F173-087F5B.svg">
   <img alt="Examples" src="https://img.shields.io/badge/Runnable_examples-45-2F9E72.svg">
 </p>
 
@@ -45,7 +45,7 @@ pyGWRx 是一个面向**地理加权建模**的 Python 实现与研究平台。�
 - **19 个模型集中管理**：经典、多尺度、稳健、广义、时空、正则化、多变量、可扩展、相似性和原创研究模型。
 - **能力边界明确**：回归、分类、变换、局部统计和推断模型不会被笼统描述成同一种“预测器”。
 - **详细模型手册**：每个模型都有原理、公式、算法步骤、参数、结果、诊断、限制、报告要求、图件和完整代码。
-- **174/174 API—示例覆盖**：每个公开接口都映射到正式示例和自动生成的 API 页面。
+- **173/173 API—示例覆盖**：每个公开接口都映射到正式示例和自动生成的 API 页面。
 - **完整空间分析基础安装**：默认同时安装 NumPy、SciPy、pandas、Matplotlib、GeoPandas 和 Shapely，安装后即可使用地图与 GeoDataFrame 工作流。
 - **可复现研究流程**：确定性示例数据、显式随机种子、严格文档构建和可选参考实现对照测试。
 
@@ -206,7 +206,7 @@ from pygwrx.core import (
 
 ## 全部公开功能与示例
 
-项目共有 **174 个公开 API**：
+项目共有 **173 个公开 API**：
 
 | 命名空间 | 内容 |
 |---|---|
@@ -258,7 +258,7 @@ MkDocs 站点包括：
 - Core、Diagnostics、Plotting、I/O 功能手册
 - 45 个示例的完整源码
 - 47 张图件组成的可视化图谱
-- 174 个公开接口的生成式 API 页面
+- 173 个公开接口的生成式 API 页面
 - 完整算法百科与两个原创模型专论
 - 测试、贡献、发布、引用和 API 稳定性说明
 
