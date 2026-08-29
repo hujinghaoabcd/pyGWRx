@@ -132,7 +132,11 @@ def test_zero_lambda_without_adjustment_reduces_to_gwr():
     y = 0.8 + 1.4 * X[:, 0] - 0.6 * X[:, 1] + rng.normal(scale=0.1, size=42)
 
     gwr = GWR(kernel="bisquare", bandwidth=22, adaptive=True).fit(
-        X, y, coords, compute_local_r2=False
+        X,
+        y,
+        coords,
+        compute_local_r2=False,
+        compute_hat_matrix=True,
     )
     lcr = LCRGWR(
         kernel="bisquare",

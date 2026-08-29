@@ -26,7 +26,7 @@ Rich prediction result returned by :meth:`GWR.predict_result`.
 |---|---|
 | Type | `class` |
 | Import | `from pygwrx.models import GWRPredictionResult` |
-| Signature | `GWRPredictionResult(predictions: 'np.ndarray', coef: 'np.ndarray', intercept: 'np.ndarray', coords: 'np.ndarray', feature_names: 'Tuple[str, ...]', coef_standard_errors: 'Optional[np.ndarray]' = None, intercept_standard_errors: 'Optional[np.ndarray]' = None, coef_t_values: 'Optional[np.ndarray]' = None, intercept_t_values: 'Optional[np.ndarray]' = None) -> None` |
+| Signature | `GWRPredictionResult(predictions: 'np.ndarray', coef: 'np.ndarray', intercept: 'np.ndarray', coords: 'np.ndarray', feature_names: 'Tuple[str, ...]', coef_standard_errors: 'Optional[np.ndarray]' = None, intercept_standard_errors: 'Optional[np.ndarray]' = None, coef_t_values: 'Optional[np.ndarray]' = None, intercept_t_values: 'Optional[np.ndarray]' = None, local_rank: 'Optional[np.ndarray]' = None, local_condition_number: 'Optional[np.ndarray]' = None, rank_deficient: 'Optional[np.ndarray]' = None) -> None` |
 | Maintained example | [`examples/models/01_gwr.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/models/01_gwr.py) |
 
 ::: pygwrx.models.GWRPredictionResult

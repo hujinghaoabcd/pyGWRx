@@ -115,7 +115,12 @@ def test_trace_only_diagnostics_match_full_hat_matrix(synthetic):
 
 def test_hat_matrix_alias_and_smoother_identity(synthetic):
     model = GWR(bandwidth=30, adaptive=True)
-    model.fit(synthetic["X"], synthetic["y"], synthetic["coords"])
+    model.fit(
+        synthetic["X"],
+        synthetic["y"],
+        synthetic["coords"],
+        compute_hat_matrix=True,
+    )
     assert model.S_matrix_ is model.hat_matrix_
     np.testing.assert_allclose(
         model.hat_matrix_ @ model.y_train_, model.fitted_values_, atol=1e-8
