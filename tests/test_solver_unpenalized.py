@@ -2,7 +2,8 @@
 
 import numpy as np
 
-from pygwrx.core import weighted_least_squares
+from pygwrx.core import compute_hat_matrix, local_regression, weighted_least_squares
+from pygwrx.core.kernels import gaussian_kernel
 
 
 def test_default_matches_weighted_lstsq():
@@ -60,3 +61,75 @@ def test_feature_rescaling_preserves_fitted_values():
     X2[:, 2] *= 1e-4
     beta2, _ = weighted_least_squares(X2, y, w)
     np.testing.assert_allclose(X2 @ beta2, X @ beta, rtol=1e-8, atol=1e-9)
+
+
+def test_hat_matrix_matches_same_svd_wls_operator():
+    rng = np.random.default_rng(314159)
+    X = np.column_stack([np.ones(9), rng.normal(size=(9, 2))])
+    coords = np.column_stack([np.linspace(0.0, 4.0, 9), rng.normal(scale=0.2, size=9)])
+    bandwidth = 1.7
+
+    hat = compute_hat_matrix(X, coords, gaussian_kernel, bandwidth)
+    distances = np.sqrt(((coords[:, None, :] - coords[None, :, :]) ** 2).sum(axis=2))
+    dummy_y = np.zeros(X.shape[0], dtype=float)
+
+    expected = np.empty_like(hat)
+    for i, dists in enumerate(distances):
+        weights = gaussian_kernel(dists, bandwidth)
+        _, inverse_normal = weighted_least_squares(X, dummy_y, weights)
+        expected[i] = X[i] @ inverse_normal @ (X.T * weights)
+
+    np.testing.assert_allclose(hat, expected, rtol=1e-11, atol=1e-12)
+
+
+def test_rank_deficient_hat_matrix_matches_minimum_norm_local_predictions():
+    x = np.linspace(-2.0, 2.0, 11)
+    X = np.column_stack([np.ones_like(x), x, 2.0 * x])
+    y = 2.5 + 3.2 * x
+    coords = np.column_stack([x, 0.15 * x**2])
+    bandwidth = 1.6
+
+    hat = compute_hat_matrix(X, coords, gaussian_kernel, bandwidth)
+    local_beta = local_regression(
+        X,
+        y,
+        coords,
+        coords,
+        gaussian_kernel,
+        bandwidth,
+    )
+    fitted_from_beta = np.einsum("ij,ij->i", X, local_beta)
+
+    assert np.all(np.isfinite(hat))
+    np.testing.assert_allclose(hat @ y, fitted_from_beta, rtol=1e-10, atol=1e-11)
+
+
+def test_ridge_hat_matrix_matches_explicit_ridge_local_predictions():
+    rng = np.random.default_rng(2718)
+    X = np.column_stack([np.ones(10), rng.normal(size=(10, 2))])
+    y = rng.normal(size=10)
+    coords = np.column_stack(
+        [np.linspace(0.0, 3.0, 10), rng.normal(scale=0.1, size=10)]
+    )
+    bandwidth = 1.2
+    ridge = 0.15
+
+    hat = compute_hat_matrix(
+        X,
+        coords,
+        gaussian_kernel,
+        bandwidth,
+        ridge=ridge,
+    )
+    local_beta = local_regression(
+        X,
+        y,
+        coords,
+        coords,
+        gaussian_kernel,
+        bandwidth,
+        ridge=ridge,
+    )
+    fitted_from_beta = np.einsum("ij,ij->i", X, local_beta)
+
+    np.testing.assert_allclose(hat @ y, fitted_from_beta, rtol=1e-10, atol=1e-11)
