@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare pyGWRx GWR with external implementations on real Columbus data."""
+"""Compare pyGWRx GWR with external implementations on the real Columbus dataset."""
 
 from __future__ import annotations
 
