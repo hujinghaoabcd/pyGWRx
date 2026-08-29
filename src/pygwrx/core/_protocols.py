@@ -80,7 +80,7 @@ class ParameterInferenceProtocol(Protocol):
         ...
 
     @property
-       def standard_error(self) -> np.ndarray | None:
+    def standard_error(self) -> np.ndarray | None:
         """Row-aligned standard errors when available."""
         ...
 
