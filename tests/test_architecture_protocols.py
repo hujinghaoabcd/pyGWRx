@@ -25,9 +25,12 @@ def test_b1_declares_only_the_frozen_protocol_capabilities():
     declared = {
         name
         for name, value in vars(protocols).items()
-        if name.endswith("Protocol") and getattr(value, "_is_protocol", False)
+        if name != "Protocol"
+        and name.endswith("Protocol")
+        and getattr(value, "_is_protocol", False)
     }
     assert declared == EXPECTED_PROTOCOLS
+    assert protocols.__all__ == ()
 
 
 def test_b1_protocols_are_not_public_package_exports():
