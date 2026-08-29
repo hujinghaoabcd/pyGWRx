@@ -14,6 +14,8 @@ A second validation layer uses the package's 49-neighbourhood Columbus dataset w
 
 The current repository contains **45 tests marked `reference`** across the independent numerical-reference suite. They run separately from the 377 non-reference tests in blocking CI.
 
+Adaptive bandwidth selectors now evaluate every integer neighbour order in the validated search range. Reference tests assert the complete ordered search trace, including non-estimable boundary candidates retained as `inf`, rather than validating only the selected optimum.
+
 ## Validation policy
 
 Only quantities with matching mathematical definitions are used as strict numerical references. A feature is not forced into a three-package comparison when package semantics differ.
