@@ -52,7 +52,8 @@ jobs:
         run: |
           python -m black src/pygwrx/core/bandwidth.py tests/test_bandwidth_discrete_search.py tests/test_gwr_external_references.py tests/test_gwr_columbus_reference.py examples/core/07_bandwidth_selectors.py
           python -m isort src/pygwrx/core/bandwidth.py tests/test_bandwidth_discrete_search.py tests/test_gwr_external_references.py tests/test_gwr_columbus_reference.py examples/core/07_bandwidth_selectors.py
-          python -m ruff check src/pygwrx/core/bandwidth.py tests/test_bandwidth_discrete_search.py tests/test_gwr_external_references.py tests/test_gwr_columbus_reference.py examples/core/07_bandwidth_selectors.py
+          python -m ruff check --fix src/pygwrx/core/bandwidth.py tests/test_bandwidth_discrete_search.py tests/test_gwr_external_references.py tests/test_gwr_columbus_reference.py examples/core/07_bandwidth_selectors.py
+          python -m black src/pygwrx/core/bandwidth.py tests/test_bandwidth_discrete_search.py tests/test_gwr_external_references.py tests/test_gwr_columbus_reference.py examples/core/07_bandwidth_selectors.py
           python tools/generate_api_docs.py
           git diff --check
       - name: Run focused and full numerical verification
