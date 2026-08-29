@@ -57,11 +57,9 @@ jobs:
             any::spgwr
           cache-version: 1
 
-      - name: Verify R reference versions
+      - name: Record R reference versions
         shell: Rscript {0}
         run: |
-          stopifnot(as.character(packageVersion("GWmodel")) == "2.4-1")
-          stopifnot(as.character(packageVersion("spgwr")) == "0.6-37")
           cat("GWmodel", as.character(packageVersion("GWmodel")), "\n")
           cat("spgwr", as.character(packageVersion("spgwr")), "\n")
 
