@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import inspect
 import json
 from pathlib import Path
@@ -191,7 +192,8 @@ def _prediction_result(cls: type) -> dict[str, Any] | None:
         return None
     name = annotation if isinstance(annotation, str) else getattr(annotation, "__name__", str(annotation))
     name = str(name).strip("'\"")
-    result_cls = getattr(models, name, None)
+    module = importlib.import_module(cls.__module__)
+    result_cls = getattr(module, name, None)
     if result_cls is None or not inspect.isclass(result_cls):
         return {"name": name, "constructor": None, "frame_schema": None}
     return {
