@@ -51,7 +51,9 @@ def test_fixed_compact_search_keeps_isolated_location_in_domain() -> None:
 
     assert np.isfinite(selected)
     assert selector.search_range_ is not None
-    assert float(selector.search_range_[1]) > float(np.max(compute_distance_matrix(coords)))
+    assert float(selector.search_range_[1]) > float(
+        np.max(compute_distance_matrix(coords))
+    )
     assert any(np.isfinite(score) for _, score in selector.search_trace_)
 
 
