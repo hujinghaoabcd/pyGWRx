@@ -1,0 +1,36 @@
+name: Apply bandwidth streaming refactor v2
+
+on:
+  push:
+    branches:
+      - perf/stream-bandwidth-distances
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: perf/stream-bandwidth-distances
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Apply refactor
+        run: python tools/_apply_bandwidth_streaming_refactor.py
+      - name: Format touched files
+        run: |
+          python -m pip install "black==26.5.1"
+          python -m black src/pygwrx/core/bandwidth.py tests/test_bandwidth_distance_streaming.py
+      - name: Commit final branch state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/apply-bandwidth-streaming.yml
+          git rm .github/workflows/apply-bandwidth-streaming-v2.yml
+          git rm tools/_apply_bandwidth_streaming_refactor.py
+          git add src/pygwrx/core/bandwidth.py tests/test_bandwidth_distance_streaming.py
+          git commit -m "Stream bandwidth selector distance calculations"
+          git push origin HEAD:perf/stream-bandwidth-distances
