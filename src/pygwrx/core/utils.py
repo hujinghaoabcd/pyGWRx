@@ -49,9 +49,11 @@ def _normalize_task(task: str) -> str:
 
 
 def euclidean_distance(coords1: np.ndarray, coords2: np.ndarray) -> np.ndarray:
-    """Compute pairwise Euclidean distances.
+    """Compute pairwise Euclidean distances. Compute Euclidean distances between coordinate
+    arrays.
 
     Integer inputs are converted to float before arithmetic to prevent overflow.
+    Inputs are converted to floating point before squaring to avoid integer overflow.
     """
     coords1_arr, coords2_arr = _validate_coordinate_pair(coords1, coords2)
     return cdist(coords1_arr, coords2_arr, metric="euclidean")
@@ -74,7 +76,8 @@ def minkowski_distance(
     coords2: np.ndarray,
     p: float = 2.0,
 ) -> np.ndarray:
-    """Compute pairwise Minkowski (Lp) distances.
+    """Compute pairwise Minkowski (Lp) distances. Compute Minkowski distances between
+    coordinate arrays.
 
     Args:
         p: Norm order. It must be finite and >= 1, or positive infinity.
@@ -148,6 +151,8 @@ def haversine_distance(
         * np.cos(lat2[np.newaxis, :])
         * np.sin(dlon / 2.0) ** 2
     )
+
+    # Floating-point roundoff can make a slightly smaller than 0 or larger than 1.
     a = np.clip(a, 0.0, 1.0)
     central_angle = 2.0 * np.arctan2(np.sqrt(a), np.sqrt(1.0 - a))
 
@@ -214,12 +219,14 @@ def compute_distance_matrix(
 
 
 class DistanceCache:
-    """Distance-matrix cache policy based on actual matrix memory.
+    """Distance-matrix cache policy based on actual matrix memory. Decide whether a
+    distance matrix is small enough to cache.
 
     The class retains the original public name for compatibility. It is a policy/advisor;
     it does not itself store matrices.
     """
 
+    # Retained for backward compatibility and used to derive default memory limits.
     THRESHOLD_GWR = 5000
     THRESHOLD_BW = 10000
 
