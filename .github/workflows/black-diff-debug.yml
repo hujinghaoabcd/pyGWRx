@@ -1,0 +1,23 @@
+name: Black Diff Debug
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  black-diff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install Black
+        run: python -m pip install "black==26.5.1"
+      - name: Show Black diff
+        run: python -m black --diff --check src/pygwrx/models/gwr.py tests/test_gwr_distance_streaming.py
