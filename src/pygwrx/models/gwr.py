@@ -383,9 +383,7 @@ class GWR(BaseSpatialRegressor):
         )
         trace_sts = 0.0
 
-        for index, distance_row in enumerate(
-            self._iter_distance_rows(self.coords_train_)
-        ):
+        for index, distance_row in enumerate(self._iter_distance_rows(self.coords_train_)):
             weights = self._weights_from_distances(distance_row)
             solve = _weighted_least_squares_details(
                 X_design,
