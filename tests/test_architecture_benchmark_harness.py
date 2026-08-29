@@ -21,6 +21,17 @@ REQUIRED_SCENARIOS = {
 }
 
 
+def _run_live_scenario(name: str) -> dict:
+    completed = subprocess.run(
+        [sys.executable, str(HARNESS), "--worker", name],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(completed.stdout)
+
+
 def test_harness_exposes_required_architecture_scenarios():
     completed = subprocess.run(
         [sys.executable, str(HARNESS), "--list"],
@@ -62,7 +73,7 @@ def test_committed_baseline_is_observational_not_a_timing_gate():
         assert metrics["retained_dense_square_megabytes"] >= 0.0
 
 
-def test_structural_execution_markers_are_preserved_in_baseline():
+def test_committed_structural_execution_markers_are_documented():
     scenarios = json.loads(BASELINE.read_text(encoding="utf-8"))["scenarios"]
 
     assert scenarios["gwr_manual_streaming"]["checks"]["hat_matrix_is_none"] is True
@@ -76,3 +87,18 @@ def test_structural_execution_markers_are_preserved_in_baseline():
 
     sgwr_buffers = scenarios["sgwr_weight_heavy"]["retained_dense_square_buffers"]
     assert len(sgwr_buffers) >= 3
+
+
+def test_live_runtime_preserves_structural_memory_paths():
+    streamed = _run_live_scenario("gwr_manual_streaming")
+    assert streamed["checks"]["hat_matrix_is_none"] is True
+    assert streamed["retained_dense_square_buffers"] == []
+
+    with_hat = _run_live_scenario("gwr_manual_hat")
+    hat_buffers = with_hat["retained_dense_square_buffers"]
+    assert len(hat_buffers) == 1
+    assert set(hat_buffers[0]["attributes"]) == {"S_matrix_", "hat_matrix_"}
+
+    scalable = _run_live_scenario("scalable_gwr_large_n")
+    assert scalable["n"] >= 2_000
+    assert scalable["retained_dense_square_buffers"] == []
