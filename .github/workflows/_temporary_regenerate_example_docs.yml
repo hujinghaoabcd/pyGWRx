@@ -1,0 +1,32 @@
+name: Temporary regenerate maintained example docs
+
+on:
+  push:
+    branches:
+      - adaptive-bandwidth-exhaustive-search
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: adaptive-bandwidth-exhaustive-search
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Regenerate and commit example documentation only
+        run: |
+          set -euo pipefail
+          python tools/generate_example_docs.py
+          rm .github/workflows/_temporary_regenerate_example_docs.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/examples/core.md .github/workflows/_temporary_regenerate_example_docs.yml
+          git diff --cached --check
+          git commit -m "Regenerate bandwidth selector example documentation"
+          git push origin HEAD:adaptive-bandwidth-exhaustive-search
