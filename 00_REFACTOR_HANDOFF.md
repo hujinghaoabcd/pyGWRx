@@ -6,7 +6,8 @@
 
 1. `ARCHITECTURE_FINAL_DECISION.md` — **最终架构宪章，优先级最高**
 2. `validation_results/gwr/GWR_VALIDATION_EVIDENCE.md` — 标准 GWR 数值冻结证据
-3. `ARCHITECTURE_REFACTOR_MASTER_PLAN.md` — 第一轮审计历史，仅作背景；与最终决定冲突时，以 `ARCHITECTURE_FINAL_DECISION.md` 为准
+3. `FUTURE_MODEL_DEVELOPMENT_PLAN.md` — 0.2 架构稳定后的未来模型扩展路线，不属于当前重构范围
+4. `ARCHITECTURE_REFACTOR_MASTER_PLAN.md` — 第一轮审计历史，仅作背景；与最终决定冲突时，以 `ARCHITECTURE_FINAL_DECISION.md` 为准
 
 继续工作时：
 
@@ -17,7 +18,8 @@
 - 不得修改 frozen reference 数据或放宽 tolerance 来让重构通过；
 - 不得让一个 public estimator 继承另一个 public estimator；
 - 不得把模型数学放回 base class；
-- 不得在 architecture migration PR 中顺手做性能算法重写。
+- 不得在 architecture migration PR 中顺手做性能算法重写；
+- 不得提前实现 `FUTURE_MODEL_DEVELOPMENT_PLAN.md` 中的未来算法，除非 0.2 架构执行台账已经允许进入未来模型开发阶段。
 
 当前最终设计冻结后的第一项代码工作是：
 
