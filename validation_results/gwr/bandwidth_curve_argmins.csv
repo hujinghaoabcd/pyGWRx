@@ -1,0 +1,14 @@
+implementation,metric,argmin_k,validation_domain,note
+pyGWRx,cv_sse,15,cv_common_finite,strict three-way CV domain
+mgwr,cv_sse,15,cv_common_finite,strict three-way CV domain
+GWmodel,cv_sse,15,cv_common_finite,strict three-way CV domain
+pyGWRx,aic,5,aic_nonsaturated,saturated k=4 excluded
+mgwr,aic,5,aic_nonsaturated,saturated k=4 excluded
+pyGWRx,aicc,22,aicc_common_valid,requires finite valid AICc
+mgwr,aicc,22,aicc_common_valid,requires finite valid AICc
+GWmodel,aicc,22,aicc_common_valid,requires finite valid AICc
+pyGWRx,bic,5,bic_nonsaturated,saturated k=4 excluded
+mgwr,bic,5,bic_nonsaturated,saturated k=4 excluded
+GWmodel,bic,5,bic_nonsaturated,different BIC formula; diagnostic only
+spgwr,cv_sse,14,spgwr_semantic,k is only q*n equivalence; spgwr optimizes continuous q
+spgwr,aicc_like,22,spgwr_semantic,k is only q*n equivalence; spgwr optimizes continuous q
