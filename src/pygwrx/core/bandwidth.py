@@ -178,7 +178,14 @@ def _automatic_bandwidth_range(
     n_samples: int,
     n_features: int,
 ) -> tuple[Bandwidth, Bandwidth]:
-    """Derive a valid search interval from a precomputed distance matrix."""
+    """Derive a valid search interval from a precomputed distance matrix.
+
+    Adaptive bandwidths use an integer neighbour-order domain. Fixed-distance
+    searches deliberately span the full observed pairwise distance scale instead
+    of trimming distance percentiles: percentile trimming can exclude isolated
+    locations from every compact-kernel candidate before the objective is even
+    evaluated.
+    """
     if adaptive:
         lower = max(n_features + 1, 2, int(np.ceil(0.05 * n_samples)))
         upper = n_samples
@@ -201,21 +208,21 @@ def _automatic_bandwidth_range(
             "with valid non-zero neighbour distances."
         )
 
-    lower = float(np.percentile(positive_distances, 5))
-    upper = float(np.percentile(positive_distances, 95))
+    minimum_positive = float(np.min(positive_distances))
+    maximum_positive = float(np.max(positive_distances))
 
-    # Percentiles can coincide for regular or heavily duplicated coordinates.  Build a
-    # small but valid interval while retaining the observed spatial scale.
-    if not np.isfinite(lower) or lower <= 0:
-        lower = float(np.min(positive_distances))
-    if not np.isfinite(upper) or upper <= 0:
-        upper = float(np.max(positive_distances))
-    if lower >= upper:
-        scale = max(abs(lower), 1.0)
-        lower = max(np.nextafter(0.0, 1.0), lower - 0.01 * scale)
-        upper = upper + 0.01 * scale
+    # Search below the smallest observed separation and beyond the largest observed
+    # separation.  The wider interval keeps sparse/isolated locations available to
+    # compact kernels and gives continuous optimizers at least one globally supported
+    # part of the domain without imposing a percentile-based spatial cutoff.
+    lower = max(np.nextafter(0.0, 1.0), 0.5 * minimum_positive)
+    upper = 2.0 * maximum_positive
+    if not np.isfinite(upper):
+        upper = float(np.nextafter(maximum_positive, np.inf))
+    if upper <= lower:
+        upper = float(np.nextafter(lower, np.inf))
 
-    return lower, upper
+    return float(lower), float(upper)
 
 
 def _normalize_candidate(
