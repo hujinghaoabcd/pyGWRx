@@ -76,7 +76,6 @@ gwmodel_case <- function(name, kernel, bandwidth, adaptive) {
     p = 2,
     theta = 0,
     longlat = FALSE,
-    hatmatrix = TRUE,
     F123.test = FALSE,
     cv = FALSE
   )
@@ -111,7 +110,6 @@ gwmodel_prediction <- function() {
     p = 2,
     theta = 0,
     longlat = FALSE,
-    hatmatrix = FALSE,
     F123.test = FALSE,
     cv = FALSE
   )
@@ -156,13 +154,20 @@ spgwr_data <- function(fit) {
   as.data.frame(fit$SDF)
 }
 
+spgwr_params <- function(data) {
+  required <- c("(Intercept)", "x1", "x2")
+  if (!all(required %in% names(data))) {
+    stop("spgwr output does not contain the expected coefficient columns.")
+  }
+  matrix_payload(data[, required, drop = FALSE])
+}
+
 spgwr_case <- function(name, kernel_function, bandwidth = NULL, adapt = NULL) {
   arguments <- list(
     formula = formula,
     data = frame,
     coords = coords,
     gweight = kernel_function,
-    hatmatrix = TRUE,
     se.fit = TRUE,
     se.fit.CCT = TRUE,
     predictions = TRUE,
@@ -178,7 +183,7 @@ spgwr_case <- function(name, kernel_function, bandwidth = NULL, adapt = NULL) {
       bandwidth = bandwidth,
       adapt = adapt
     ),
-    params = matrix_payload(sdf[, seq_len(3L), drop = FALSE]),
+    params = spgwr_params(sdf),
     predy = get_column(sdf, c("pred", "yhat")),
     residuals = get_column(sdf, c("gwr.e", "residual")),
     local_r2 = get_column(sdf, c("localR2", "Local_R2")),
@@ -197,14 +202,13 @@ spgwr_prediction <- function() {
     gweight = spgwr::gwr.Gauss,
     fit.points = prediction_spdf,
     predictions = TRUE,
-    hatmatrix = FALSE,
     se.fit = FALSE,
     longlat = FALSE
   )
   tryCatch({
     fit <- do.call(spgwr::gwr, arguments)
     sdf <- spgwr_data(fit)
-    params <- as.matrix(sdf[, seq_len(3L), drop = FALSE])
+    params <- as.matrix(spgwr_params(sdf))
     design <- cbind(1.0, as.matrix(prediction_frame[, c("x1", "x2")]))
     list(
       coords = matrix_payload(prediction_coords),
