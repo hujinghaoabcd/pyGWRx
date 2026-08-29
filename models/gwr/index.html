@@ -7285,7 +7285,7 @@
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">X</span><span class="p">,</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">y</span><span class="p">,</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">coords</span><span class="p">,</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">compute_hat_matrix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">compute_hat_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">compute_local_r2</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">compute_inference</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">verbose</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -7302,8 +7302,8 @@
 <tbody>
 <tr>
 <td><code>compute_hat_matrix</code></td>
-<td style="text-align: right;"><code>True</code></td>
-<td>Stores the full <code>n × n</code> smoother matrix. Set to <code>False</code> for larger samples. The trace, <code>trace(S'S)</code>, influence, AIC/AICc/BIC and effective-parameter diagnostics are still computed.</td>
+<td style="text-align: right;"><code>False</code></td>
+<td>Does not store the full <code>n × n</code> smoother matrix by default. Set to <code>True</code> only when the matrix entries themselves are required. The trace, <code>trace(S'S)</code>, influence, AIC/AICc/BIC and effective-parameter diagnostics are still computed.</td>
 </tr>
 <tr>
 <td><code>compute_local_r2</code></td>
@@ -7347,8 +7347,8 @@
 </tr>
 <tr>
 <td><code>predict_result()</code></td>
-<td>Predictions, local slopes, intercepts, coordinates and optional standard errors/t statistics</td>
-<td>Auditable prediction and coefficient inspection. Rank-deficient target recalibrations keep predictions but expose <code>NaN</code> coefficient inference.</td>
+<td>Predictions, local slopes, intercepts, coordinates, rank/condition diagnostics and optional standard errors/t statistics</td>
+<td>Auditable prediction and coefficient inspection. Rank-deficient target recalibrations keep predictions, set coefficient inference to <code>NaN</code>, and expose the numerical-rank flags directly.</td>
 </tr>
 <tr>
 <td><code>get_local_parameters()</code></td>
