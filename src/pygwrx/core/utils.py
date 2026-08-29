@@ -22,10 +22,10 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from pygwrx.core.distance import (  # noqa: F401
-    DistanceCache,
     _DEFAULT_DISTANCE_BLOCK_ROWS,
     _iter_distance_blocks,
     _iter_distance_rows,
+    DistanceCache,
     chebyshev_distance,
     chunked_computation,
     compute_distance_matrix,
