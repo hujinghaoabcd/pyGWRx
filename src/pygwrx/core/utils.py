@@ -24,13 +24,12 @@ from scipy.spatial.distance import cdist
 
 from pygwrx.core.validation import (
     CoordinateInput,
-    _as_float_coordinate_array,
     _extract_geopandas_coords,
     _validate_coordinate_pair,
     _validate_count,
     _validate_positive_scalar,
-    validate_coords,
-    validate_data,
+    validate_coords as validate_coords,
+    validate_data as validate_data,
 )
 
 if TYPE_CHECKING:
