@@ -13,11 +13,11 @@ import numpy as np
 import pandas as pd
 
 import pygwrx.core as core
-from pygwrx.core import utils, validation
+from pygwrx.core import distance, utils, validation
 
 
 def test_validation_module_is_canonical_and_legacy_utils_reexports() -> None:
-    """The new module owns validation while old imports remain identical aliases."""
+    """The validation module owns validation while old imports remain aliases."""
     assert validation.validate_coords.__module__ == "pygwrx.core.validation"
     assert validation.validate_data.__module__ == "pygwrx.core.validation"
 
@@ -27,16 +27,16 @@ def test_validation_module_is_canonical_and_legacy_utils_reexports() -> None:
     assert core.validate_data is validation.validate_data
 
 
-def test_validation_split_does_not_move_distance_or_execution_helpers() -> None:
-    """B2 must not absorb responsibilities reserved for later Phase-B stages."""
+def test_validation_split_keeps_later_phase_responsibilities_separate() -> None:
+    """Validation remains isolated as later Phase-B owners are introduced."""
     assert not hasattr(validation, "compute_distance_matrix")
     assert not hasattr(validation, "DistanceCache")
     assert not hasattr(validation, "chunked_computation")
     assert not hasattr(validation, "add_intercept")
 
-    assert utils.compute_distance_matrix.__module__ == "pygwrx.core.utils"
-    assert utils.DistanceCache.__module__ == "pygwrx.core.utils"
-    assert utils.chunked_computation.__module__ == "pygwrx.core.utils"
+    assert utils.compute_distance_matrix is distance.compute_distance_matrix
+    assert utils.DistanceCache is distance.DistanceCache
+    assert utils.chunked_computation is distance.chunked_computation
     assert utils.add_intercept.__module__ == "pygwrx.core.utils"
 
 
