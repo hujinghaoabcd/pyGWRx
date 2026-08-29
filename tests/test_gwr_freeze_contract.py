@@ -48,6 +48,21 @@ def test_explicit_hat_matrix_storage_does_not_change_gwr_numerics():
     assert default.diagnostics_["trace_StS"] == stored.diagnostics_["trace_StS"]
 
 
+def test_legacy_hat_matrix_flag_can_still_request_storage():
+    X, y, coords = _data()
+    model = GWR(kernel="gaussian", bandwidth=0.8).fit(
+        X,
+        y,
+        coords,
+        compute_hat_matrix_flag=True,
+        compute_local_r2=False,
+    )
+
+    assert model.hat_matrix_ is not None
+    assert model.S_matrix_ is model.hat_matrix_
+    assert model.hat_matrix_.shape == (X.shape[0], X.shape[0])
+
+
 def test_fixed_equal_bandwidth_range_is_rejected_early():
     with pytest.raises(ValueError, match=r"fixed bandwidth_range.*lower < upper"):
         GWR(bandwidth="cv", adaptive=False, bandwidth_range=(1.0, 1.0))
