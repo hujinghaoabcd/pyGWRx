@@ -171,7 +171,7 @@ Plotting functions return Matplotlib objects and never call `plt.show()` automat
 - `BootstrapGWR` performs coefficient non-stationarity inference rather than response prediction.
 - `GWDA` is a classifier and provides `predict()`/`predict_proba()`.
 - `MGTWR` is implemented entirely inside pyGWRx and has no model-specific runtime dependency.
-- `mgwr` and `spglm` are used only in optional GWGLM reference-comparison tests, not during ordinary GWGLM fitting.
+- `mgwr` is used only in optional GWR/GWGLM reference-comparison tests, and `spglm` only in optional GWGLM reference tests; ordinary model fitting does not depend on either package.
 - `LGGWR` and `GRGWR` are original research models; report sensitivity, initialization, convergence, and validation scope.
 
 ## Choosing a model
@@ -288,7 +288,7 @@ Version **0.1.2** is an **Alpha research release**. The supported public tree is
 Current stable-suite baseline:
 
 ```text
-365 passed
+400 passed
 ```
 
 The blocking GitHub Actions workflow validates quality gates, minimum dependencies, numerical references, coverage, distributions, and the Windows/Linux/macOS × Python 3.11–3.14 matrix.

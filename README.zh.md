@@ -164,7 +164,7 @@ fig.savefig("gwr_diagnostics.png", dpi=200, bbox_inches="tight")
 - `BootstrapGWR` 检验系数空间非平稳性，不负责响应预测。
 - `GWDA` 是分类模型，提供 `predict()` 与 `predict_proba()`。
 - `MGTWR` 已在 pyGWRx 内部完整实现，不需要模型专用外部运行依赖。
-- `mgwr` 与 `spglm` 只用于可选的 GWGLM 参考对照测试，正常 GWGLM 拟合不会调用这两个包。
+- `mgwr` 仅用于可选的 GWR/GWGLM 参考对照测试，`spglm` 仅用于可选的 GWGLM 参考测试；正常模型拟合不依赖这两个包。
 - `LGGWR` 和 `GRGWR` 是原创研究模型，应报告初始化、敏感性、收敛与验证范围。
 
 ## 如何选择模型
@@ -281,7 +281,7 @@ mkdocs build --strict --clean
 当前稳定测试基线：
 
 ```text
-365 passed
+400 passed
 ```
 
 阻断式 GitHub Actions 工作流覆盖质量门、最低依赖、数值参考、覆盖率、发行包构建，以及 Windows/Linux/macOS × Python 3.11–3.14 的完整矩阵。
