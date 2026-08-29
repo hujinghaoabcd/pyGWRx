@@ -12,9 +12,9 @@ The deterministic calibration data live in `tests/reference_data/gwr/input.csv`;
 
 A second validation layer uses the package's 49-neighbourhood Columbus dataset with `CRIME ~ INC + HOVAL` and coordinates `X`, `Y`. Compact frozen outputs are stored under `tests/reference_data/gwr/real_columbus/frozen/`; full comparison tables and the human-readable report are stored under `validation_results/gwr/real_columbus/`. The real-data suite checks fixed and adaptive Gaussian/bisquare calibration, five genuinely held-out locations, controlled adaptive-bandwidth criteria, and the near-saturated `k=4` boundary.
 
-The current repository contains **45 tests marked `reference`** across the independent numerical-reference suite. They run separately from the 377 non-reference tests in blocking CI.
+The current repository contains **50 tests marked `reference`** across the independent numerical-reference suite. They run separately from the non-reference regression suite in blocking CI.
 
-Adaptive bandwidth selectors now evaluate every integer neighbour order in the validated search range. Reference tests assert the complete ordered search trace, including non-estimable boundary candidates retained as `inf`, rather than validating only the selected optimum.
+Adaptive bandwidth selectors evaluate every integer neighbour order in the validated search range. Reference tests assert the complete ordered search trace, including non-estimable boundary candidates retained as `inf`, rather than validating only the selected optimum.
 
 ## Validation policy
 
@@ -30,7 +30,10 @@ Strict/shared comparisons include, where available:
 - smoother and effective-complexity diagnostics when definitions align;
 - coefficient standard errors and t statistics under aligned variance conventions;
 - target-location local recalibration and prediction;
-- bandwidth selection as a separate semantic/reference check.
+- bandwidth selection as a separate semantic/reference check;
+- against `mgwr`, the full smoother matrix, diagonal influence, standardized residuals, and Cook's distance.
+
+The deep `mgwr` diagnostics are blocking references rather than report-only comparisons. For each fixed/adaptive Gaussian/bisquare case, plus the fixed-Gaussian `sigma2_v1=True` case, CI checks the full `n x n` smoother matrix, its diagonal influence, standardized residuals, and Cook's distance against frozen `mgwr 2.2.1` output. The test also verifies `diag(S) == influence` and `S @ y == fitted_values` internally.
 
 `spgwr` adaptive bandwidths are proportions rather than integer neighbour counts. Its adaptive results are retained as a secondary semantic reference rather than treated as bit-for-bit equivalents of integer-k implementations.
 
@@ -58,3 +61,5 @@ Rscript tools/reference/gwr/generate_r_references.R
 Columbus real-data references can be regenerated with `generate_columbus_mgwr.py`, `generate_columbus_r_references.R`, and `generate_columbus_bandwidth_curves.py`, then compared with `compare_columbus_references.py` and compacted with `finalize_columbus_validation.py`.
 
 Generated JSON files are frozen under `tests/reference_data/gwr/` and consumed by tests marked `reference`. Normal CI therefore validates against frozen outputs without requiring R at test time.
+
+The consolidated evidence narrative is stored in `validation_results/gwr/GWR_VALIDATION_EVIDENCE.md`; the lower-level CSV/JSON tables remain the machine-readable source of numerical differences.
