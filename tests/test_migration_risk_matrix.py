@@ -80,9 +80,7 @@ def test_a3_is_not_a_current_mro_compatibility_freeze():
 
 def test_human_readable_matrix_mentions_all_estimators():
     contract = _load("migration_risks.json")
-    document = (CONTRACT_DIR / "MIGRATION_RISK_MATRIX.md").read_text(
-        encoding="utf-8"
-    )
+    document = (CONTRACT_DIR / "MIGRATION_RISK_MATRIX.md").read_text(encoding="utf-8")
 
     for name in contract["estimators"]:
         assert name in document
