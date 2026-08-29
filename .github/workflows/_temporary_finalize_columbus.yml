@@ -1,0 +1,99 @@
+name: Temporary finalize Columbus validation
+
+on:
+  push:
+    branches: [gwr-reference-validation]
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+  NUMEXPR_NUM_THREADS: "1"
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: gwr-reference-validation
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install validation environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test]" black==26.5.1
+
+      - name: Restore successful Columbus validation artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/columbus
+          mkdir -p /tmp/columbus
+          gh run download 33227953991 \
+            --repo "$GITHUB_REPOSITORY" \
+            --name gwr-columbus-real-data-validation \
+            --dir /tmp/columbus
+          mkdir -p tests/reference_data/gwr/real_columbus
+          mkdir -p validation_results/gwr/real_columbus
+          cp -R /tmp/columbus/tests/reference_data/gwr/real_columbus/. \
+            tests/reference_data/gwr/real_columbus/
+          cp -R /tmp/columbus/validation_results/gwr/real_columbus/. \
+            validation_results/gwr/real_columbus/
+
+      - name: Freeze references and normalize text
+        run: |
+          set -euo pipefail
+          python tools/reference/gwr/finalize_columbus_validation.py
+          find tests/reference_data/gwr/real_columbus \
+            -mindepth 1 -maxdepth 1 ! -name frozen -exec rm -rf {} +
+          python - <<'PY'
+          from pathlib import Path
+
+          for root in [
+              Path("validation_results/gwr/real_columbus"),
+              Path("tests/reference_data/gwr/real_columbus/frozen"),
+          ]:
+              for path in root.rglob("*"):
+                  if path.is_file() and path.suffix.lower() in {".csv", ".json", ".md"}:
+                      data = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+                      path.write_bytes(data)
+          PY
+
+      - name: Format and verify blocking Columbus references
+        run: |
+          set -euo pipefail
+          python -m black \
+            tools/reference/gwr/compare_columbus_references.py \
+            tools/reference/gwr/finalize_columbus_validation.py \
+            tests/test_gwr_columbus_reference.py
+          python -m black --check \
+            tools/reference/gwr/compare_columbus_references.py \
+            tools/reference/gwr/finalize_columbus_validation.py \
+            tests/test_gwr_columbus_reference.py
+          pytest -q tests/test_gwr_columbus_reference.py -m reference
+
+      - name: Commit finalized validation
+        run: |
+          set -euo pipefail
+          rm .github/workflows/_temporary_finalize_columbus.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Finalize Columbus real-data GWR validation"
+          git pull --rebase origin gwr-reference-validation
+          git push origin HEAD:gwr-reference-validation
