@@ -162,6 +162,7 @@ python_version = "3.11"
 files = [
     "src/pygwrx/__init__.py",
     "src/pygwrx/_optional.py",
+    "src/pygwrx/core/_protocols.py",
     "src/pygwrx/core/_summary.py",
     "src/pygwrx/core/kernels.py",
     "src/pygwrx/core/solver.py",
@@ -187,4 +188,3 @@ warn_unused_ignores = true
 
 [tool.ruff.lint.per-file-ignores]
 "examples/**/*.py" = ["E402"]
-
