@@ -5,6 +5,10 @@ Changelog and the project uses semantic versioning.
 
 ## [Unreleased]
 
+### Changed
+- Changed the shared local weighted-least-squares default from an implicit `1e-8` ridge penalty to standard unpenalized WLS estimated from `sqrt(W) @ X`; positive ridge remains an explicit lower-level opt-in.
+- Aligned standard GWR calibration, target prediction, and bandwidth scoring on the same unpenalized WLS semantics.
+
 ### Removed
 - Removed the deprecated public `BaseGWR` compatibility alias. New code should
   inherit from or import `BaseSpatialRegressor`; the consolidated spatial

@@ -49,7 +49,7 @@ core,get_bandwidth_selector,function,Create a bandwidth selector by method name.
 core,OptimizationResult,class,Result returned by a one-dimensional optimizer.,examples/core/06_optimization.py
 core,GoldenSectionSearch,class,Golden-section search for one-dimensional minimization.,examples/core/06_optimization.py
 core,BrentSearch,class,Brent's bounded method for continuous one-dimensional minimization.,examples/core/06_optimization.py
-core,weighted_least_squares,function,Solve a weighted least-squares problem.,examples/core/04_solver.py
+core,weighted_least_squares,function,Solve weighted least squares from ``sqrt(W) @ X``.,examples/core/04_solver.py
 core,local_regression,function,Perform local weighted regression at target locations.,examples/core/04_solver.py
 core,compute_hat_matrix,function,Compute the GWR hat matrix ``S`` such that ``y_hat = S @ y``.,examples/core/04_solver.py
 core,adaptive_bandwidth_weights,function,Convert an adaptive neighbour-order bandwidth into a distance scale.,examples/core/04_solver.py

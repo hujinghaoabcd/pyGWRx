@@ -6,13 +6,13 @@ This page documents **4** public symbols. Each entry includes its purpose, impor
 
 ## `weighted_least_squares`
 
-Solve a weighted least-squares problem.
+Solve weighted least squares from ``sqrt(W) @ X``.
 
 | Property | Value |
 |---|---|
 | Type | `function` |
 | Import | `from pygwrx.core import weighted_least_squares` |
-| Signature | `weighted_least_squares(X: 'np.ndarray', y: 'np.ndarray', weights: 'np.ndarray', *, ridge: 'float' = 1e-08) -> 'Tuple[np.ndarray, np.ndarray]'` |
+| Signature | `weighted_least_squares(X: 'np.ndarray', y: 'np.ndarray', weights: 'np.ndarray', *, ridge: 'float' = 0.0) -> 'Tuple[np.ndarray, np.ndarray]'` |
 | Maintained example | [`examples/core/04_solver.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/04_solver.py) |
 
 ::: pygwrx.core.weighted_least_squares
@@ -26,7 +26,7 @@ Perform local weighted regression at target locations.
 |---|---|
 | Type | `function` |
 | Import | `from pygwrx.core import local_regression` |
-| Signature | `local_regression(X: 'np.ndarray', y: 'np.ndarray', coords: 'np.ndarray', target_coords: 'np.ndarray', kernel_func: 'KernelFunction', bandwidth: 'float', distance_metric: 'str' = 'euclidean', adaptive: 'bool' = False, *, ridge: 'float' = 1e-08) -> 'np.ndarray'` |
+| Signature | `local_regression(X: 'np.ndarray', y: 'np.ndarray', coords: 'np.ndarray', target_coords: 'np.ndarray', kernel_func: 'KernelFunction', bandwidth: 'float', distance_metric: 'str' = 'euclidean', adaptive: 'bool' = False, *, ridge: 'float' = 0.0) -> 'np.ndarray'` |
 | Maintained example | [`examples/core/04_solver.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/04_solver.py) |
 
 ::: pygwrx.core.local_regression
@@ -40,7 +40,7 @@ Compute the GWR hat matrix ``S`` such that ``y_hat = S @ y``.
 |---|---|
 | Type | `function` |
 | Import | `from pygwrx.core import compute_hat_matrix` |
-| Signature | `compute_hat_matrix(X: 'np.ndarray', coords: 'np.ndarray', kernel_func: 'KernelFunction', bandwidth: 'float', distance_metric: 'str' = 'euclidean', adaptive: 'bool' = False, *, ridge: 'float' = 1e-08) -> 'np.ndarray'` |
+| Signature | `compute_hat_matrix(X: 'np.ndarray', coords: 'np.ndarray', kernel_func: 'KernelFunction', bandwidth: 'float', distance_metric: 'str' = 'euclidean', adaptive: 'bool' = False, *, ridge: 'float' = 0.0) -> 'np.ndarray'` |
 | Maintained example | [`examples/core/04_solver.py`](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/04_solver.py) |
 
 ::: pygwrx.core.compute_hat_matrix

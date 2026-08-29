@@ -19,6 +19,8 @@ from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 
+from pygwrx.core.solver import weighted_least_squares
+
 Bandwidth = Union[int, float]
 BandwidthRange = Optional[Tuple[float, float]]
 KernelFunction = Callable[[np.ndarray, float], np.ndarray]
@@ -38,9 +40,9 @@ class _InvalidCandidateError(RuntimeError):
     """Internal exception used when a candidate bandwidth is not estimable."""
 
 
-# A single numerical regularization value is used for both coefficient fitting and
-# hat-matrix calculations, so the fitted values and trace(S) refer to the same smoother.
-_RIDGE = 1e-8
+# Standard GWR bandwidth scoring is unpenalized. The constant is retained internally
+# only to make that numerical policy explicit at the local-solver call site.
+_RIDGE = 0.0
 
 
 def _validate_positive_int(value: int, name: str, minimum: int = 1) -> int:
@@ -294,42 +296,25 @@ def _fit_local_model(
     *,
     target_row: Optional[np.ndarray] = None,
 ) -> tuple[np.ndarray, Optional[np.ndarray]]:
-    """Fit a local weighted model while preserving exact zero weights."""
+    """Fit an unpenalized local weighted model for bandwidth scoring."""
     n_features = X.shape[1]
-    if np.count_nonzero(weights > 0) < n_features:
+    positive = weights > 0.0
+    if np.count_nonzero(positive) < n_features:
         raise _InvalidCandidateError(
-            "Candidate bandwidth supplies fewer positive-weight observations than "
-            "design-matrix columns."
+            "Candidate bandwidth supplies fewer positive-weight observations than design columns."
         )
-
-    XtW = X.T * weights
-    XtWX = XtW @ X
-    system = XtWX + _RIDGE * np.eye(n_features)
-    XtWy = XtW @ y
-
+    Xw = X[positive] * np.sqrt(weights[positive])[:, None]
+    if np.linalg.matrix_rank(Xw) < n_features:
+        raise _InvalidCandidateError(
+            "Candidate bandwidth produces a rank-deficient weighted design."
+        )
     try:
-        beta = np.linalg.solve(system, XtWy)
-    except np.linalg.LinAlgError:
-        try:
-            beta = np.linalg.lstsq(system, XtWy, rcond=None)[0]
-        except np.linalg.LinAlgError as exc:
-            raise _InvalidCandidateError("Local weighted solve failed.") from exc
-
-    if not np.all(np.isfinite(beta)):
-        raise _InvalidCandidateError(
-            "Local weighted solve produced invalid coefficients."
-        )
-
+        beta, inverse_normal = weighted_least_squares(X, y, weights, ridge=0.0)
+    except np.linalg.LinAlgError as exc:
+        raise _InvalidCandidateError("Local weighted solve failed.") from exc
     if target_row is None:
         return beta, None
-
-    try:
-        # target_row @ inv(system) @ XtW, computed without explicitly inverting system.
-        left = np.linalg.solve(system.T, target_row)
-    except np.linalg.LinAlgError:
-        left = np.linalg.lstsq(system.T, target_row, rcond=None)[0]
-
-    hat_row = left @ XtW
+    hat_row = target_row @ inverse_normal @ (X.T * weights)
     if not np.all(np.isfinite(hat_row)):
         raise _InvalidCandidateError("Hat-matrix row contains invalid values.")
     return beta, hat_row
