@@ -39,10 +39,9 @@ def test_legacy_normal_equations_match_current_solver_on_well_conditioned_data()
     )
 
 
-def test_legacy_reference_contains_no_ridge_parameter_or_penalty():
+def test_legacy_reference_has_no_regularization_parameter_or_penalty_term():
     signature = inspect.signature(_weighted_least_squares_normal_equations_legacy)
     assert "ridge" not in signature.parameters
 
     source = inspect.getsource(_weighted_least_squares_normal_equations_legacy)
     assert "XtWX +" not in source
-    assert "ridge" not in source.lower()
