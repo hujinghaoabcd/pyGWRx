@@ -1,0 +1,59 @@
+name: Temporary adaptive bandwidth exhaustive search
+
+on:
+  push:
+    branches:
+      - adaptive-bandwidth-exhaustive-search
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-verify:
+    runs-on: ubuntu-24.04
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: adaptive-bandwidth-exhaustive-search
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Apply exhaustive adaptive-bandwidth patch
+        run: python tools/_temporary_adaptive_bandwidth_search.py
+      - name: Install verification environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test,reference]" black==26.5.1 isort==9.0.1 ruff==0.16.5
+      - name: Format and regenerate API documentation
+        run: |
+          python -m black src/pygwrx/core/bandwidth.py tests/test_bandwidth_discrete_search.py tests/test_gwr_external_references.py tests/test_gwr_columbus_reference.py examples/core/07_bandwidth_selectors.py
+          python -m isort src/pygwrx/core/bandwidth.py tests/test_bandwidth_discrete_search.py tests/test_gwr_external_references.py tests/test_gwr_columbus_reference.py examples/core/07_bandwidth_selectors.py
+          python -m ruff check src/pygwrx/core/bandwidth.py tests/test_bandwidth_discrete_search.py tests/test_gwr_external_references.py tests/test_gwr_columbus_reference.py examples/core/07_bandwidth_selectors.py
+          python tools/generate_api_docs.py
+          git diff --check
+      - name: Run focused and full numerical verification
+        run: |
+          pytest -q tests/test_bandwidth_discrete_search.py
+          pytest -q -m reference
+          pytest -q -m "not reference"
+      - name: Commit verified patch and remove temporary machinery
+        run: |
+          set -euo pipefail
+          rm tools/_temporary_adaptive_bandwidth_search.py
+          rm .github/workflows/_temporary_adaptive_bandwidth_search.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Make adaptive bandwidth search exhaustive and traceable"
+          git pull --rebase origin adaptive-bandwidth-exhaustive-search
+          git push origin HEAD:adaptive-bandwidth-exhaustive-search
