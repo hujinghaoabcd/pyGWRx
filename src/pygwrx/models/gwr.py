@@ -151,6 +151,7 @@ class GWR(BaseSpatialRegressor):
         )
         self.sigma2_v1 = bool(sigma2_v1)
         self.S_matrix_: Optional[np.ndarray] = None
+        self.bandwidth_search_: Optional[Dict[str, object]] = None
         self._reset_inference_state()
 
     def _reset_inference_state(self) -> None:
@@ -173,6 +174,7 @@ class GWR(BaseSpatialRegressor):
         self._reset_gwr_state()
         self._reset_inference_state()
         self.S_matrix_ = None
+        self.bandwidth_search_ = None
 
     def _resolve_bandwidth(
         self,
@@ -205,7 +207,59 @@ class GWR(BaseSpatialRegressor):
                 bandwidth_range=self.bandwidth_range,
                 distance_metric=self.distance_metric,
             )
-            return int(selected) if self.adaptive else float(selected)
+            selected_value: Union[int, float] = (
+                int(selected) if self.adaptive else float(selected)
+            )
+            raw_range = getattr(selector, "search_range_", None)
+            if raw_range is None:
+                search_range = None
+                boundary_solution = False
+            elif self.adaptive:
+                search_range = (int(raw_range[0]), int(raw_range[1]))
+                boundary_solution = int(selected_value) in search_range
+            else:
+                search_range = (float(raw_range[0]), float(raw_range[1]))
+                selected_float = float(selected_value)
+                scale = max(
+                    1.0,
+                    abs(selected_float),
+                    abs(search_range[0]),
+                    abs(search_range[1]),
+                )
+                atol = 32.0 * np.finfo(float).eps * scale
+                boundary_solution = bool(
+                    np.isclose(
+                        selected_float,
+                        search_range[0],
+                        rtol=1e-10,
+                        atol=atol,
+                    )
+                    or np.isclose(
+                        selected_float,
+                        search_range[1],
+                        rtol=1e-10,
+                        atol=atol,
+                    )
+                )
+
+            trace = tuple(getattr(selector, "search_trace_", ()))
+            best_score = getattr(selector, "best_score_", None)
+            selector_method = getattr(
+                selector, "optimization_method", self.optimization_method
+            )
+            self.bandwidth_search_ = {
+                "criterion": method,
+                "adaptive": bool(self.adaptive),
+                "optimization_method": (
+                    "exhaustive_integer" if self.adaptive else selector_method
+                ),
+                "search_range": search_range,
+                "selected": selected_value,
+                "best_score": None if best_score is None else float(best_score),
+                "trace": trace,
+                "boundary_solution": bool(boundary_solution),
+            }
+            return selected_value
 
         value = float(self.bandwidth)
         if self.adaptive:
@@ -718,6 +772,20 @@ class GWR(BaseSpatialRegressor):
             else np.asarray(self.coef_)
         )
 
+        bandwidth_lines = [
+            f"Bandwidth: {self.bandwidth_} ({'adaptive neighbours' if self.adaptive else 'fixed distance'})"
+        ]
+        if self.bandwidth_search_ is not None:
+            search_range = self.bandwidth_search_.get("search_range")
+            bandwidth_lines.extend(
+                [
+                    f"Bandwidth criterion: {self.bandwidth_search_.get('criterion')}",
+                    f"Bandwidth search method: {self.bandwidth_search_.get('optimization_method')}",
+                    f"Bandwidth search range: {search_range}",
+                    f"Bandwidth boundary solution: {self.bandwidth_search_.get('boundary_solution')}",
+                ]
+            )
+
         lines = [
             "=" * 78,
             "Gaussian Geographically Weighted Regression (GWR)",
@@ -725,7 +793,7 @@ class GWR(BaseSpatialRegressor):
             f"Samples: {n}",
             f"Predictors: {self.X_train_.shape[1]}",
             f"Kernel: {self.kernel}",
-            f"Bandwidth: {self.bandwidth_} ({'adaptive neighbours' if self.adaptive else 'fixed distance'})",
+            *bandwidth_lines,
             f"Distance metric: {self.distance_metric}",
             f"Residual variance (sigma^2): {self.sigma2_:.6f}",
             "",
