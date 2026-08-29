@@ -172,7 +172,20 @@ def main() -> None:
             )
         md = model.diagnostics_
         rd = ref["diagnostics"]
-        for metric in ["r2", "adj_r2", "aic", "aicc", "bic", "trace_S", "trace_StS"]:
+        for metric in [
+            "r2",
+            "adj_r2",
+            "aic",
+            "aicc",
+            "bic",
+            "trace_S",
+            "trace_StS",
+        ]:
+            interpretation = (
+                "different_enp_convention"
+                if case == "fixed_gaussian_v1" and metric == "adj_r2"
+                else "strict"
+            )
             _record(
                 rows,
                 reference="mgwr",
@@ -181,6 +194,7 @@ def main() -> None:
                 metric=metric,
                 actual=[md[metric]],
                 expected=[rd[metric]],
+                interpretation=interpretation,
             )
         _record(
             rows,
@@ -216,7 +230,9 @@ def main() -> None:
                 metric=metric,
                 actual=actual,
                 expected=expected,
-                interpretation=("different_definition" if metric == "local_r2" else "strict"),
+                interpretation=(
+                    "different_definition" if metric == "local_r2" else "strict"
+                ),
             )
         md = model.diagnostics_
         rd = ref["diagnostics"]
@@ -252,8 +268,16 @@ def main() -> None:
     sp_pairs = [
         ("fixed_gaussian_v2", "fixed_gaussian", "strict"),
         ("fixed_bisquare_v2", "fixed_bisquare", "strict"),
-        ("adaptive_gaussian_v2", "adaptive_gaussian", "different_adaptive_semantics"),
-        ("adaptive_bisquare_v2", "adaptive_bisquare", "different_adaptive_semantics"),
+        (
+            "adaptive_gaussian_v2",
+            "adaptive_gaussian",
+            "different_adaptive_semantics",
+        ),
+        (
+            "adaptive_bisquare_v2",
+            "adaptive_bisquare",
+            "different_adaptive_semantics",
+        ),
     ]
     for py_case, ref_case, interpretation in sp_pairs:
         model = fits[py_case]
@@ -278,7 +302,11 @@ def main() -> None:
     pred_model = fits["fixed_gaussian_v2"]
     pred = pred_model.predict_result(X_new, coords_new)
     pred_params = np.column_stack([pred.intercept, pred.coef])
-    for reference, payload in [("mgwr", mgwr), ("GWmodel", gwmodel), ("spgwr", spgwr)]:
+    for reference, payload in [
+        ("mgwr", mgwr),
+        ("GWmodel", gwmodel),
+        ("spgwr", spgwr),
+    ]:
         ref = payload["fixed_gaussian_prediction"]
         _record(
             rows,
@@ -299,61 +327,6 @@ def main() -> None:
             expected=ref["predictions"],
         )
 
-    bw_rows = []
-    py_bw = {}
-    for criterion in ["cv", "aic", "aicc", "bic"]:
-        model = GWR(
-            kernel="bisquare",
-            bandwidth=criterion,
-            adaptive=True,
-            bandwidth_range=(5, 35),
-            optimization_method="grid",
-        ).fit(
-            X,
-            y,
-            coords,
-            compute_hat_matrix=False,
-            compute_local_r2=False,
-            compute_inference=False,
-        )
-        py_bw[criterion] = int(model.bandwidth_)
-    for criterion, value in py_bw.items():
-        bw_rows.append(
-            {
-                "implementation": "pyGWRx",
-                "criterion": criterion,
-                "bandwidth": value,
-                "bandwidth_type": "adaptive_neighbours",
-            }
-        )
-    for criterion, value in mgwr["adaptive_bisquare_bandwidth_selection"].items():
-        bw_rows.append(
-            {
-                "implementation": "mgwr",
-                "criterion": criterion,
-                "bandwidth": value,
-                "bandwidth_type": "adaptive_neighbours",
-            }
-        )
-    for criterion, value in gwmodel["adaptive_bisquare_bandwidth_selection"].items():
-        bw_rows.append(
-            {
-                "implementation": "GWmodel",
-                "criterion": criterion,
-                "bandwidth": value,
-                "bandwidth_type": "adaptive_neighbours",
-            }
-        )
-    for criterion, value in spgwr["fixed_bandwidth_selection"].items():
-        bw_rows.append(
-            {
-                "implementation": "spgwr",
-                "criterion": criterion,
-                "bandwidth": value,
-                "bandwidth_type": "fixed_distance",
-            }
-        )
-
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     fieldnames = [
         "reference",
@@ -366,22 +339,15 @@ def main() -> None:
         "rmse",
         "max_rel_diff",
     ]
-    with (OUT_DIR / "comparison.csv").open("w", newline="", encoding="utf-8") as handle:
+    with (OUT_DIR / "comparison.csv").open(
+        "w", newline="", encoding="utf-8"
+    ) as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
     (OUT_DIR / "comparison.json").write_text(
         json.dumps(rows, indent=2) + "\n", encoding="utf-8"
     )
-    with (OUT_DIR / "bandwidth_selection.csv").open(
-        "w", newline="", encoding="utf-8"
-    ) as handle:
-        writer = csv.DictWriter(
-            handle,
-            fieldnames=["implementation", "criterion", "bandwidth", "bandwidth_type"],
-        )
-        writer.writeheader()
-        writer.writerows(bw_rows)
 
     strict = [row for row in rows if row["interpretation"] == "strict"]
     by_ref: dict[str, list[dict[str, Any]]] = {}
@@ -412,7 +378,8 @@ def main() -> None:
             "- GWmodel Local_R2 is not numerically identical to the mgwr/spgwr/PyGWRx local weighted R² convention and is reported separately.",
             "- GWmodel AIC and BIC labels use formulas that differ from the RSS/trace(S) formulas used by PyGWRx/mgwr; AICc is directly comparable and is tested strictly.",
             "- spgwr adaptive bandwidth is supplied as a sample proportion and resolves local radii differently from integer-k adaptive bandwidths; adaptive results are therefore semantic cross-checks, not strict equality tests.",
-            "- Bandwidth-selection outputs are retained in bandwidth_selection.csv rather than forced into a universal equality assertion.",
+            "- With sigma2_v1=True, mgwr uses a different effective-parameter convention for adjusted R²; that diagnostic is archived as a definition difference rather than a strict error.",
+            "- Bandwidth-selection validation is handled separately by the controlled k=4..40 criterion-curve report, which removes optimizer/default-range effects.",
             "",
         ]
     )
