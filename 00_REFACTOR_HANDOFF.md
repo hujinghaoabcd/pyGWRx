@@ -45,7 +45,8 @@
 
 - A1 — Public API & capability snapshot：**DONE**，PR #34，merge SHA `888f9ceac8fd2c988afb4a004056d5c523302290`。
 - A2 — 19-model fitted-state atomicity freeze：**DONE**，PR #35，merge SHA `b655688f7201aaa9677fe153f2cbc15e6e63afb6`。
-- A3 — 19-model migration risk matrix：**IN PROGRESS**，分支 `refactor/a3-migration-risk-matrix`。
-- A3 完成后下一项固定为：**A4 — performance/memory baseline harness**。
+- A3 — 19-model migration risk matrix：**DONE**，PR #36，merge SHA `dc150ef09fed370a45e5a6e62f14846979fff643`。
+- A4 — performance/memory baseline harness：**IN PROGRESS**，分支 `refactor/a4-performance-memory-baseline`。
+- A4 完成后下一项固定为：**A5 — pre-refactor contract/message hygiene**。
 
-A1/A2 已经证明：后续重构必须同时守住 public API/capability snapshot 与 failed-refit 原子性，不能只看数值测试是否通过。
+A1/A2/A3 已经形成三层安全网：公开 API/capability、failed-refit 原子性、以及逐模型迁移风险与执行策略。A4 只建立性能/内存基线，不做性能算法改写，也不设置 noisy wall-time CI gate。
