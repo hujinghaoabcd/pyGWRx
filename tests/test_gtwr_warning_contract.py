@@ -16,17 +16,17 @@ def test_gtwr_sparse_local_warning_describes_minimum_norm_unpenalized_solution()
     """Sparse local fits must describe the rank-aware solver truthfully."""
     design = np.array(
         [
-  [1.0, 0.0, 0.0],
-  [1.0, 1.0, 0.0],
-  [1.0, 0.0, 1.0],
+            [1.0, 0.0, 0.0],
+            [1.0, 1.0, 0.0],
+            [1.0, 0.0, 1.0],
         ]
     )
     response = np.array([1.0, 2.0, 3.0])
     distances = np.array(
         [
-  [0.0, 10.0, 10.0],
-  [10.0, 0.0, 10.0],
-  [10.0, 10.0, 0.0],
+            [0.0, 10.0, 10.0],
+            [10.0, 0.0, 10.0],
+            [10.0, 10.0, 0.0],
         ]
     )
 
@@ -34,7 +34,9 @@ def test_gtwr_sparse_local_warning_describes_minimum_norm_unpenalized_solution()
     model.y_train_ = response.copy()
     model.bandwidth_ = 1.0
 
-    def focal_only_kernel(distance_row: np.ndarray, bandwidth: float) -> np.ndarray:
+    def focal_only_kernel(
+        distance_row: np.ndarray, bandwidth: float
+    ) -> np.ndarray:
         return np.where(distance_row < bandwidth, 1.0, 0.0)
 
     model.kernel_func_ = focal_only_kernel
@@ -42,10 +44,10 @@ def test_gtwr_sparse_local_warning_describes_minimum_norm_unpenalized_solution()
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         local_fit = model._fit_training_locations(
-  design,
-  distances,
-  store_hat_matrix=False,
-  compute_inference=False,
+            design,
+            distances,
+            store_hat_matrix=False,
+            compute_inference=False,
         )
 
     runtime_messages = [
