@@ -47,6 +47,7 @@
 - A1 — Public API & capability snapshot：**DONE**，PR #34，merge SHA `888f9ceac8fd2c988afb4a004056d5c523302290`。
 - A2 — 19-model fitted-state atomicity freeze：**DONE**，PR #35，merge SHA `b655688f7201aaa9677fe153f2cbc15e6e63afb6`。
 - A3 — 19-model migration risk matrix：**DONE**，PR #36，merge SHA `dc150ef09fed370a45e5a6e62f14846979fff643`。
-- 下一项固定为：**A4 — performance/memory baseline harness**。
+- A4 — performance/memory baseline harness：**IN PROGRESS**，分支 `refactor/a4-performance-memory-baseline`。
+- A4 完成后下一项固定为：**A5 — pre-refactor contract/message hygiene**。
 
-A1/A2/A3 共同构成后续迁移的安全冻结：Public API / capability、failed-refit atomicity、迁移风险与执行约束必须同时守住；标准 GWR 的独立 reference evidence 继续作为 blocking numerical gate。A4 只建立可复现的性能/内存 baseline 与结构型 memory regression guard，不改变 estimator 数学、执行策略或统计公式。
+A1/A2/A3 共同构成后续迁移的安全冻结：Public API / capability、failed-refit atomicity、迁移风险与执行约束必须同时守住；标准 GWR 的独立 reference evidence 继续作为 blocking numerical gate。A4 只建立可复现的性能/内存 baseline 与结构型 memory regression guard，不改变 estimator 数学、执行策略或统计公式，也不设置 noisy wall-time CI gate。
