@@ -947,7 +947,8 @@ class GTWR(BaseSpatiotemporalRegressor):
                 warnings.warn(
                     f"Location {index}: only {n_positive} positive-weight observations "
                     f"are available for {n_parameters} design columns. The local "
-                    "solution is ridge regularized; consider increasing the bandwidth.",
+                    "rank-aware WLS solver returns a minimum-norm unpenalized local "
+                    "solution; consider increasing the bandwidth.",
                     RuntimeWarning,
                     stacklevel=2,
                 )
