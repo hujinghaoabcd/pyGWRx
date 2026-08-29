@@ -971,10 +971,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#understanding-bandwidth-size" class="md-nav__link">
+  <a href="#understanding-bandwidth-size-and-local-rank" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Understanding bandwidth size
+        Understanding bandwidth size and local rank
       
     </span>
   </a>
@@ -1071,10 +1071,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-check-coefficient-stability" class="md-nav__link">
+  <a href="#3-check-numerical-identifiability-before-interpreting-coefficients" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Check coefficient stability
+        3. Check numerical identifiability before interpreting coefficients
       
     </span>
   </a>
@@ -1082,10 +1082,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-examine-influence-and-residuals" class="md-nav__link">
+  <a href="#4-check-coefficient-stability-and-uncertainty" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Examine influence and residuals
+        4. Check coefficient stability and uncertainty
       
     </span>
   </a>
@@ -1093,10 +1093,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#5-validate-the-intended-use" class="md-nav__link">
+  <a href="#5-examine-influence-and-residuals" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Validate the intended use
+        5. Examine influence and residuals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-validate-the-intended-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Validate the intended use
       
     </span>
   </a>
@@ -6690,10 +6701,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#understanding-bandwidth-size" class="md-nav__link">
+  <a href="#understanding-bandwidth-size-and-local-rank" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Understanding bandwidth size
+        Understanding bandwidth size and local rank
       
     </span>
   </a>
@@ -6790,10 +6801,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-check-coefficient-stability" class="md-nav__link">
+  <a href="#3-check-numerical-identifiability-before-interpreting-coefficients" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Check coefficient stability
+        3. Check numerical identifiability before interpreting coefficients
       
     </span>
   </a>
@@ -6801,10 +6812,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-examine-influence-and-residuals" class="md-nav__link">
+  <a href="#4-check-coefficient-stability-and-uncertainty" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Examine influence and residuals
+        4. Check coefficient stability and uncertainty
       
     </span>
   </a>
@@ -6812,10 +6823,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#5-validate-the-intended-use" class="md-nav__link">
+  <a href="#5-examine-influence-and-residuals" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Validate the intended use
+        5. Examine influence and residuals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-validate-the-intended-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Validate the intended use
       
     </span>
   </a>
@@ -7067,7 +7089,9 @@
 <li>automatic bandwidth selection by CV, AIC, AICc or BIC;</li>
 <li>fitted-model bandwidth-search provenance including criterion, search method, search range, evaluated trace, best score and boundary-solution flag;</li>
 <li>optional storage of the full hat matrix while always retaining its traces and influence diagnostics;</li>
-<li>local standard errors, t statistics, local R², standardised residuals and Cook's distance;</li>
+<li>local numerical-rank and condition diagnostics for every fitted weighted design;</li>
+<li>local standard errors and t statistics only where the local parameterisation is numerically identifiable;</li>
+<li>local R², standardised residuals and Cook's distance;</li>
 <li>target-location prediction by recalibrating local coefficients from the stored training data.</li>
 </ul>
 <p>Prediction is <strong>not</strong> interpolation of the coefficient maps. For every target coordinate, pyGWRx recomputes its distances to the training observations, constructs a new kernel, solves a new weighted regression, and applies those local coefficients to the supplied target predictors.</p>
@@ -7148,19 +7172,20 @@
 </span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>
 </span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"selected neighbour count:"</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">bandwidth_</span><span class="p">)</span>
 </span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"bandwidth search:"</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">bandwidth_search_</span><span class="p">)</span>
-</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_diagnostics</span><span class="p">())</span>
-</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>
-</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a><span class="n">X_new</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-</span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>    <span class="p">{</span>
-</span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>        <span class="s2">"income"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.40</span><span class="p">],</span>
-</span><span id="__span-1-46"><a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a>        <span class="s2">"access"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.10</span><span class="p">,</span> <span class="mf">0.30</span><span class="p">],</span>
-</span><span id="__span-1-47"><a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a>    <span class="p">}</span>
-</span><span id="__span-1-48"><a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a><span class="p">)</span>
-</span><span id="__span-1-49"><a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a><span class="n">coords_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">25.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">75.0</span><span class="p">,</span> <span class="mf">65.0</span><span class="p">]])</span>
-</span><span id="__span-1-50"><a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a>
-</span><span id="__span-1-51"><a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a><span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">coords_new</span><span class="p">)</span>
-</span><span id="__span-1-52"><a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a><span class="nb">print</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">to_frame</span><span class="p">())</span>
+</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"rank-deficient locations:"</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">rank_deficient_</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_diagnostics</span><span class="p">())</span>
+</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>
+</span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a><span class="n">X_new</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>    <span class="p">{</span>
+</span><span id="__span-1-46"><a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a>        <span class="s2">"income"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.40</span><span class="p">],</span>
+</span><span id="__span-1-47"><a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a>        <span class="s2">"access"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.10</span><span class="p">,</span> <span class="mf">0.30</span><span class="p">],</span>
+</span><span id="__span-1-48"><a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a>    <span class="p">}</span>
+</span><span id="__span-1-49"><a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a><span class="p">)</span>
+</span><span id="__span-1-50"><a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a><span class="n">coords_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">25.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">75.0</span><span class="p">,</span> <span class="mf">65.0</span><span class="p">]])</span>
+</span><span id="__span-1-51"><a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a>
+</span><span id="__span-1-52"><a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a><span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">coords_new</span><span class="p">)</span>
+</span><span id="__span-1-53"><a id="__codelineno-1-53" name="__codelineno-1-53" href="#__codelineno-1-53"></a><span class="nb">print</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">to_frame</span><span class="p">())</span>
 </span></code></pre></div>
 <p>For a first real-data run, replace the generated <code>X</code>, <code>y</code> and <code>coords</code> while preserving row alignment and coordinate units.</p>
 <h2 id="constructor">Constructor<a class="headerlink" href="#constructor" title="Permanent link">&para;</a></h2>
@@ -7250,9 +7275,10 @@
 </tr>
 </tbody>
 </table>
-<h3 id="understanding-bandwidth-size">Understanding bandwidth size<a class="headerlink" href="#understanding-bandwidth-size" title="Permanent link">&para;</a></h3>
+<h3 id="understanding-bandwidth-size-and-local-rank">Understanding bandwidth size and local rank<a class="headerlink" href="#understanding-bandwidth-size-and-local-rank" title="Permanent link">&para;</a></h3>
 <p>A smaller bandwidth gives a more local and flexible surface but uses less information per fit. It can increase variance, local singularity and sensitivity to individual observations. A larger bandwidth smooths coefficients and approaches a more global relationship.</p>
-<p>With an adaptive bandwidth, the local distance threshold changes by location so that each local regression is based on approximately the same number of nearest observations. With compact kernels, the number of positive-weight observations is especially important. If a local fit has fewer positive-weight observations than design columns, pyGWRx warns and returns the Moore-Penrose minimum-norm <strong>unpenalized</strong> WLS solution; it does not silently add ridge regularisation. Treat the warning as a reason to increase the bandwidth, simplify the design, or inspect local collinearity.</p>
+<p>With an adaptive bandwidth, the local distance threshold changes by location so that each local regression is based on approximately the same number of nearest observations. With compact kernels, the number of positive-weight observations is especially important. A local design can also be rank deficient even when the raw positive-weight observation count exceeds the number of parameters, for example because two predictors become locally collinear or one predictor has effectively no local variation.</p>
+<p>pyGWRx solves each unpenalized weighted design with one SVD. When the weighted design is rank deficient, the coefficient vector remains the Moore-Penrose minimum-norm solution and fitted values remain numerically defined. That does <strong>not</strong> make the individual coefficients identifiable. Such locations are marked in <code>rank_deficient_</code>; <code>local_rank_</code> and <code>local_condition_number_</code> expose the numerical diagnosis; coefficient covariance, standard errors and t statistics are returned as <code>NaN</code> at those locations. Increase the bandwidth, simplify the design or diagnose local collinearity before interpreting the affected coefficient surfaces.</p>
 <h2 id="fitting">Fitting<a class="headerlink" href="#fitting" title="Permanent link">&para;</a></h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">X</span><span class="p">,</span>
@@ -7286,7 +7312,7 @@
 <tr>
 <td><code>compute_inference</code></td>
 <td style="text-align: right;"><code>True</code></td>
-<td>Computes covariance diagonals, local standard errors and local t statistics. Disable for prediction-only workflows or exploratory timing tests.</td>
+<td>Computes covariance diagonals, local standard errors and local t statistics where the local weighted design is identifiable. Rank diagnostics are retained even when this option is disabled.</td>
 </tr>
 <tr>
 <td><code>verbose</code></td>
@@ -7320,17 +7346,17 @@
 <tr>
 <td><code>predict_result()</code></td>
 <td>Predictions, local slopes, intercepts, coordinates and optional standard errors/t statistics</td>
-<td>Auditable prediction and coefficient inspection.</td>
+<td>Auditable prediction and coefficient inspection. Rank-deficient target recalibrations keep predictions but expose <code>NaN</code> coefficient inference.</td>
 </tr>
 <tr>
 <td><code>get_local_parameters()</code></td>
-<td>Dictionary containing target intercepts, slopes and coordinates</td>
-<td>Coefficient surfaces at target locations without applying target <code>X</code>.</td>
+<td>Dictionary containing target intercepts, slopes, coordinates, local rank, local condition number and rank-deficiency flag</td>
+<td>Coefficient surfaces and numerical identifiability at target locations without applying target <code>X</code>.</td>
 </tr>
 <tr>
 <td><code>get_local_coefficients()</code></td>
 <td>Slopes only</td>
-<td>Compatibility helper; prefer <code>get_local_parameters()</code> when the intercept matters.</td>
+<td>Compatibility helper; prefer <code>get_local_parameters()</code> when the intercept or rank diagnosis matters.</td>
 </tr>
 </tbody>
 </table>
@@ -7358,7 +7384,7 @@
 <tr>
 <td><code>coef_</code></td>
 <td><code>(n, p)</code></td>
-<td>Local slope estimates at calibration locations.</td>
+<td>Local slope estimates at calibration locations. Rank-deficient locations contain the minimum-norm coefficient vector and require the rank flags below for interpretation.</td>
 </tr>
 <tr>
 <td><code>intercept_</code></td>
@@ -7374,6 +7400,21 @@
 <td><code>residuals_</code></td>
 <td><code>(n,)</code></td>
 <td><code>y - fitted_values_</code>.</td>
+</tr>
+<tr>
+<td><code>local_rank_</code></td>
+<td><code>(n,)</code> integer array</td>
+<td>Numerical rank of each weighted local design matrix.</td>
+</tr>
+<tr>
+<td><code>local_condition_number_</code></td>
+<td><code>(n,)</code></td>
+<td>Condition number of each weighted local design; rank-deficient locations are reported as infinity.</td>
+</tr>
+<tr>
+<td><code>rank_deficient_</code></td>
+<td><code>(n,)</code> boolean array</td>
+<td><code>True</code> where local rank is smaller than the number of fitted parameters.</td>
 </tr>
 <tr>
 <td><code>local_r2_</code></td>
@@ -7403,12 +7444,12 @@
 <tr>
 <td><code>coef_se_</code>, <code>intercept_se_</code></td>
 <td>local arrays or <code>None</code></td>
-<td>Local standard errors when inference is enabled.</td>
+<td>Local standard errors when inference is enabled; rows are <code>NaN</code> at rank-deficient local designs.</td>
 </tr>
 <tr>
 <td><code>coef_t_</code>, <code>intercept_t_</code></td>
 <td>local arrays or <code>None</code></td>
-<td>Local coefficient-to-standard-error ratios. Account for multiple local comparisons.</td>
+<td>Local coefficient-to-standard-error ratios; rows are <code>NaN</code> where the corresponding local parameterisation is not identifiable. Account for multiple local comparisons.</td>
 </tr>
 <tr>
 <td><code>hat_matrix_</code></td>
@@ -7417,7 +7458,7 @@
 </tr>
 </tbody>
 </table>
-<p><code>to_frame()</code> combines coordinates, coefficients, fitted values, residuals, local R², inference arrays and influence measures into one location-indexed pandas DataFrame.</p>
+<p><code>to_frame()</code> combines coordinates, coefficients, fitted values, residuals, local R², inference arrays, influence measures and local rank diagnostics into one location-indexed pandas DataFrame.</p>
 <h2 id="how-to-interpret-a-fitted-gwr-responsibly">How to interpret a fitted GWR responsibly<a class="headerlink" href="#how-to-interpret-a-fitted-gwr-responsibly" title="Permanent link">&para;</a></h2>
 <h3 id="1-establish-a-global-baseline">1. Establish a global baseline<a class="headerlink" href="#1-establish-a-global-baseline" title="Permanent link">&para;</a></h3>
 <p>Fit and inspect an ordinary linear model using the same response and predictors. GWR should answer a spatial non-stationarity question, not merely replace an unexamined global model.</p>
@@ -7428,11 +7469,13 @@
 <li>A very large adaptive bandwidth suggests weak evidence for strongly local variation.</li>
 <li>A very small bandwidth can produce unstable coefficients even when fit statistics improve.</li>
 </ul>
-<h3 id="3-check-coefficient-stability">3. Check coefficient stability<a class="headerlink" href="#3-check-coefficient-stability" title="Permanent link">&para;</a></h3>
-<p>Map coefficients together with standard errors or adjusted significance information. Compare local condition numbers and coefficient correlations through the diagnostics module. Abrupt isolated coefficient changes are often a warning rather than a substantive finding.</p>
-<h3 id="4-examine-influence-and-residuals">4. Examine influence and residuals<a class="headerlink" href="#4-examine-influence-and-residuals" title="Permanent link">&para;</a></h3>
+<h3 id="3-check-numerical-identifiability-before-interpreting-coefficients">3. Check numerical identifiability before interpreting coefficients<a class="headerlink" href="#3-check-numerical-identifiability-before-interpreting-coefficients" title="Permanent link">&para;</a></h3>
+<p>Inspect <code>rank_deficient_</code>, <code>local_rank_</code> and <code>local_condition_number_</code> before mapping or testing coefficients. A minimum-norm coefficient at a rank-deficient location is a valid numerical solution for prediction, but the individual parameter decomposition is not uniquely identified. Do not interpret its sign, magnitude or significance as if it were an ordinary full-rank local estimate.</p>
+<h3 id="4-check-coefficient-stability-and-uncertainty">4. Check coefficient stability and uncertainty<a class="headerlink" href="#4-check-coefficient-stability-and-uncertainty" title="Permanent link">&para;</a></h3>
+<p>Map coefficients together with standard errors or adjusted significance information only after excluding or resolving rank-deficient locations. Compare local condition diagnostics and coefficient correlations. Abrupt isolated coefficient changes are often a warning rather than a substantive finding.</p>
+<h3 id="5-examine-influence-and-residuals">5. Examine influence and residuals<a class="headerlink" href="#5-examine-influence-and-residuals" title="Permanent link">&para;</a></h3>
 <p>Use <code>standardized_residuals_</code>, <code>cooks_distance_</code> and residual maps. Remaining residual spatial structure means that local coefficient variation has not explained all spatial dependence.</p>
-<h3 id="5-validate-the-intended-use">5. Validate the intended use<a class="headerlink" href="#5-validate-the-intended-use" title="Permanent link">&para;</a></h3>
+<h3 id="6-validate-the-intended-use">6. Validate the intended use<a class="headerlink" href="#6-validate-the-intended-use" title="Permanent link">&para;</a></h3>
 <p>Random train/test splitting can leak spatial information. For claims about transfer to new places, use spatial blocks or held-out regions and compare against global and simpler spatial baselines.</p>
 <h2 id="common-mistakes-and-corrections">Common mistakes and corrections<a class="headerlink" href="#common-mistakes-and-corrections" title="Permanent link">&para;</a></h2>
 <table>
@@ -7465,9 +7508,14 @@
 <td>Supply predictors only.</td>
 </tr>
 <tr>
+<td>Treating a finite minimum-norm coefficient as identified after a rank warning</td>
+<td>Rank deficiency means multiple coefficient vectors can represent the same local fit.</td>
+<td>Inspect <code>rank_deficient_</code>; change the bandwidth/design or treat affected coefficient inference as unavailable.</td>
+</tr>
+<tr>
 <td>Mapping coefficients without uncertainty or collinearity</td>
 <td>Attractive surfaces may be numerically unstable or statistically weak.</td>
-<td>Pair coefficient maps with SE/t information, local condition diagnostics and residuals.</td>
+<td>Pair coefficient maps with SE/t information, rank/condition diagnostics and residuals.</td>
 </tr>
 <tr>
 <td>Treating local t values as independent tests</td>
@@ -7497,8 +7545,9 @@
 <li>automatic criterion, optimisation method and search bounds;</li>
 <li>selected bandwidth and whether it reached a boundary;</li>
 <li>intercept and residual-variance conventions;</li>
+<li>number and spatial distribution of rank-deficient local fits, if any;</li>
 <li>effective parameter count, AICc/CV and global comparison;</li>
-<li>local coefficient summaries with uncertainty and collinearity checks;</li>
+<li>local coefficient summaries with uncertainty and collinearity/rank checks;</li>
 <li>influence and residual diagnostics;</li>
 <li>validation design;</li>
 <li>pyGWRx version and relevant fit switches.</li>
@@ -7516,7 +7565,7 @@
 <tr>
 <td>Coefficients</td>
 <td>Location-specific weighted regressions</td>
-<td>Gaussian local WLS at calibration or target locations.</td>
+<td>Gaussian local WLS at calibration or target locations; one SVD supplies the minimum-norm solution and numerical rank.</td>
 </tr>
 <tr>
 <td>Spatial scale</td>
@@ -7531,7 +7580,12 @@
 <tr>
 <td>Diagnostics</td>
 <td>Weighting-function and bandwidth choice are central</td>
-<td>Smoother traces, information criteria, local R², inference, leverage, Cook's distance and export helpers.</td>
+<td>Smoother traces, information criteria, local R², inference, leverage, Cook's distance, local rank/condition diagnostics and export helpers.</td>
+</tr>
+<tr>
+<td>Rank-deficient local fit</td>
+<td>Local normal equations may be singular or ill conditioned</td>
+<td>Preserve the Moore-Penrose minimum-norm fitted solution, flag the location, and suppress coefficient SE/t inference with <code>NaN</code>.</td>
 </tr>
 <tr>
 <td>Large samples</td>
