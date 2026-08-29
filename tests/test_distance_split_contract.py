@@ -51,7 +51,7 @@ def test_distance_metric_spec_stays_private_first() -> None:
 
 
 def test_distance_metric_spec_normalizes_aliases_and_freezes_params() -> None:
-    """Ordinary metric names/parameters receive one canonical internal representation."""
+    """Canonicalize ordinary metric names and parameters into one internal form."""
     cityblock = distance.DistanceMetricSpec(" cityblock ")
     assert cityblock.name == "manhattan"
     assert dict(cityblock.params) == {}
