@@ -21,27 +21,27 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from pygwrx.core.distance import (  # noqa: F401
-    _DEFAULT_DISTANCE_BLOCK_ROWS,
-    DistanceCache,
-    chebyshev_distance,
-    chunked_computation,
-    compute_distance_matrix,
-    euclidean_distance,
-    haversine_distance,
-    _iter_distance_blocks,
-    _iter_distance_rows,
-    manhattan_distance,
-    minkowski_distance,
-)
-from pygwrx.core.validation import (  # noqa: F401
-    _extract_geopandas_coords,
-    validate_coords,
-    validate_data,
-)
+from pygwrx.core import distance as _distance
+from pygwrx.core import validation as _validation
 
 if TYPE_CHECKING:
     import geopandas as gpd
+
+DistanceCache = _distance.DistanceCache
+_DEFAULT_DISTANCE_BLOCK_ROWS = _distance._DEFAULT_DISTANCE_BLOCK_ROWS
+_iter_distance_blocks = _distance._iter_distance_blocks
+_iter_distance_rows = _distance._iter_distance_rows
+chebyshev_distance = _distance.chebyshev_distance
+chunked_computation = _distance.chunked_computation
+compute_distance_matrix = _distance.compute_distance_matrix
+euclidean_distance = _distance.euclidean_distance
+haversine_distance = _distance.haversine_distance
+manhattan_distance = _distance.manhattan_distance
+minkowski_distance = _distance.minkowski_distance
+
+_extract_geopandas_coords = _validation._extract_geopandas_coords
+validate_coords = _validation.validate_coords
+validate_data = _validation.validate_data
 
 
 def add_intercept(X: np.ndarray) -> np.ndarray:
