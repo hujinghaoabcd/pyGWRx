@@ -190,7 +190,11 @@ def _prediction_result(cls: type) -> dict[str, Any] | None:
     annotation = inspect.signature(method).return_annotation
     if annotation is inspect.Signature.empty:
         return None
-    name = annotation if isinstance(annotation, str) else getattr(annotation, "__name__", str(annotation))
+    name = (
+        annotation
+        if isinstance(annotation, str)
+        else getattr(annotation, "__name__", str(annotation))
+    )
     name = str(name).strip("'\"")
     module = importlib.import_module(cls.__module__)
     result_cls = getattr(module, name, None)
@@ -209,7 +213,9 @@ def generate_contract() -> dict[str, Any]:
         cls = getattr(models, name)
         root_cls = getattr(pygwrx, name)
         if root_cls is not cls:
-            raise RuntimeError(f"pygwrx.{name} and pygwrx.models.{name} are not identical")
+            raise RuntimeError(
+                f"pygwrx.{name} and pygwrx.models.{name} are not identical"
+            )
         instance = cls()
         methods = {
             method_name: contract
@@ -253,7 +259,9 @@ def main() -> None:
     if args.check:
         if not args.output.exists():
             print(text)
-            raise SystemExit("Estimator contract file is missing; generated contract printed above.")
+            raise SystemExit(
+                "Estimator contract file is missing; generated contract printed above."
+            )
         expected = args.output.read_text(encoding="utf-8")
         if expected != text:
             print("--- GENERATED ESTIMATOR CONTRACT ---")
