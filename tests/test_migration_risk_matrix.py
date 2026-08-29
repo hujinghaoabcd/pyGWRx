@@ -28,7 +28,13 @@ def test_migration_risk_matrix_covers_exactly_the_a1_estimators():
 
 def test_every_estimator_has_actionable_risk_metadata():
     contract = _load("migration_risks.json")
-    allowed_roles = {"regressor", "classifier", "transformer", "statistics", "inference"}
+    allowed_roles = {
+        "regressor",
+        "classifier",
+        "transformer",
+        "statistics",
+        "inference",
+    }
     allowed_risks = {"LOW", "MEDIUM", "HIGH", "CRITICAL"}
     required = {
         "role",
@@ -74,7 +80,9 @@ def test_a3_is_not_a_current_mro_compatibility_freeze():
 
 def test_human_readable_matrix_mentions_all_estimators():
     contract = _load("migration_risks.json")
-    document = (CONTRACT_DIR / "MIGRATION_RISK_MATRIX.md").read_text(encoding="utf-8")
+    document = (CONTRACT_DIR / "MIGRATION_RISK_MATRIX.md").read_text(
+        encoding="utf-8"
+    )
 
     for name in contract["estimators"]:
         assert name in document
