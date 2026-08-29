@@ -1,0 +1,47 @@
+name: Temporary GWR reference generation
+
+on:
+  push:
+    branches: [gwr-reference-validation]
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: gwr-reference-validation
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Generate mgwr reference
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "mgwr==2.2.1" pandas numpy
+          python tools/reference/gwr/generate_mgwr.py
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
+      - name: Install R system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudunits2-dev libgdal-dev libgeos-dev libproj-dev
+      - name: Install R reference packages
+        shell: Rscript {0}
+        run: |
+          install.packages(c("jsonlite", "sp", "spgwr", "GWmodel"), repos = "https://cloud.r-project.org")
+      - name: Generate GWmodel and spgwr references
+        run: Rscript tools/reference/gwr/generate_r_references.R
+      - name: Commit frozen references
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/reference_data/gwr/*.json
+          git diff --cached --check
+          git commit -m "Generate external GWR reference fixtures"
+          git push origin HEAD:gwr-reference-validation
