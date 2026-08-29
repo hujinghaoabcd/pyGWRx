@@ -1,0 +1,60 @@
+name: Temporary unify hat-matrix SVD
+
+on:
+  push:
+    branches: [unify-hat-matrix-svd]
+
+permissions:
+  contents: write
+
+env:
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+  NUMEXPR_NUM_THREADS: "1"
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  patch-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: unify-hat-matrix-svd
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Apply focused numerical-core patch
+        run: python tools/_temporary_unify_hat_matrix_svd.py
+
+      - name: Install verification environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test,reference]" black==26.5.1 isort==9.0.1 ruff==0.16.5
+
+      - name: Format and run focused tests
+        run: |
+          python -m black src/pygwrx/core/solver.py tests/test_solver_unpenalized.py tests/test_solver_legacy_reference.py
+          python -m isort src/pygwrx/core/solver.py tests/test_solver_unpenalized.py tests/test_solver_legacy_reference.py
+          python -m ruff check src/pygwrx/core/solver.py tests/test_solver_unpenalized.py tests/test_solver_legacy_reference.py
+          pytest -q tests/test_solver_unpenalized.py tests/test_solver_legacy_reference.py
+          pytest -q -m reference
+
+      - name: Commit verified patch and remove temporary machinery
+        run: |
+          set -euo pipefail
+          rm tools/_temporary_unify_hat_matrix_svd.py
+          rm .github/workflows/_temporary_unify_hat_matrix_svd.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Unify hat-matrix calculation with SVD WLS solver"
+          git pull --rebase origin unify-hat-matrix-svd
+          git push origin HEAD:unify-hat-matrix-svd
