@@ -19,7 +19,12 @@ def _make_data(n_samples: int = 300):
     rng = np.random.default_rng(20260829)
     coords = rng.uniform(0.0, 1.0, size=(n_samples, 2))
     X = rng.normal(size=(n_samples, 2))
-    y = 2.5 + 1.2 * X[:, 0] - 0.7 * X[:, 1] + rng.normal(0.0, 0.1, n_samples)
+    y = (
+        2.5
+        + 1.2 * X[:, 0]
+        - 0.7 * X[:, 1]
+        + rng.normal(0.0, 0.1, n_samples)
+    )
     return X, y, coords
 
 
@@ -62,9 +67,8 @@ def test_numeric_bandwidth_fit_streams_calibration_and_local_r2_distances(
     assert np.all(np.isfinite(model.local_r2_))
     assert calls
     assert max(rows for rows, _ in calls) <= gwr_module._DISTANCE_BLOCK_ROWS
-    assert all(
-        not (rows == coords.shape[0] and cols == coords.shape[0])
-        for rows, cols in calls
+    assert not any(
+        rows == coords.shape[0] and cols == coords.shape[0] for rows, cols in calls
     )
 
 
@@ -91,6 +95,6 @@ def test_prediction_streams_target_to_training_distances(monkeypatch):
     assert np.all(np.isfinite(predictions))
     assert calls
     assert max(rows for rows, _ in calls) <= gwr_module._DISTANCE_BLOCK_ROWS
-    assert all(
-        not (rows == n_targets and cols == coords.shape[0]) for rows, cols in calls
+    assert not any(
+        rows == n_targets and cols == coords.shape[0] for rows, cols in calls
     )
