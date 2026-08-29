@@ -18,6 +18,8 @@ from typing import Protocol
 
 import numpy as np
 
+__all__: tuple[str, ...] = ()
+
 
 class FittedLifecycleProtocol(Protocol):
     """Minimal fitted-state lifecycle exposed by estimator-like objects."""
@@ -25,6 +27,14 @@ class FittedLifecycleProtocol(Protocol):
     @property
     def is_fitted_(self) -> bool:
         """Whether fitting completed successfully."""
+        ...
+
+    def _mark_fitted(self) -> None:
+        """Mark a successfully fitted object as fitted."""
+        ...
+
+    def _mark_unfitted(self) -> None:
+        """Clear the fitted lifecycle marker before or after a failed fit."""
         ...
 
     def _check_is_fitted(self) -> None:
@@ -70,7 +80,7 @@ class ParameterInferenceProtocol(Protocol):
         ...
 
     @property
-    def standard_error(self) -> np.ndarray | None:
+       def standard_error(self) -> np.ndarray | None:
         """Row-aligned standard errors when available."""
         ...
 
