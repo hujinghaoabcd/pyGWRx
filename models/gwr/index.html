@@ -7065,6 +7065,7 @@
 <li>fixed-distance or adaptive-neighbour bandwidths;</li>
 <li>built-in Gaussian, bisquare, exponential, tricube and boxcar kernels, or a callable kernel;</li>
 <li>automatic bandwidth selection by CV, AIC, AICc or BIC;</li>
+<li>fitted-model bandwidth-search provenance including criterion, search method, search range, evaluated trace, best score and boundary-solution flag;</li>
 <li>optional storage of the full hat matrix while always retaining its traces and influence diagnostics;</li>
 <li>local standard errors, t statistics, local R², standardised residuals and Cook's distance;</li>
 <li>target-location prediction by recalibrating local coefficients from the stored training data.</li>
@@ -7099,8 +7100,8 @@
 </tr>
 <tr>
 <td><code>coords</code></td>
-<td style="text-align: right;"><code>(n, d)</code>; normally <code>(n, 2)</code></td>
-<td>Coordinates used to calculate neighbourhood distances.</td>
+<td style="text-align: right;"><code>(n, 2)</code></td>
+<td>Two-dimensional coordinates used to calculate neighbourhood distances.</td>
 <td>Use a projected CRS for planar metrics, or <code>[longitude, latitude]</code> in degrees with <code>distance_metric="haversine"</code>.</td>
 </tr>
 </tbody>
@@ -7146,19 +7147,20 @@
 </span><span id="__span-1-36"><a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a><span class="p">)</span>
 </span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>
 </span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"selected neighbour count:"</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">bandwidth_</span><span class="p">)</span>
-</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_diagnostics</span><span class="p">())</span>
-</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>
-</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a><span class="n">X_new</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>    <span class="p">{</span>
-</span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>        <span class="s2">"income"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.40</span><span class="p">],</span>
-</span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>        <span class="s2">"access"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.10</span><span class="p">,</span> <span class="mf">0.30</span><span class="p">],</span>
-</span><span id="__span-1-46"><a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a>    <span class="p">}</span>
-</span><span id="__span-1-47"><a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a><span class="p">)</span>
-</span><span id="__span-1-48"><a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a><span class="n">coords_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">25.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">75.0</span><span class="p">,</span> <span class="mf">65.0</span><span class="p">]])</span>
-</span><span id="__span-1-49"><a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a>
-</span><span id="__span-1-50"><a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a><span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">coords_new</span><span class="p">)</span>
-</span><span id="__span-1-51"><a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a><span class="nb">print</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">to_frame</span><span class="p">())</span>
+</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"bandwidth search:"</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">bandwidth_search_</span><span class="p">)</span>
+</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_diagnostics</span><span class="p">())</span>
+</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>
+</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a><span class="n">X_new</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>    <span class="p">{</span>
+</span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>        <span class="s2">"income"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.40</span><span class="p">],</span>
+</span><span id="__span-1-46"><a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a>        <span class="s2">"access"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.10</span><span class="p">,</span> <span class="mf">0.30</span><span class="p">],</span>
+</span><span id="__span-1-47"><a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a>    <span class="p">}</span>
+</span><span id="__span-1-48"><a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a><span class="p">)</span>
+</span><span id="__span-1-49"><a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a><span class="n">coords_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">25.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">75.0</span><span class="p">,</span> <span class="mf">65.0</span><span class="p">]])</span>
+</span><span id="__span-1-50"><a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a>
+</span><span id="__span-1-51"><a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a><span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">coords_new</span><span class="p">)</span>
+</span><span id="__span-1-52"><a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a><span class="nb">print</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">to_frame</span><span class="p">())</span>
 </span></code></pre></div>
 <p>For a first real-data run, replace the generated <code>X</code>, <code>y</code> and <code>coords</code> while preserving row alignment and coordinate units.</p>
 <h2 id="constructor">Constructor<a class="headerlink" href="#constructor" title="Permanent link">&para;</a></h2>
@@ -7214,13 +7216,13 @@
 <td><code>bandwidth_range</code></td>
 <td><code>(lower, upper)</code> or <code>None</code></td>
 <td>Restricts automatic search.</td>
-<td>Use scientifically defensible bounds or bounds that prevent underdetermined local fits. Adaptive bounds must represent integer neighbour counts. Check whether the selected value lies on a boundary.</td>
+<td>Use scientifically defensible bounds or bounds that prevent underdetermined local fits. Adaptive bounds must represent integer neighbour counts. Without explicit fixed bounds, pyGWRx searches from half the smallest positive pairwise distance to twice the largest pairwise distance so isolated locations are not removed by percentile trimming. Check whether the selected value lies on a boundary.</td>
 </tr>
 <tr>
 <td><code>optimization_method</code></td>
 <td><code>"golden_section"</code>, <code>"brent"</code>, or <code>"grid"</code>; default <code>"golden_section"</code></td>
 <td>Numerical search used for automatic bandwidth selection.</td>
-<td>Grid search is transparent and useful for sensitivity checks. Continuous methods are usually faster for fixed-distance bandwidths. Adaptive searches ultimately evaluate integer neighbour counts.</td>
+<td>Grid search is transparent and useful for sensitivity checks. Continuous methods are usually faster for fixed-distance bandwidths. Adaptive searches evaluate every valid integer neighbour count regardless of this setting.</td>
 </tr>
 <tr>
 <td><code>fit_intercept</code></td>
@@ -7250,7 +7252,7 @@
 </table>
 <h3 id="understanding-bandwidth-size">Understanding bandwidth size<a class="headerlink" href="#understanding-bandwidth-size" title="Permanent link">&para;</a></h3>
 <p>A smaller bandwidth gives a more local and flexible surface but uses less information per fit. It can increase variance, local singularity and sensitivity to individual observations. A larger bandwidth smooths coefficients and approaches a more global relationship.</p>
-<p>With an adaptive bandwidth, the local distance threshold changes by location so that each local regression is based on approximately the same number of nearest observations. With compact kernels, the number of positive-weight observations is especially important. pyGWRx warns and applies numerical ridge stabilisation when a local fit has fewer positive-weight observations than design columns; that warning should prompt a larger bandwidth or a simpler design, not be silently ignored.</p>
+<p>With an adaptive bandwidth, the local distance threshold changes by location so that each local regression is based on approximately the same number of nearest observations. With compact kernels, the number of positive-weight observations is especially important. If a local fit has fewer positive-weight observations than design columns, pyGWRx warns and returns the Moore-Penrose minimum-norm <strong>unpenalized</strong> WLS solution; it does not silently add ridge regularisation. Treat the warning as a reason to increase the bandwidth, simplify the design, or inspect local collinearity.</p>
 <h2 id="fitting">Fitting<a class="headerlink" href="#fitting" title="Permanent link">&para;</a></h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">X</span><span class="p">,</span>
@@ -7259,9 +7261,8 @@
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">compute_hat_matrix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">compute_local_r2</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">compute_inference</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">compute_hat_matrix_flag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">verbose</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">)</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">verbose</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">)</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -7288,19 +7289,15 @@
 <td>Computes covariance diagonals, local standard errors and local t statistics. Disable for prediction-only workflows or exploratory timing tests.</td>
 </tr>
 <tr>
-<td><code>compute_hat_matrix_flag</code></td>
-<td style="text-align: right;"><code>None</code></td>
-<td>Compatibility alias for older pyGWRx code. New code should use <code>compute_hat_matrix</code>.</td>
-</tr>
-<tr>
 <td><code>verbose</code></td>
 <td style="text-align: right;"><code>None</code></td>
 <td>Optional per-fit override of the constructor setting.</td>
 </tr>
 </tbody>
 </table>
+<p><code>compute_hat_matrix_flag</code> remains accepted only as a backward-compatibility alias for older pyGWRx code; new workflows should use <code>compute_hat_matrix</code>.</p>
 <h3 id="memory-guidance">Memory guidance<a class="headerlink" href="#memory-guidance" title="Permanent link">&para;</a></h3>
-<p>The full hat matrix requires roughly <code>8 × n²</code> bytes before Python-array overhead. For example, <code>n=10,000</code> implies about 800 MB for one float64 matrix. Use <code>compute_hat_matrix=False</code> unless the actual matrix entries are required; diagnostics do not require it to be retained.</p>
+<p>The full hat matrix requires roughly <code>8 × n²</code> bytes before Python-array overhead. For example, <code>n=10,000</code> implies about 800 MB for one float64 matrix. Use <code>compute_hat_matrix=False</code> unless the actual matrix entries are required; diagnostics do not require it to be retained. Standard GWR currently still forms a full pairwise distance matrix during calibration, so disabling hat-matrix storage does <strong>not</strong> yet remove all <code>O(n²)</code> memory use.</p>
 <h2 id="prediction-and-target-location-coefficients">Prediction and target-location coefficients<a class="headerlink" href="#prediction-and-target-location-coefficients" title="Permanent link">&para;</a></h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">coords_new</span><span class="p">)</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">coords_new</span><span class="p">)</span>
@@ -7352,6 +7349,11 @@
 <td><code>bandwidth_</code></td>
 <td>scalar</td>
 <td>Selected fixed distance or adaptive neighbour count.</td>
+</tr>
+<tr>
+<td><code>bandwidth_search_</code></td>
+<td>dictionary or <code>None</code></td>
+<td>Automatic-search provenance: criterion, search method/range, selected value, best score, evaluated trace and <code>boundary_solution</code>. It is <code>None</code> when a numeric bandwidth is supplied directly.</td>
 </tr>
 <tr>
 <td><code>coef_</code></td>
@@ -7421,6 +7423,7 @@
 <p>Fit and inspect an ordinary linear model using the same response and predictors. GWR should answer a spatial non-stationarity question, not merely replace an unexamined global model.</p>
 <h3 id="2-inspect-the-selected-bandwidth">2. Inspect the selected bandwidth<a class="headerlink" href="#2-inspect-the-selected-bandwidth" title="Permanent link">&para;</a></h3>
 <ul>
+<li>Inspect <code>bandwidth_search_</code> rather than only <code>bandwidth_</code>; it records the criterion, evaluated search trace and whether the selected value is a search-boundary solution.</li>
 <li>A selected boundary value indicates that the search range may be constraining the result.</li>
 <li>A very large adaptive bandwidth suggests weak evidence for strongly local variation.</li>
 <li>A very small bandwidth can produce unstable coefficients even when fit statistics improve.</li>
@@ -7518,7 +7521,7 @@
 <tr>
 <td>Spatial scale</td>
 <td>One kernel bandwidth</td>
-<td>Fixed distance or adaptive neighbour count; manual or CV/AIC/AICc/BIC selected.</td>
+<td>Fixed distance or adaptive neighbour count; manual or CV/AIC/AICc/BIC selected. Automatic searches retain their evaluated provenance on the fitted model.</td>
 </tr>
 <tr>
 <td>Prediction</td>
