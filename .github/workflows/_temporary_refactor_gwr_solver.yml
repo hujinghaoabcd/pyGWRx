@@ -1,0 +1,255 @@
+name: Temporary refactor GWR solver
+
+on:
+  push:
+    branches: [refactor-gwr-unpenalized-solver]
+
+permissions:
+  contents: write
+
+env:
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+  NUMEXPR_NUM_THREADS: "1"
+  MPLBACKEND: "Agg"
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  refactor:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refactor-gwr-unpenalized-solver
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Apply numerical refactor
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def once(text, pattern, replacement, label):
+              out, n = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              if n != 1:
+                  raise SystemExit(f"{label}: expected one match, got {n}")
+              return out
+
+          p = Path("src/pygwrx/core/solver.py")
+          s = p.read_text(encoding="utf-8")
+          s = s.replace("_DEFAULT_RIDGE = 1e-8", "_DEFAULT_RIDGE = 0.0", 1)
+          new_wls = '''def weighted_least_squares(
+              X: np.ndarray,
+              y: np.ndarray,
+              weights: np.ndarray,
+              *,
+              ridge: float = _DEFAULT_RIDGE,
+          ) -> Tuple[np.ndarray, np.ndarray]:
+              """Solve weighted least squares using SVD of the weighted design.
+
+              The default ``ridge=0.0`` is standard unpenalized WLS. Positive ridge
+              values remain an explicit lower-level opt-in and are solved through an
+              augmented least-squares design.
+              """
+              X_arr = _validate_design_matrix(X)
+              y_arr = _validate_response(y, X_arr.shape[0])
+              weights_arr = _validate_weights(weights, X_arr.shape[0])
+              ridge_value = _validate_nonnegative_scalar(ridge, "ridge")
+
+              positive = weights_arr > 0.0
+              sqrt_w = np.sqrt(weights_arr[positive])
+              Xw = X_arr[positive] * sqrt_w[:, None]
+              yw = y_arr[positive] * sqrt_w
+              if ridge_value > 0.0:
+                  design = np.vstack(
+                      [Xw, np.sqrt(ridge_value) * np.eye(X_arr.shape[1])]
+                  )
+                  response = np.concatenate(
+                      [yw, np.zeros(X_arr.shape[1], dtype=float)]
+                  )
+              else:
+                  design = Xw
+                  response = yw
+
+              beta, _, _, singular_values = np.linalg.lstsq(
+                  design, response, rcond=None
+              )
+              if not np.all(np.isfinite(beta)):
+                  raise np.linalg.LinAlgError(
+                      "The weighted least-squares solve produced non-finite coefficients."
+                  )
+
+              # pinv(design.T @ design) is obtained from the same SVD spectrum without
+              # estimating beta through normal equations.
+              _, svals, vt = np.linalg.svd(design, full_matrices=False)
+              if svals.size == 0 or svals[0] <= 0.0:
+                  raise np.linalg.LinAlgError(
+                      "The weighted least-squares design has zero numerical rank."
+                  )
+              cutoff = np.finfo(float).eps * max(design.shape) * float(svals[0])
+              keep = svals > cutoff
+              v = vt[keep].T
+              inverse_normal = (v * (1.0 / (svals[keep] ** 2))) @ v.T
+              inverse_normal = 0.5 * (inverse_normal + inverse_normal.T)
+              if not np.all(np.isfinite(inverse_normal)):
+                  raise np.linalg.LinAlgError(
+                      "The weighted least-squares covariance factor is non-finite."
+                  )
+              return np.asarray(beta, dtype=float), inverse_normal
+          '''
+          new_wls = re.sub(r"^          ", "", new_wls, flags=re.M)
+          s = once(
+              s,
+              r"def _normal_equations\([\s\S]*?(?=def local_regression\()",
+              new_wls + "\n\n",
+              "WLS block",
+          )
+          s = s.replace(
+              "Returning a ridge-regularized local solution; consider increasing ",
+              "Returning a minimum-norm unpenalized local solution; consider increasing ",
+          )
+          old_hat = '''            system, _, XtW = _normal_equations(
+                          X_arr,
+                          dummy_y,
+                          weights,
+                          ridge=ridge_value,
+                      )
+
+                      # X_i @ inv(system) @ XtW, computed without explicitly inverting system.
+                      left = _solve_linear_system(system.T, X_arr[i])
+                      hat_row = left @ XtW'''
+          old_hat = re.sub(r"^            ", "", old_hat, flags=re.M)
+          new_hat = '''            _, inverse_normal = weighted_least_squares(
+                          X_arr,
+                          dummy_y,
+                          weights,
+                          ridge=ridge_value,
+                      )
+                      XtW = X_arr.T * weights
+                      hat_row = X_arr[i] @ inverse_normal @ XtW'''
+          new_hat = re.sub(r"^            ", "", new_hat, flags=re.M)
+          if old_hat not in s:
+              raise SystemExit("hat solve block not found")
+          s = s.replace(old_hat, new_hat, 1)
+          s = s.replace(
+              "The corresponding hat-matrix row is ridge regularized.",
+              "The corresponding hat-matrix row uses a minimum-norm WLS operator.",
+              1,
+          )
+          p.write_text(s, encoding="utf-8", newline="\n")
+
+          p = Path("src/pygwrx/core/bandwidth.py")
+          b = p.read_text(encoding="utf-8")
+          b = b.replace(
+              "import numpy as np\n",
+              "import numpy as np\n\nfrom pygwrx.core.solver import weighted_least_squares\n",
+              1,
+          )
+          b = b.replace("_RIDGE = 1e-8", "_RIDGE = 0.0", 1)
+          local = '''def _fit_local_model(
+              X: np.ndarray,
+              y: np.ndarray,
+              weights: np.ndarray,
+              *,
+              target_row: Optional[np.ndarray] = None,
+          ) -> tuple[np.ndarray, Optional[np.ndarray]]:
+              """Fit one unpenalized local weighted model."""
+              n_features = X.shape[1]
+              positive = weights > 0.0
+              if np.count_nonzero(positive) < n_features:
+                  raise _InvalidCandidateError(
+                      "Candidate bandwidth supplies fewer positive-weight observations than "
+                      "design-matrix columns."
+                  )
+              Xw = X[positive] * np.sqrt(weights[positive])[:, None]
+              if np.linalg.matrix_rank(Xw) < n_features:
+                  raise _InvalidCandidateError(
+                      "Candidate bandwidth produces a rank-deficient weighted design."
+                  )
+              try:
+                  beta, inverse_normal = weighted_least_squares(
+                      X, y, weights, ridge=0.0
+                  )
+              except np.linalg.LinAlgError as exc:
+                  raise _InvalidCandidateError("Local weighted solve failed.") from exc
+              if target_row is None:
+                  return beta, None
+              hat_row = target_row @ inverse_normal @ (X.T * weights)
+              if not np.all(np.isfinite(hat_row)):
+                  raise _InvalidCandidateError("Hat-matrix row contains invalid values.")
+              return beta, hat_row
+          '''
+          local = re.sub(r"^          ", "", local, flags=re.M)
+          b = once(
+              b,
+              r"def _fit_local_model\([\s\S]*?(?=def _integer_grid\()",
+              local + "\n\n",
+              "bandwidth local solver",
+          )
+          p.write_text(b, encoding="utf-8", newline="\n")
+
+          p = Path("src/pygwrx/models/gwr.py")
+          g = p.read_text(encoding="utf-8")
+          g = g.replace(
+              "solution is ridge regularized; consider increasing the bandwidth.",
+              "solution uses a minimum-norm unpenalized WLS estimate; consider increasing the bandwidth or checking local collinearity.",
+              1,
+          )
+          p.write_text(g, encoding="utf-8", newline="\n")
+
+          p = Path("CHANGELOG.md")
+          c = p.read_text(encoding="utf-8")
+          c = c.replace(
+              "## [Unreleased]\n\n",
+              "## [Unreleased]\n\n### Changed\n- Changed the shared local weighted-least-squares default from an implicit `1e-8` ridge penalty to standard unpenalized WLS solved from `sqrt(W) @ X`. Positive ridge values remain an explicit lower-level opt-in.\n- Aligned GWR calibration, prediction, hat-matrix construction, and bandwidth scoring on the same unpenalized WLS semantics.\n\n",
+              1,
+          )
+          p.write_text(c, encoding="utf-8", newline="\n")
+
+          p = Path("docs/guides/core-numerics.md")
+          d = p.read_text(encoding="utf-8")
+          d = d.replace(
+              "## Local solvers\n\n",
+              "## Local solvers\n\nThe standard solver is unpenalized weighted least squares. It estimates coefficients from `sqrt(W) @ X` using SVD-backed least squares, preserves exact zero weights, and does not add hidden ridge regularization. The low-level `ridge=` argument remains an explicit opt-in.\n\n",
+              1,
+          )
+          p.write_text(d, encoding="utf-8", newline="\n")
+
+          Path("tests/test_solver_unpenalized.py").write_text(
+              '''"""Tests for the unpenalized weighted least-squares core."""\n\nimport numpy as np\n\nfrom pygwrx.core import compute_hat_matrix, gaussian_kernel, local_regression, weighted_least_squares\n\n\ndef test_default_matches_weighted_lstsq():\n    rng = np.random.default_rng(123)\n    X = np.column_stack([np.ones(12), rng.normal(size=(12, 2))])\n    y = rng.normal(size=12)\n    w = np.array([1.0, .8, 0., .4, 1.2, .6, .2, 0., 1.5, .7, .9, .3])\n    beta, inv = weighted_least_squares(X, y, w)\n    sw = np.sqrt(w)\n    Xw, yw = X * sw[:, None], y * sw\n    np.testing.assert_allclose(beta, np.linalg.lstsq(Xw, yw, rcond=None)[0], rtol=1e-11, atol=1e-12)\n    np.testing.assert_allclose(inv, np.linalg.pinv(Xw.T @ Xw, hermitian=True), rtol=1e-9, atol=1e-11)\n\n\ndef test_rank_deficient_default_is_minimum_norm():\n    x = np.linspace(-2., 2., 9)\n    X = np.column_stack([np.ones_like(x), x, 2*x])\n    y = 3. + 4*x\n    w = np.linspace(.3, 1.1, x.size)\n    beta, _ = weighted_least_squares(X, y, w)\n    sw = np.sqrt(w)\n    expected = np.linalg.lstsq(X * sw[:, None], y * sw, rcond=None)[0]\n    np.testing.assert_allclose(beta, expected, rtol=1e-11, atol=1e-12)\n\n\ndef test_explicit_ridge_still_matches_closed_form():\n    rng = np.random.default_rng(7)\n    X = np.column_stack([np.ones(10), rng.normal(size=(10, 2))])\n    y = rng.normal(size=10)\n    w = np.linspace(.2, 1.3, 10)\n    ridge = .25\n    beta, inv = weighted_least_squares(X, y, w, ridge=ridge)\n    system = X.T @ (w[:, None] * X) + ridge * np.eye(X.shape[1])\n    np.testing.assert_allclose(beta, np.linalg.solve(system, X.T @ (w*y)), rtol=1e-11, atol=1e-12)\n    np.testing.assert_allclose(inv, np.linalg.inv(system), rtol=1e-10, atol=1e-11)\n\n\ndef test_feature_rescaling_preserves_fitted_values():\n    rng = np.random.default_rng(77)\n    X = np.column_stack([np.ones(30), rng.normal(size=30), rng.normal(size=30)])\n    y = 1.5 + 2*X[:, 1] - .4*X[:, 2] + rng.normal(0., .01, 30)\n    w = np.exp(-np.linspace(0., 2., 30))\n    beta, _ = weighted_least_squares(X, y, w)\n    X2 = X.copy(); X2[:, 1] *= 1e4; X2[:, 2] *= 1e-4\n    beta2, _ = weighted_least_squares(X2, y, w)\n    np.testing.assert_allclose(X2 @ beta2, X @ beta, rtol=1e-8, atol=1e-9)\n\n\ndef test_hat_matrix_matches_local_training_fits():\n    rng = np.random.default_rng(19)\n    coords = rng.uniform(0., 5., size=(18, 2))\n    x = rng.normal(size=18)\n    X = np.column_stack([np.ones(18), x])\n    y = 2. + 1.3*x + rng.normal(0., .05, 18)\n    params = local_regression(X, y, coords, coords, gaussian_kernel, 2.5)\n    hat = compute_hat_matrix(X, coords, gaussian_kernel, 2.5)\n    np.testing.assert_allclose(hat @ y, np.einsum("ij,ij->i", X, params), rtol=1e-10, atol=1e-10)\n''', encoding="utf-8", newline="\n")
+          PY
+
+      - name: Install and validate
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,reference]"
+          python -m black src/pygwrx/core/solver.py src/pygwrx/core/bandwidth.py src/pygwrx/models/gwr.py tests/test_solver_unpenalized.py
+          python -m isort src/pygwrx/core/solver.py src/pygwrx/core/bandwidth.py src/pygwrx/models/gwr.py tests/test_solver_unpenalized.py
+          python tools/generate_example_docs.py
+          python tools/generate_api_docs.py
+          python -m pytest -q tests/test_solver_unpenalized.py
+          python -m pytest -q tests/test_gwr_external_references.py tests/test_gwr_columbus_reference.py
+          python -m pytest -q tests/test_gwr*.py -m "not reference"
+          python -m ruff check src/pygwrx/core/solver.py src/pygwrx/core/bandwidth.py src/pygwrx/models/gwr.py tests/test_solver_unpenalized.py
+          python -m mypy
+          git diff --check
+
+      - name: Commit refactor
+        run: |
+          set -euo pipefail
+          rm .github/workflows/_temporary_refactor_gwr_solver.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Use unpenalized SVD solver for standard GWR"
+          git pull --rebase origin refactor-gwr-unpenalized-solver
+          git push origin HEAD:refactor-gwr-unpenalized-solver
