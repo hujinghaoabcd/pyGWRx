@@ -1,0 +1,181 @@
+{
+  "curve_comparisons": [
+    {
+      "criterion": "cv_sse",
+      "reference": "mgwr",
+      "reference_version": "2.2.1",
+      "interpretation": "strict",
+      "common_k_min": 4,
+      "common_k_max": 49,
+      "n_candidates": 46,
+      "n_compared": 46,
+      "max_abs_diff": 85911.15835137395,
+      "mean_abs_diff": 1870.9950177622525,
+      "rmse": 12666.929565042274,
+      "max_rel_diff": 1.4235469424615468
+    },
+    {
+      "criterion": "cv_sse",
+      "reference": "GWmodel",
+      "reference_version": "2.4.1",
+      "interpretation": "strict",
+      "common_k_min": 5,
+      "common_k_max": 49,
+      "n_candidates": 45,
+      "n_compared": 45,
+      "max_abs_diff": 153.891051128885,
+      "mean_abs_diff": 3.436580990840917,
+      "rmse": 22.94087877776476,
+      "max_rel_diff": 0.0010286113237213746
+    },
+    {
+      "criterion": "aic",
+      "reference": "mgwr",
+      "reference_version": "2.2.1",
+      "interpretation": "strict",
+      "common_k_min": 4,
+      "common_k_max": 49,
+      "n_candidates": 46,
+      "n_compared": 46,
+      "max_abs_diff": 1356.0232294665614,
+      "mean_abs_diff": 29.47877183096749,
+      "rmse": 199.93471754403092,
+      "max_rel_diff": 0.7151672861847956
+    },
+    {
+      "criterion": "aicc",
+      "reference": "mgwr",
+      "reference_version": "2.2.1",
+      "interpretation": "strict",
+      "common_k_min": 5,
+      "common_k_max": 49,
+      "n_candidates": 45,
+      "n_compared": 45,
+      "max_abs_diff": 0.010106415962582105,
+      "mean_abs_diff": 0.00023187513523655274,
+      "rmse": 0.001506693437965839,
+      "max_rel_diff": 4.23198438240629e-06
+    },
+    {
+      "criterion": "aicc",
+      "reference": "GWmodel",
+      "reference_version": "2.4.1",
+      "interpretation": "strict",
+      "common_k_min": 5,
+      "common_k_max": 49,
+      "n_candidates": 45,
+      "n_compared": 45,
+      "max_abs_diff": 0.01280205776947696,
+      "mean_abs_diff": 0.00029514074810019035,
+      "rmse": 0.001908989578205325,
+      "max_rel_diff": 5.3607577195134934e-06
+    },
+    {
+      "criterion": "bic",
+      "reference": "mgwr",
+      "reference_version": "2.2.1",
+      "interpretation": "strict",
+      "common_k_min": 4,
+      "common_k_max": 49,
+      "n_candidates": 46,
+      "n_compared": 46,
+      "max_abs_diff": 1356.0224500429256,
+      "mean_abs_diff": 29.478751958546706,
+      "rmse": 199.93460262428528,
+      "max_rel_diff": 0.7527179769362439
+    },
+    {
+      "criterion": "bic",
+      "reference": "GWmodel",
+      "reference_version": "2.4.1",
+      "interpretation": "different_definition",
+      "common_k_min": 4,
+      "common_k_max": 49,
+      "n_candidates": 46,
+      "n_compared": 46,
+      "max_abs_diff": 820.8635352699985,
+      "mean_abs_diff": 69.58685771690507,
+      "rmse": 131.8518976180214,
+      "max_rel_diff": 0.6482160857863501
+    }
+  ],
+  "argmins": [
+    {
+      "criterion": "cv_sse",
+      "reference": "mgwr",
+      "interpretation": "strict",
+      "common_k_min": 4,
+      "common_k_max": 49,
+      "n_candidates": 46,
+      "pygwrx_argmin": 11,
+      "reference_argmin": 11,
+      "match": true
+    },
+    {
+      "criterion": "cv_sse",
+      "reference": "GWmodel",
+      "interpretation": "strict",
+      "common_k_min": 5,
+      "common_k_max": 49,
+      "n_candidates": 45,
+      "pygwrx_argmin": 11,
+      "reference_argmin": 11,
+      "match": true
+    },
+    {
+      "criterion": "aic",
+      "reference": "mgwr",
+      "interpretation": "strict",
+      "common_k_min": 4,
+      "common_k_max": 49,
+      "n_candidates": 46,
+      "pygwrx_argmin": 4,
+      "reference_argmin": 4,
+      "match": true
+    },
+    {
+      "criterion": "aicc",
+      "reference": "mgwr",
+      "interpretation": "strict",
+      "common_k_min": 5,
+      "common_k_max": 49,
+      "n_candidates": 45,
+      "pygwrx_argmin": 24,
+      "reference_argmin": 24,
+      "match": true
+    },
+    {
+      "criterion": "aicc",
+      "reference": "GWmodel",
+      "interpretation": "strict",
+      "common_k_min": 5,
+      "common_k_max": 49,
+      "n_candidates": 45,
+      "pygwrx_argmin": 24,
+      "reference_argmin": 24,
+      "match": true
+    },
+    {
+      "criterion": "bic",
+      "reference": "mgwr",
+      "interpretation": "strict",
+      "common_k_min": 4,
+      "common_k_max": 49,
+      "n_candidates": 46,
+      "pygwrx_argmin": 4,
+      "reference_argmin": 4,
+      "match": true
+    },
+    {
+      "criterion": "bic",
+      "reference": "GWmodel",
+      "interpretation": "different_definition",
+      "common_k_min": 4,
+      "common_k_max": 49,
+      "n_candidates": 46,
+      "pygwrx_argmin": 4,
+      "reference_argmin": 4,
+      "match": true
+    }
+  ]
+}

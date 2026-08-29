@@ -22,10 +22,14 @@ def _load(path: Path) -> dict[str, Any]:
 
 def _write(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
 
-def _compact_case(case: dict[str, Any], *, keep_inference: bool = True) -> dict[str, Any]:
+def _compact_case(
+    case: dict[str, Any], *, keep_inference: bool = True
+) -> dict[str, Any]:
     keys = ["config", "params", "predy", "residuals", "local_r2", "diagnostics"]
     if keep_inference:
         keys.extend(
@@ -37,7 +41,9 @@ def _compact_case(case: dict[str, Any], *, keep_inference: bool = True) -> dict[
                 "cooks_distance",
             ]
         )
-    return {key: case.get(key) for key in keys if key in case and case.get(key) is not None}
+    return {
+        key: case.get(key) for key in keys if key in case and case.get(key) is not None
+    }
 
 
 def _compact_prediction(prediction: dict[str, Any]) -> dict[str, Any]:
@@ -140,9 +146,13 @@ def _criterion_summary(
         criterion_result: dict[str, Any] = {}
         py_finite = [(k, _finite(point.get(criterion))) for k, point in py.items()]
         py_finite = [(k, value) for k, value in py_finite if value is not None]
-        criterion_result["pygwrx_raw_argmin"] = min(py_finite, key=lambda item: item[1])[0]
+        criterion_result["pygwrx_raw_argmin"] = min(
+            py_finite, key=lambda item: item[1]
+        )[0]
         stable_py = [(k, value) for k, value in py_finite if k >= 5]
-        criterion_result["pygwrx_k_ge_5_argmin"] = min(stable_py, key=lambda item: item[1])[0]
+        criterion_result["pygwrx_k_ge_5_argmin"] = min(
+            stable_py, key=lambda item: item[1]
+        )[0]
         criterion_result["references"] = {}
         for ref_name in refs:
             ref = sources[ref_name]
@@ -163,7 +173,10 @@ def _criterion_summary(
             ref_values = np.asarray([abs(r) for _, _, r in stable], dtype=float)
             rel = delta / np.maximum(ref_values, np.finfo(float).eps)
             criterion_result["references"][ref_name] = {
-                "common_raw_domain": [min(k for k, _, _ in common), max(k for k, _, _ in common)],
+                "common_raw_domain": [
+                    min(k for k, _, _ in common),
+                    max(k for k, _, _ in common),
+                ],
                 "raw_argmin": {"pygwrx": raw_py, "reference": raw_ref},
                 "k_ge_5_argmin": {
                     "pygwrx": stable_py_argmin,

@@ -477,9 +477,7 @@ def main() -> None:
         json.dumps(rows, indent=2) + "\n", encoding="utf-8"
     )
     (OUT_DIR / "bandwidth_curve_comparison.json").write_text(
-        json.dumps(
-            {"curve_comparisons": curve_rows, "argmins": argmin_rows}, indent=2
-        )
+        json.dumps({"curve_comparisons": curve_rows, "argmins": argmin_rows}, indent=2)
         + "\n",
         encoding="utf-8",
     )

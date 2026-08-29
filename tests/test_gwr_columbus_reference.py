@@ -19,9 +19,7 @@ pytestmark = pytest.mark.reference
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_PATH = ROOT / "src" / "pygwrx" / "data" / "Columbus" / "columbus.csv"
-REFERENCE_DIR = (
-    ROOT / "tests" / "reference_data" / "gwr" / "real_columbus" / "frozen"
-)
+REFERENCE_DIR = ROOT / "tests" / "reference_data" / "gwr" / "real_columbus" / "frozen"
 HOLDOUT_ROWS = (0, 10, 20, 30, 40)
 
 SPECS: dict[str, dict[str, Any]] = {
