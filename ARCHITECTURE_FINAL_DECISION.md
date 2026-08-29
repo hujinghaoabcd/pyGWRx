@@ -1260,7 +1260,7 @@ plotting/ 不调用 np.linalg.svd 做模型诊断
 | A2 | 19-model fitted-state atomicity freeze | DONE | #35 | `b655688f7201aaa9677fe153f2cbc15e6e63afb6` | characterization | failed-refit atomicity contract 覆盖 19 estimator |
 | A3 | 19-model migration risk matrix | DONE | #36 | `dc150ef09fed370a45e5a6e62f14846979fff643` | n/a | machine-readable matrix + docs + contract tests；无 runtime 数值变更 |
 | A4 | performance/memory baseline harness | DONE | #38 | `de64389163fc5094ab46b72671872d26f35b9733` | benchmark + structural memory | observational timing/RSS baseline + live retained-`n × n` guards；无 estimator runtime 变更 |
-| A5 | pre-refactor contract/message hygiene | PENDING | — | — | model tests | 含 GTWR misleading ridge warning |
+| A5 | pre-refactor contract/message hygiene | DONE | #40 | `595a632076025eb9b45794caaff37e3b3747a700` | model tests + full CI | 修正 GTWR misleading ridge warning；新增 minimum-norm warning contract test；无算法/solver 变更 |
 | B1 | private `_protocols.py` | PENDING | — | — | no behavior | 不 public export |
 | B2 | validation split | PENDING | — | — | core + all tests | compatibility re-export |
 | B3 | distance split + metric spec | PENDING | — | — | core + GWR refs | keep streaming |
