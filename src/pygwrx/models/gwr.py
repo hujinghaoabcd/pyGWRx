@@ -46,6 +46,9 @@ class GWRPredictionResult:
     intercept_standard_errors: Optional[np.ndarray] = None
     coef_t_values: Optional[np.ndarray] = None
     intercept_t_values: Optional[np.ndarray] = None
+    local_rank: Optional[np.ndarray] = None
+    local_condition_number: Optional[np.ndarray] = None
+    rank_deficient: Optional[np.ndarray] = None
 
     def to_frame(self) -> pd.DataFrame:
         data: Dict[str, np.ndarray] = {
@@ -58,6 +61,12 @@ class GWRPredictionResult:
             data["intercept_se"] = self.intercept_standard_errors
         if self.intercept_t_values is not None:
             data["intercept_t"] = self.intercept_t_values
+        if self.local_rank is not None:
+            data["local_rank"] = self.local_rank
+        if self.local_condition_number is not None:
+            data["local_condition_number"] = self.local_condition_number
+        if self.rank_deficient is not None:
+            data["rank_deficient"] = self.rank_deficient
 
         for index, name in enumerate(self.feature_names):
             data[f"coef_{name}"] = self.coef[:, index]
@@ -184,6 +193,9 @@ class GWR(BaseSpatialRegressor):
         self._reset_inference_state()
         self.S_matrix_ = None
         self.bandwidth_search_ = None
+        self.n_samples_ = None
+        self.n_features_in_ = None
+        self.feature_names_in_ = None
 
     def _resolve_bandwidth(
         self,
@@ -478,7 +490,7 @@ class GWR(BaseSpatialRegressor):
         leverage_term = 1.0 - self.influence_
         self.standardized_residuals_ = np.full(self.n_samples_, np.nan, dtype=float)
         valid_leverage = leverage_term > np.finfo(float).eps
-        if np.isfinite(self.sigma2_) and self.sigma2_ >= 0.0:
+        if np.isfinite(self.sigma2_) and self.sigma2_ > np.finfo(float).eps:
             self.standardized_residuals_[valid_leverage] = self.residuals_[
                 valid_leverage
             ] / np.sqrt(self.sigma2_ * leverage_term[valid_leverage])
@@ -531,7 +543,7 @@ class GWR(BaseSpatialRegressor):
         y: Union[np.ndarray, pd.Series],
         coords: Union[np.ndarray, pd.DataFrame],
         *,
-        compute_hat_matrix: bool = True,
+        compute_hat_matrix: bool = False,
         compute_local_r2: bool = True,
         compute_inference: bool = True,
         compute_hat_matrix_flag: Optional[bool] = None,
@@ -543,11 +555,12 @@ class GWR(BaseSpatialRegressor):
         ``compute_hat_matrix=False`` avoids storing the full ``n x n`` smoother
         matrix. Calibration distances are evaluated in bounded row blocks, so a
         numeric-bandwidth fit does not also retain an ``n x n`` distance matrix.
-        Automatic bandwidth selection has its own distance-matrix policy.
+        Automatic bandwidth selection uses the same bounded distance backend.
 
         ``compute_hat_matrix_flag`` is retained as a compatibility alias for older
         PyGWRx code. New code should use ``compute_hat_matrix``.
         """
+        self._reset_fit_state()
         if compute_hat_matrix_flag is not None:
             if not isinstance(compute_hat_matrix_flag, (bool, np.bool_)):
                 raise TypeError("compute_hat_matrix_flag must be boolean or None.")
@@ -574,7 +587,6 @@ class GWR(BaseSpatialRegressor):
         )
         if not isinstance(self.sigma2_v1, (bool, np.bool_)):
             raise TypeError("sigma2_v1 must be boolean.")
-        self._reset_fit_state()
 
         try:
             X_arr, y_arr, coords_arr = self._validate_inputs(X, y, coords)
@@ -675,7 +687,6 @@ class GWR(BaseSpatialRegressor):
                 self.y_train_,
                 weights,
             )
-            inverse_xtx_xtw = solve.inverse_normal @ (X_design.T * weights)
             full_params[index] = solve.beta
             local_rank[index] = solve.rank
             local_condition_number[index] = solve.condition_number
@@ -683,6 +694,7 @@ class GWR(BaseSpatialRegressor):
                 if solve.rank < X_design.shape[1]:
                     covariance_factors[index] = np.nan
                 else:
+                    inverse_xtx_xtw = solve.inverse_normal @ (X_design.T * weights)
                     covariance_factors[index] = np.sum(
                         inverse_xtx_xtw**2,
                         axis=1,
@@ -780,6 +792,11 @@ class GWR(BaseSpatialRegressor):
             intercept_standard_errors=intercept_se,
             coef_t_values=coef_t,
             intercept_t_values=intercept_t,
+            local_rank=np.asarray(params["local_rank"], dtype=int),
+            local_condition_number=np.asarray(
+                params["local_condition_number"], dtype=float
+            ),
+            rank_deficient=np.asarray(params["rank_deficient"], dtype=bool),
         )
 
     def get_local_parameters(
@@ -844,15 +861,27 @@ class GWR(BaseSpatialRegressor):
             raise RuntimeError("Training data are unavailable.")
 
         X_global = add_intercept(self.X_train_) if self.fit_intercept else self.X_train_
-        global_beta = np.linalg.lstsq(X_global, self.y_train_, rcond=None)[0]
+        n, p = X_global.shape
+        global_solve = _weighted_least_squares_details(
+            X_global,
+            self.y_train_,
+            np.ones(n, dtype=float),
+        )
+        global_beta = global_solve.beta
         global_fitted = X_global @ global_beta
         global_residuals = self.y_train_ - global_fitted
         global_rss = float(np.dot(global_residuals, global_residuals))
-        n, p = X_global.shape
-        global_df = max(n - p, 1)
+        global_df = max(n - global_solve.rank, 1)
         global_sigma2 = global_rss / global_df
-        covariance = global_sigma2 * np.linalg.pinv(X_global.T @ X_global)
-        global_se = np.sqrt(np.maximum(np.diag(covariance), 0.0))
+        if global_solve.rank < p:
+            global_se = np.full(p, np.nan, dtype=float)
+        else:
+            global_se = np.sqrt(
+                np.maximum(
+                    np.diag(global_solve.inverse_normal) * global_sigma2,
+                    0.0,
+                )
+            )
 
         feature_names = (
             [str(name) for name in self.feature_names_in_]

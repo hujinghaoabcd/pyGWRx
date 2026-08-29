@@ -234,7 +234,7 @@ def test_lambda_one_reduces_to_standard_gwr():
         kernel="gaussian",
         bandwidth=1.4,
         sigma2_v1=False,
-    ).fit(X, y, coords, compute_local_r2=False)
+    ).fit(X, y, coords, compute_local_r2=False, compute_hat_matrix=True)
     gtwr = GTWR(
         kernel="gaussian",
         bandwidth=1.4,
