@@ -238,36 +238,6 @@ def _compute_kernel_weights(
     return weights
 
 
-def _normal_equations(
-    X: np.ndarray,
-    y: np.ndarray,
-    weights: np.ndarray,
-    *,
-    ridge: float,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Build a regularized weighted normal system without constructing diag(W)."""
-    XtW = X.T * weights
-    XtWX = XtW @ X
-    system = XtWX + ridge * np.eye(X.shape[1], dtype=float)
-    XtWy = XtW @ y
-    return system, XtWy, XtW
-
-
-def _solve_linear_system(system: np.ndarray, rhs: np.ndarray) -> np.ndarray:
-    """Solve a square linear system with a deterministic pseudo-inverse fallback."""
-    try:
-        solution = np.linalg.solve(system, rhs)
-    except np.linalg.LinAlgError:
-        solution = np.linalg.pinv(system) @ rhs
-
-    if not np.all(np.isfinite(solution)):
-        raise np.linalg.LinAlgError(
-            "The weighted linear system produced non-finite values."
-        )
-
-    return solution
-
-
 def weighted_least_squares(
     X: np.ndarray,
     y: np.ndarray,
@@ -507,7 +477,9 @@ def compute_hat_matrix(
 
     hat_matrix = np.empty(expected_shape, dtype=float)
 
-    # A dummy y is used only to reuse the identical weighted normal-system builder.
+    # The response is irrelevant for the smoother matrix. A zero vector lets us
+    # reuse weighted_least_squares() so the hat matrix uses exactly the same
+    # SVD-based inverse-normal operator as local coefficient estimation.
     dummy_y = np.zeros(X_arr.shape[0], dtype=float)
 
     for i, dists in enumerate(distances):
@@ -529,16 +501,14 @@ def compute_hat_matrix(
                     stacklevel=2,
                 )
 
-            system, _, XtW = _normal_equations(
+            _, inverse_normal = weighted_least_squares(
                 X_arr,
                 dummy_y,
                 weights,
                 ridge=ridge_value,
             )
-
-            # X_i @ inv(system) @ XtW, computed without explicitly inverting system.
-            left = _solve_linear_system(system.T, X_arr[i])
-            hat_row = left @ XtW
+            XtW = X_arr.T * weights
+            hat_row = X_arr[i] @ inverse_normal @ XtW
 
             if not np.all(np.isfinite(hat_row)):
                 raise np.linalg.LinAlgError(

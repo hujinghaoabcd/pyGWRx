@@ -45,3 +45,12 @@ def test_legacy_reference_has_no_regularization_parameter_or_penalty_term():
 
     source = inspect.getsource(_weighted_least_squares_normal_equations_legacy)
     assert "XtWX +" not in source
+
+
+def test_production_solver_no_longer_contains_normal_equation_helpers():
+    import pygwrx.core.solver as solver_module
+
+    source = inspect.getsource(solver_module)
+    assert "def _normal_equations(" not in source
+    assert "def _solve_linear_system(" not in source
+    assert "_legacy_solver" not in source
