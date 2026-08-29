@@ -243,11 +243,11 @@ def haversine_distance(
     return radius_value * central_angle
 
 
-def compute_distance_matrix(
+def compute_distance_matrix(  # type: ignore[no-untyped-def]
     coords1: np.ndarray,
     coords2: Optional[np.ndarray] = None,
     metric: str = "euclidean",
-    **kwargs: float,
+    **kwargs,
 ) -> np.ndarray:
     """Compute a pairwise distance matrix.
 
