@@ -41,6 +41,7 @@ def test_aicc_returns_infinity_when_small_sample_correction_is_undefined():
 
 
 def test_compute_edf_clamps_only_roundoff_scale_negative_zero():
+    # Mimic independently accumulated traces for a theoretically saturated smoother.
     trace_s = 40.0
     trace_sts = 39.999999999999986
     raw_edf = 40.0 - 2.0 * trace_s + trace_sts
