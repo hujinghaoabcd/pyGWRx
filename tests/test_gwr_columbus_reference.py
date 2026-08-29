@@ -11,9 +11,14 @@ import pandas as pd
 import pytest
 
 from pygwrx import GWR
-from pygwrx.core.bandwidth import _fit_local_model, _kernel_weights
+from pygwrx.core.bandwidth import (
+    AICSelector,
+    CrossValidationSelector,
+    _fit_local_model,
+    _kernel_weights,
+)
 from pygwrx.core.kernels import get_kernel_function
-from pygwrx.core.utils import add_intercept, compute_distance_matrix
+from pygwrx.core.utils import add_intercept
 
 pytestmark = pytest.mark.reference
 
@@ -255,34 +260,44 @@ def test_columbus_adaptive_bandwidth_argmins_are_stable(
     X_design = add_intercept(X_frame.to_numpy(dtype=float))
     y = y_series.to_numpy(dtype=float)
     coords = coords_frame.to_numpy(dtype=float)
-    distances = np.asarray(
-        compute_distance_matrix(coords, coords, metric="euclidean"),
-        dtype=float,
+    kernel = get_kernel_function("bisquare")
+
+    cv_selector = CrossValidationSelector(
+        n_intervals=2,
+        adaptive=True,
+        optimization_method="golden_section",
+    )
+    aicc_selector = AICSelector(
+        n_intervals=2,
+        corrected=True,
+        adaptive=True,
+        optimization_method="brent",
     )
 
-    cv_sse: dict[int, float] = {}
-    aicc: dict[int, float] = {}
-    for k in range(5, 50):
-        cv_sse[k] = _cv_sse(X_design, y, distances, k)
-        model = GWR(
-            kernel="bisquare",
-            bandwidth=k,
-            adaptive=True,
-            sigma2_v1=False,
-            fit_intercept=True,
-            distance_metric="euclidean",
-        ).fit(
-            X_frame,
-            y_series,
-            coords_frame,
-            compute_hat_matrix=False,
-            compute_local_r2=False,
-            compute_inference=False,
-        )
-        aicc[k] = float((model.diagnostics_ or {})["aicc"])
+    cv = cv_selector.select(
+        X_design,
+        y,
+        coords,
+        kernel,
+        bandwidth_range=(4, 49),
+    )
+    aicc = aicc_selector.select(
+        X_design,
+        y,
+        coords,
+        kernel,
+        bandwidth_range=(4, 49),
+    )
 
-    assert min(cv_sse, key=cv_sse.get) == 11
-    assert min(aicc, key=aicc.get) == 24
+    assert cv == 11
+    assert aicc == 24
+    assert tuple(k for k, _ in cv_selector.search_trace_) == tuple(range(4, 50))
+    assert tuple(k for k, _ in aicc_selector.search_trace_) == tuple(range(4, 50))
+    assert np.isinf(dict(aicc_selector.search_trace_)[4])
+
+    summary = _load("bandwidth_summary.json")
+    assert summary["criteria"]["cv_sse"]["pygwrx_raw_argmin"] == cv
+    assert summary["criteria"]["aicc"]["pygwrx_k_ge_5_argmin"] == aicc
 
 
 def test_columbus_near_saturated_boundary_is_preserved() -> None:

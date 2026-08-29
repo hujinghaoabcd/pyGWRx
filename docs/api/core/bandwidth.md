@@ -116,9 +116,18 @@ Create a bandwidth selector by method name.
         BICSelector(n_intervals=5, adaptive=True, verbose=False),
     ]
     for selector in selectors:
+        selected = selector.select(
+            Xa,
+            ya,
+            ca,
+            gaussian_kernel,
+            bandwidth_range=(10, 18),
+        )
         print(
             type(selector).__name__,
-            selector.select(Xa, ya, ca, gaussian_kernel, bandwidth_range=(10, 18)),
+            selected,
+            "evaluated=",
+            len(selector.search_trace_),
         )
     print("factory=", type(get_bandwidth_selector("aicc", adaptive=True)).__name__)
     print("abstract_base=", BandwidthSelector)
