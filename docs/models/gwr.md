@@ -59,7 +59,9 @@ The published GWR idea and the pyGWRx class are closely aligned, but the softwar
 - automatic bandwidth selection by CV, AIC, AICc or BIC;
 - fitted-model bandwidth-search provenance including criterion, search method, search range, evaluated trace, best score and boundary-solution flag;
 - optional storage of the full hat matrix while always retaining its traces and influence diagnostics;
-- local standard errors, t statistics, local R², standardised residuals and Cook's distance;
+- local numerical-rank and condition diagnostics for every fitted weighted design;
+- local standard errors and t statistics only where the local parameterisation is numerically identifiable;
+- local R², standardised residuals and Cook's distance;
 - target-location prediction by recalibrating local coefficients from the stored training data.
 
 Prediction is **not** interpolation of the coefficient maps. For every target coordinate, pyGWRx recomputes its distances to the training observations, constructs a new kernel, solves a new weighted regression, and applies those local coefficients to the supplied target predictors.
@@ -126,6 +128,7 @@ model = GWR(
 
 print("selected neighbour count:", model.bandwidth_)
 print("bandwidth search:", model.bandwidth_search_)
+print("rank-deficient locations:", model.rank_deficient_.sum())
 print(model.get_diagnostics())
 print(model.to_frame().head())
 
@@ -175,11 +178,13 @@ GWR(
 | `sigma2_v1` | Boolean; default `True` | Selects the residual-variance denominator. | `True` uses `RSS / (n - trace(S))`; `False` uses `RSS / (n - 2 trace(S) + trace(S'S))`. Keep this setting fixed when comparing reported standard errors across models. |
 | `verbose` | Boolean; default `False` | Prints bandwidth and fit progress. | Enable during slow searches or debugging; it does not change the estimator. |
 
-### Understanding bandwidth size
+### Understanding bandwidth size and local rank
 
 A smaller bandwidth gives a more local and flexible surface but uses less information per fit. It can increase variance, local singularity and sensitivity to individual observations. A larger bandwidth smooths coefficients and approaches a more global relationship.
 
-With an adaptive bandwidth, the local distance threshold changes by location so that each local regression is based on approximately the same number of nearest observations. With compact kernels, the number of positive-weight observations is especially important. If a local fit has fewer positive-weight observations than design columns, pyGWRx warns and returns the Moore-Penrose minimum-norm **unpenalized** WLS solution; it does not silently add ridge regularisation. Treat the warning as a reason to increase the bandwidth, simplify the design, or inspect local collinearity.
+With an adaptive bandwidth, the local distance threshold changes by location so that each local regression is based on approximately the same number of nearest observations. With compact kernels, the number of positive-weight observations is especially important. A local design can also be rank deficient even when the raw positive-weight observation count exceeds the number of parameters, for example because two predictors become locally collinear or one predictor has effectively no local variation.
+
+pyGWRx solves each unpenalized weighted design with one SVD. When the weighted design is rank deficient, the coefficient vector remains the Moore-Penrose minimum-norm solution and fitted values remain numerically defined. That does **not** make the individual coefficients identifiable. Such locations are marked in `rank_deficient_`; `local_rank_` and `local_condition_number_` expose the numerical diagnosis; coefficient covariance, standard errors and t statistics are returned as `NaN` at those locations. Increase the bandwidth, simplify the design or diagnose local collinearity before interpreting the affected coefficient surfaces.
 
 ## Fitting
 
@@ -199,7 +204,7 @@ model.fit(
 |---|---:|---|
 | `compute_hat_matrix` | `True` | Stores the full `n × n` smoother matrix. Set to `False` for larger samples. The trace, `trace(S'S)`, influence, AIC/AICc/BIC and effective-parameter diagnostics are still computed. |
 | `compute_local_r2` | `True` | Computes a weighted local R² at every calibration location. Disable only when it is not needed and fit time matters. Local R² is descriptive and should not replace residual checks. |
-| `compute_inference` | `True` | Computes covariance diagonals, local standard errors and local t statistics. Disable for prediction-only workflows or exploratory timing tests. |
+| `compute_inference` | `True` | Computes covariance diagonals, local standard errors and local t statistics where the local weighted design is identifiable. Rank diagnostics are retained even when this option is disabled. |
 | `verbose` | `None` | Optional per-fit override of the constructor setting. |
 
 `compute_hat_matrix_flag` remains accepted only as a backward-compatibility alias for older pyGWRx code; new workflows should use `compute_hat_matrix`.
@@ -219,9 +224,9 @@ params = model.get_local_parameters(coords_new)
 | Method | Returns | Use case |
 |---|---|---|
 | `predict()` | One prediction per target row | Standard numeric prediction. |
-| `predict_result()` | Predictions, local slopes, intercepts, coordinates and optional standard errors/t statistics | Auditable prediction and coefficient inspection. |
-| `get_local_parameters()` | Dictionary containing target intercepts, slopes and coordinates | Coefficient surfaces at target locations without applying target `X`. |
-| `get_local_coefficients()` | Slopes only | Compatibility helper; prefer `get_local_parameters()` when the intercept matters. |
+| `predict_result()` | Predictions, local slopes, intercepts, coordinates and optional standard errors/t statistics | Auditable prediction and coefficient inspection. Rank-deficient target recalibrations keep predictions but expose `NaN` coefficient inference. |
+| `get_local_parameters()` | Dictionary containing target intercepts, slopes, coordinates, local rank, local condition number and rank-deficiency flag | Coefficient surfaces and numerical identifiability at target locations without applying target `X`. |
+| `get_local_coefficients()` | Slopes only | Compatibility helper; prefer `get_local_parameters()` when the intercept or rank diagnosis matters. |
 
 The rows and columns of `X_new` must correspond to `coords_new` and to the training predictors. When DataFrames are used, column names and order must match the fitted model.
 
@@ -231,20 +236,23 @@ The rows and columns of `X_new` must correspond to `coords_new` and to the train
 |---|---|---|
 | `bandwidth_` | scalar | Selected fixed distance or adaptive neighbour count. |
 | `bandwidth_search_` | dictionary or `None` | Automatic-search provenance: criterion, search method/range, selected value, best score, evaluated trace and `boundary_solution`. It is `None` when a numeric bandwidth is supplied directly. |
-| `coef_` | `(n, p)` | Local slope estimates at calibration locations. |
+| `coef_` | `(n, p)` | Local slope estimates at calibration locations. Rank-deficient locations contain the minimum-norm coefficient vector and require the rank flags below for interpretation. |
 | `intercept_` | `(n,)` | Local intercepts, or zeros when no intercept is fitted. |
 | `fitted_values_` | `(n,)` | Calibration-location fitted responses. |
 | `residuals_` | `(n,)` | `y - fitted_values_`. |
+| `local_rank_` | `(n,)` integer array | Numerical rank of each weighted local design matrix. |
+| `local_condition_number_` | `(n,)` | Condition number of each weighted local design; rank-deficient locations are reported as infinity. |
+| `rank_deficient_` | `(n,)` boolean array | `True` where local rank is smaller than the number of fitted parameters. |
 | `local_r2_` | `(n,)` or `None` | Weighted local R². Interpret together with local sample support. |
 | `diagnostics_` | dictionary | Global fit and GWR smoother diagnostics, including information criteria and effective complexity where available. |
 | `influence_` | `(n,)` | Diagonal of the smoother matrix. Large values indicate locally influential observations. |
 | `standardized_residuals_` | `(n,)` | Residuals adjusted for fitted variance and leverage. |
 | `cooks_distance_` | `(n,)` | Local influence summary based on standardised residuals and leverage. |
-| `coef_se_`, `intercept_se_` | local arrays or `None` | Local standard errors when inference is enabled. |
-| `coef_t_`, `intercept_t_` | local arrays or `None` | Local coefficient-to-standard-error ratios. Account for multiple local comparisons. |
+| `coef_se_`, `intercept_se_` | local arrays or `None` | Local standard errors when inference is enabled; rows are `NaN` at rank-deficient local designs. |
+| `coef_t_`, `intercept_t_` | local arrays or `None` | Local coefficient-to-standard-error ratios; rows are `NaN` where the corresponding local parameterisation is not identifiable. Account for multiple local comparisons. |
 | `hat_matrix_` | `(n, n)` or `None` | Stored smoother matrix only when requested. `S_matrix_` is a compatibility alias. |
 
-`to_frame()` combines coordinates, coefficients, fitted values, residuals, local R², inference arrays and influence measures into one location-indexed pandas DataFrame.
+`to_frame()` combines coordinates, coefficients, fitted values, residuals, local R², inference arrays, influence measures and local rank diagnostics into one location-indexed pandas DataFrame.
 
 ## How to interpret a fitted GWR responsibly
 
@@ -259,15 +267,19 @@ Fit and inspect an ordinary linear model using the same response and predictors.
 - A very large adaptive bandwidth suggests weak evidence for strongly local variation.
 - A very small bandwidth can produce unstable coefficients even when fit statistics improve.
 
-### 3. Check coefficient stability
+### 3. Check numerical identifiability before interpreting coefficients
 
-Map coefficients together with standard errors or adjusted significance information. Compare local condition numbers and coefficient correlations through the diagnostics module. Abrupt isolated coefficient changes are often a warning rather than a substantive finding.
+Inspect `rank_deficient_`, `local_rank_` and `local_condition_number_` before mapping or testing coefficients. A minimum-norm coefficient at a rank-deficient location is a valid numerical solution for prediction, but the individual parameter decomposition is not uniquely identified. Do not interpret its sign, magnitude or significance as if it were an ordinary full-rank local estimate.
 
-### 4. Examine influence and residuals
+### 4. Check coefficient stability and uncertainty
+
+Map coefficients together with standard errors or adjusted significance information only after excluding or resolving rank-deficient locations. Compare local condition diagnostics and coefficient correlations. Abrupt isolated coefficient changes are often a warning rather than a substantive finding.
+
+### 5. Examine influence and residuals
 
 Use `standardized_residuals_`, `cooks_distance_` and residual maps. Remaining residual spatial structure means that local coefficient variation has not explained all spatial dependence.
 
-### 5. Validate the intended use
+### 6. Validate the intended use
 
 Random train/test splitting can leak spatial information. For claims about transfer to new places, use spatial blocks or held-out regions and compare against global and simpler spatial baselines.
 
@@ -279,7 +291,8 @@ Random train/test splitting can leak spatial information. For claims about trans
 | Setting `bandwidth=30` with `adaptive=False` while intending 30 neighbours | The value is interpreted as 30 coordinate units. | Set `adaptive=True`. |
 | Using `bandwidth="adaptive"` | This string is intentionally rejected. | Use `adaptive=True` with a numeric or automatically selected bandwidth. |
 | Adding an intercept column while `fit_intercept=True` | Creates a duplicate constant and local singularity. | Supply predictors only. |
-| Mapping coefficients without uncertainty or collinearity | Attractive surfaces may be numerically unstable or statistically weak. | Pair coefficient maps with SE/t information, local condition diagnostics and residuals. |
+| Treating a finite minimum-norm coefficient as identified after a rank warning | Rank deficiency means multiple coefficient vectors can represent the same local fit. | Inspect `rank_deficient_`; change the bandwidth/design or treat affected coefficient inference as unavailable. |
+| Mapping coefficients without uncertainty or collinearity | Attractive surfaces may be numerically unstable or statistically weak. | Pair coefficient maps with SE/t information, rank/condition diagnostics and residuals. |
 | Treating local t values as independent tests | Many overlapping local models create a multiple-comparison problem. | Use adjusted procedures and interpret spatial patterns, not isolated threshold crossings. |
 | Comparing fixed and adaptive bandwidth numbers directly | They have different units and meanings. | Compare fitted neighbourhoods, criteria and effective support, not raw numbers. |
 | Calling in-sample `score()` predictive validation | Recalibration at training locations is not out-of-area validation. | Use a spatially structured holdout design. |
@@ -296,8 +309,9 @@ A reproducible GWR analysis should report:
 - automatic criterion, optimisation method and search bounds;
 - selected bandwidth and whether it reached a boundary;
 - intercept and residual-variance conventions;
+- number and spatial distribution of rank-deficient local fits, if any;
 - effective parameter count, AICc/CV and global comparison;
-- local coefficient summaries with uncertainty and collinearity checks;
+- local coefficient summaries with uncertainty and collinearity/rank checks;
 - influence and residual diagnostics;
 - validation design;
 - pyGWRx version and relevant fit switches.
@@ -306,10 +320,11 @@ A reproducible GWR analysis should report:
 
 | Topic | Published GWR concept | pyGWRx contract |
 |---|---|---|
-| Coefficients | Location-specific weighted regressions | Gaussian local WLS at calibration or target locations. |
+| Coefficients | Location-specific weighted regressions | Gaussian local WLS at calibration or target locations; one SVD supplies the minimum-norm solution and numerical rank. |
 | Spatial scale | One kernel bandwidth | Fixed distance or adaptive neighbour count; manual or CV/AIC/AICc/BIC selected. Automatic searches retain their evaluated provenance on the fitted model. |
 | Prediction | Local calibration may be performed at arbitrary locations | Explicit `predict_result()` recalibrates coefficients from stored training observations. |
-| Diagnostics | Weighting-function and bandwidth choice are central | Smoother traces, information criteria, local R², inference, leverage, Cook's distance and export helpers. |
+| Diagnostics | Weighting-function and bandwidth choice are central | Smoother traces, information criteria, local R², inference, leverage, Cook's distance, local rank/condition diagnostics and export helpers. |
+| Rank-deficient local fit | Local normal equations may be singular or ill conditioned | Preserve the Moore-Penrose minimum-norm fitted solution, flag the location, and suppress coefficient SE/t inference with `NaN`. |
 | Large samples | Conventional repeated local fitting can be expensive | Full distance calculations remain part of standard GWR; use memory switches or `ScalableGWR` when needed. |
 
 ## References

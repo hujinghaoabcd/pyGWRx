@@ -25,7 +25,10 @@ from pygwrx.core.bandwidth import get_bandwidth_selector
 from pygwrx.core.base import BaseSpatialRegressor
 from pygwrx.core.kernels import get_kernel_function
 from pygwrx.core.metrics import compute_diagnostics
-from pygwrx.core.solver import adaptive_bandwidth_weights, weighted_least_squares
+from pygwrx.core.solver import (
+    _weighted_least_squares_details,
+    adaptive_bandwidth_weights,
+)
 from pygwrx.core.utils import add_intercept, compute_distance_matrix, validate_coords
 
 
@@ -89,6 +92,8 @@ class _LocalFitResult:
     trace_StS: float
     covariance_factors: Optional[np.ndarray]
     hat_matrix: Optional[np.ndarray]
+    local_rank: np.ndarray
+    local_condition_number: np.ndarray
 
 
 class GWR(BaseSpatialRegressor):
@@ -166,6 +171,9 @@ class GWR(BaseSpatialRegressor):
         self.coef_se_: Optional[np.ndarray] = None
         self.intercept_t_: Optional[np.ndarray] = None
         self.coef_t_: Optional[np.ndarray] = None
+        self.local_rank_: Optional[np.ndarray] = None
+        self.local_condition_number_: Optional[np.ndarray] = None
+        self.rank_deficient_: Optional[np.ndarray] = None
         self.inference_enabled_: bool = False
 
     def _reset_fit_state(self) -> None:
@@ -298,6 +306,27 @@ class GWR(BaseSpatialRegressor):
             raise ValueError("The local kernel contains no positive weights.")
         return weights
 
+    @staticmethod
+    def _warn_rank_deficiency(
+        rank_deficient: np.ndarray,
+        *,
+        context: str,
+        n_parameters: int,
+    ) -> None:
+        indices = np.flatnonzero(rank_deficient)
+        if indices.size == 0:
+            return
+        preview = ", ".join(str(int(index)) for index in indices[:5])
+        suffix = ", ..." if indices.size > 5 else ""
+        warnings.warn(
+            f"{indices.size} {context} weighted design(s) are rank deficient for "
+            f"{n_parameters} parameters (locations: {preview}{suffix}). Coefficients "
+            "use the Moore-Penrose minimum-norm WLS solution; coefficient standard "
+            "errors and t values are unavailable at rank-deficient locations.",
+            RuntimeWarning,
+            stacklevel=3,
+        )
+
     def _fit_training_locations(
         self,
         X_design: np.ndarray,
@@ -320,6 +349,8 @@ class GWR(BaseSpatialRegressor):
         params = np.empty((n_samples, n_parameters), dtype=float)
         fitted = np.empty(n_samples, dtype=float)
         influence = np.empty(n_samples, dtype=float)
+        local_rank = np.empty(n_samples, dtype=int)
+        local_condition_number = np.empty(n_samples, dtype=float)
         covariance_factors = (
             np.empty((n_samples, n_parameters), dtype=float)
             if compute_inference
@@ -332,21 +363,15 @@ class GWR(BaseSpatialRegressor):
 
         for index, distance_row in enumerate(distances):
             weights = self._weights_from_distances(distance_row)
-            n_positive = int(np.count_nonzero(weights > 0.0))
-            if n_positive < n_parameters:
-                warnings.warn(
-                    f"Location {index}: only {n_positive} positive-weight observations "
-                    f"are available for {n_parameters} design columns. The local "
-                    "solution uses a minimum-norm unpenalized WLS estimate; consider increasing the bandwidth or checking local collinearity.",
-                    RuntimeWarning,
-                    stacklevel=2,
-                )
-
-            beta, inverse_normal = weighted_least_squares(
+            solve = _weighted_least_squares_details(
                 X_design,
                 self.y_train_,
                 weights,
             )
+            beta = solve.beta
+            inverse_normal = solve.inverse_normal
+            local_rank[index] = solve.rank
+            local_condition_number[index] = solve.condition_number
             inverse_xtx_xtw = inverse_normal @ (X_design.T * weights)
             hat_row = X_design[index] @ inverse_xtx_xtw
 
@@ -357,7 +382,20 @@ class GWR(BaseSpatialRegressor):
             if hat_matrix is not None:
                 hat_matrix[index] = hat_row
             if covariance_factors is not None:
-                covariance_factors[index] = np.sum(inverse_xtx_xtw**2, axis=1)
+                if solve.rank < n_parameters:
+                    covariance_factors[index] = np.nan
+                else:
+                    covariance_factors[index] = np.sum(
+                        inverse_xtx_xtw**2,
+                        axis=1,
+                    )
+
+        rank_deficient = local_rank < n_parameters
+        self._warn_rank_deficiency(
+            rank_deficient,
+            context="calibration-location",
+            n_parameters=n_parameters,
+        )
 
         return _LocalFitResult(
             params=params,
@@ -368,6 +406,8 @@ class GWR(BaseSpatialRegressor):
             trace_StS=float(trace_sts),
             covariance_factors=covariance_factors,
             hat_matrix=hat_matrix,
+            local_rank=local_rank,
+            local_condition_number=local_condition_number,
         )
 
     def _compute_local_r2_from_distances(self, distances: np.ndarray) -> np.ndarray:
@@ -550,6 +590,9 @@ class GWR(BaseSpatialRegressor):
             self.fitted_values_ = local_fit.fitted_values.copy()
             self.residuals_ = self.y_train_ - self.fitted_values_
             self.influence_ = local_fit.influence.copy()
+            self.local_rank_ = local_fit.local_rank.copy()
+            self.local_condition_number_ = local_fit.local_condition_number.copy()
+            self.rank_deficient_ = self.local_rank_ < X_design.shape[1]
             self.hat_matrix_ = local_fit.hat_matrix
             self.S_matrix_ = self.hat_matrix_  # compatibility alias
             self.diagnostics_ = compute_diagnostics(
@@ -603,18 +646,37 @@ class GWR(BaseSpatialRegressor):
             coords_arr, self.coords_train_, metric=self.distance_metric
         )
         full_params = np.empty((coords_arr.shape[0], X_design.shape[1]), dtype=float)
+        local_rank = np.empty(coords_arr.shape[0], dtype=int)
+        local_condition_number = np.empty(coords_arr.shape[0], dtype=float)
         covariance_factors = (
             np.empty_like(full_params) if self.inference_enabled_ else None
         )
         for index, distance_row in enumerate(distances):
             weights = self._weights_from_distances(distance_row)
-            beta, inverse_normal = weighted_least_squares(
-                X_design, self.y_train_, weights
+            solve = _weighted_least_squares_details(
+                X_design,
+                self.y_train_,
+                weights,
             )
-            inverse_xtx_xtw = inverse_normal @ (X_design.T * weights)
-            full_params[index] = beta
+            inverse_xtx_xtw = solve.inverse_normal @ (X_design.T * weights)
+            full_params[index] = solve.beta
+            local_rank[index] = solve.rank
+            local_condition_number[index] = solve.condition_number
             if covariance_factors is not None:
-                covariance_factors[index] = np.sum(inverse_xtx_xtw**2, axis=1)
+                if solve.rank < X_design.shape[1]:
+                    covariance_factors[index] = np.nan
+                else:
+                    covariance_factors[index] = np.sum(
+                        inverse_xtx_xtw**2,
+                        axis=1,
+                    )
+
+        rank_deficient = local_rank < X_design.shape[1]
+        self._warn_rank_deficiency(
+            rank_deficient,
+            context="prediction-location",
+            n_parameters=X_design.shape[1],
+        )
 
         if self.fit_intercept:
             intercept = full_params[:, 0]
@@ -647,6 +709,9 @@ class GWR(BaseSpatialRegressor):
             "intercept": intercept,
             "standard_errors": standard_errors,
             "t_values": t_values,
+            "local_rank": local_rank,
+            "local_condition_number": local_condition_number,
+            "rank_deficient": rank_deficient,
         }
 
     def predict_result(
@@ -709,6 +774,15 @@ class GWR(BaseSpatialRegressor):
             "intercept": np.asarray(params["intercept"], dtype=float).copy(),
             "coef": np.asarray(params["coef"], dtype=float).copy(),
             "coords": np.asarray(params["coords"], dtype=float).copy(),
+            "local_rank": np.asarray(params["local_rank"], dtype=int).copy(),
+            "local_condition_number": np.asarray(
+                params["local_condition_number"],
+                dtype=float,
+            ).copy(),
+            "rank_deficient": np.asarray(
+                params["rank_deficient"],
+                dtype=bool,
+            ).copy(),
         }
 
     def get_local_coefficients(
@@ -738,6 +812,9 @@ class GWR(BaseSpatialRegressor):
             ("influence", self.influence_),
             ("standardized_residual", self.standardized_residuals_),
             ("cooks_distance", self.cooks_distance_),
+            ("local_rank", self.local_rank_),
+            ("local_condition_number", self.local_condition_number_),
+            ("rank_deficient", self.rank_deficient_),
         ):
             if values is not None:
                 frame[name] = values
@@ -786,6 +863,12 @@ class GWR(BaseSpatialRegressor):
                 ]
             )
 
+        rank_deficient_count = (
+            int(np.count_nonzero(self.rank_deficient_))
+            if self.rank_deficient_ is not None
+            else 0
+        )
+
         lines = [
             "=" * 78,
             "Gaussian Geographically Weighted Regression (GWR)",
@@ -795,6 +878,7 @@ class GWR(BaseSpatialRegressor):
             f"Kernel: {self.kernel}",
             *bandwidth_lines,
             f"Distance metric: {self.distance_metric}",
+            f"Rank-deficient local fits: {rank_deficient_count}/{n}",
             f"Residual variance (sigma^2): {self.sigma2_:.6f}",
             "",
             "Global OLS reference",
