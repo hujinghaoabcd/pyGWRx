@@ -247,7 +247,7 @@ def compute_distance_matrix(
     coords1: np.ndarray,
     coords2: Optional[np.ndarray] = None,
     metric: str = "euclidean",
-    **kwargs,
+    **kwargs: float,
 ) -> np.ndarray:
     """Compute a pairwise distance matrix.
 
