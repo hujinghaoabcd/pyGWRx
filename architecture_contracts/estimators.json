@@ -1,0 +1,4957 @@
+{
+  "estimator_count": 19,
+  "estimators": {
+    "BootstrapGWR": {
+      "constructor": [
+        {
+          "default": "'aicc'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'aicc'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_method"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "'golden_section'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "optimization_method"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "distance_metric"
+        },
+        {
+          "default": "99",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "n_bootstrap"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "reselect_bandwidth"
+        },
+        {
+          "default": "'plus_one'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "pvalue_method"
+        },
+        {
+          "default": "'two-sided'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "localized_tail"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "store_local_bootstrap"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "random_state"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [
+        {
+          "location": "constructor",
+          "parameter": "store_local_bootstrap"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "X_train_",
+        "bandwidth_",
+        "bootstrap_bandwidths_",
+        "bootstrap_localized_statistics_",
+        "bootstrap_modified_statistics_",
+        "bootstrap_statistics_",
+        "coefficients_global_",
+        "coefficients_gwr_",
+        "coords_train_",
+        "feature_names_in_",
+        "fitted_values_global_",
+        "fitted_values_gwr_",
+        "gwr_model_",
+        "local_standard_errors_",
+        "local_t_values_",
+        "localized_lower_critical_",
+        "localized_p_values_",
+        "localized_statistics_",
+        "localized_upper_critical_",
+        "modified_critical_values_",
+        "modified_p_values_",
+        "modified_statistics_",
+        "n_features_in_",
+        "n_samples_",
+        "p_value_",
+        "parameter_names_",
+        "residuals_global_",
+        "residuals_gwr_",
+        "rss_global_",
+        "rss_gwr_",
+        "sigma_global_",
+        "test_statistic_",
+        "trace_S_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.BootstrapGWR",
+      "prediction_result": null,
+      "public_module": "pygwrx.models.bootstrap_gwr",
+      "root_import": "pygwrx.BootstrapGWR"
+    },
+    "GRGWR": {
+      "constructor": [
+        {
+          "default": "3",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "n_regimes"
+        },
+        {
+          "default": "20",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "1.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lambda_boundary"
+        },
+        {
+          "default": "10",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "max_iter"
+        },
+        {
+          "default": "0.0001",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "tol"
+        },
+        {
+          "default": "0.5",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "spatial_constraint_weight"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        },
+        {
+          "default": "8",
+          "kind": "KEYWORD_ONLY",
+          "name": "n_neighbors"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "min_regime_size"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "enforce_connectivity"
+        },
+        {
+          "default": "42",
+          "kind": "KEYWORD_ONLY",
+          "name": "random_state"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [],
+      "initialized_public_fitted_state": [
+        "X_",
+        "adjacency_",
+        "adjacency_matrix_",
+        "clustering_features_",
+        "coef_",
+        "coefficients_",
+        "converged_",
+        "coords_",
+        "diagnostics_",
+        "distance_matrix_",
+        "edges_",
+        "feature_names_",
+        "feature_names_in_",
+        "fitted_values_",
+        "global_coef_",
+        "hat_matrix_",
+        "intercept_",
+        "local_parameters_",
+        "n_features_in_",
+        "n_iter_",
+        "n_regimes_actual_",
+        "objective_history_",
+        "regime_boundaries_",
+        "regime_component_counts_",
+        "regime_sizes_",
+        "regimes_",
+        "residuals_",
+        "search_results_",
+        "selection_criterion_",
+        "stop_reason_",
+        "y_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "results_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.GRGWR",
+      "prediction_result": {
+        "constructor": [
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "predictions"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coefficients"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercepts"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "regimes"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coords"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "feature_names"
+          }
+        ],
+        "frame_schema": {
+          "always": [
+            "coord_0",
+            "coord_1",
+            "prediction",
+            "regime",
+            "intercept"
+          ],
+          "optional": [],
+          "per_feature": [
+            "coef_{feature}"
+          ]
+        },
+        "name": "GRGWRPredictionResult"
+      },
+      "public_module": "pygwrx.models.grgwr",
+      "root_import": "pygwrx.GRGWR"
+    },
+    "GTWR": {
+      "constructor": [
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_method"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "0.05",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lambda_st"
+        },
+        {
+          "default": "(0.0, 1.0)",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lambda_range"
+        },
+        {
+          "default": "11",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lambda_grid_size"
+        },
+        {
+          "default": "0.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "ksi"
+        },
+        {
+          "default": "'gwmodel'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "distance_combination"
+        },
+        {
+          "default": "1.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "tau"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "causal"
+        },
+        {
+          "default": "'auto'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "time_unit"
+        },
+        {
+          "default": "'golden_section'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "optimization_method"
+        },
+        {
+          "default": "25",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "search_grid_size"
+        },
+        {
+          "default": "1e-05",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "search_tol"
+        },
+        {
+          "default": "100",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "search_max_iter"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "distance_metric"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "sigma2_v1"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [
+        {
+          "location": "fit",
+          "parameter": "compute_hat_matrix"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_hat_matrix_flag"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_inference"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_local_r2"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "S_matrix_",
+        "X_train_",
+        "bandwidth_",
+        "bandwidth_score_",
+        "bandwidth_selection_result_",
+        "coef_",
+        "coef_se_",
+        "coef_t_",
+        "context_train_",
+        "cooks_distance_",
+        "coords_train_",
+        "diagnostics_",
+        "feature_names_in_",
+        "fitted_values_",
+        "hat_matrix_",
+        "inference_enabled_",
+        "influence_",
+        "intercept_",
+        "intercept_se_",
+        "intercept_t_",
+        "kernel_func_",
+        "ksi_",
+        "lambda_selection_history_",
+        "lambda_st_",
+        "local_r2_",
+        "n_features_in_",
+        "n_samples_",
+        "parameter_covariance_diagonal_",
+        "parameter_standard_errors_",
+        "parameter_t_values_",
+        "residuals_",
+        "sigma2_",
+        "spatial_distance_matrix_",
+        "spatiotemporal_distance_matrix_",
+        "standardized_residuals_",
+        "tau_",
+        "temporal_distance_matrix_",
+        "time_input_kind_",
+        "time_origin_",
+        "time_unit_",
+        "times_train_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "times"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_hat_matrix"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_local_r2"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_inference"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_hat_matrix_flag"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "verbose"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "times"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "times"
+            }
+          ]
+        },
+        "score": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "VAR_KEYWORD",
+              "name": "kwargs"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_geodataframe": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "crs"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.GTWR",
+      "prediction_result": {
+        "constructor": [
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "predictions"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coords"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "times"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "feature_names"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef_standard_errors"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept_standard_errors"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef_t_values"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept_t_values"
+          }
+        ],
+        "frame_schema": {
+          "always": [
+            "coord_0",
+            "coord_1",
+            "time",
+            "prediction",
+            "intercept"
+          ],
+          "optional": [
+            "intercept_se",
+            "intercept_t"
+          ],
+          "per_feature": [
+            "coef_{feature}",
+            "se_{feature}",
+            "t_{feature}"
+          ]
+        },
+        "name": "GTWRPredictionResult"
+      },
+      "public_module": "pygwrx.models.gtwr",
+      "root_import": "pygwrx.GTWR"
+    },
+    "GWDA": {
+      "constructor": [
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "quadratic"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "local_mean"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "local_cov"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "local_prior"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "prior"
+        },
+        {
+          "default": "0.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "regularization"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [],
+      "initialized_public_fitted_state": [
+        "X_train_",
+        "bandwidth_",
+        "bandwidth_scores_",
+        "class_counts_",
+        "class_covariances_",
+        "class_covs_",
+        "class_means_",
+        "class_priors_",
+        "classes_",
+        "confusion_matrix_",
+        "coords_train_",
+        "correct_ratio_",
+        "discriminant_scores_",
+        "entropy_",
+        "feature_names_in_",
+        "fixed_prior_",
+        "n_features_in_",
+        "pooled_covariances_",
+        "predictions_",
+        "probabilities_",
+        "validation_mode_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X_pred"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords_pred"
+            },
+            {
+              "default": "True",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "validate"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict_proba": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "select_bandwidth": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "bounds"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.GWDA",
+      "prediction_result": null,
+      "public_module": "pygwrx.models.gwda",
+      "root_import": "pygwrx.GWDA"
+    },
+    "GWGLM": {
+      "constructor": [
+        {
+          "default": "'gaussian'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "family"
+        },
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "'aicc'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_method"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "'golden_section'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "optimization_method"
+        },
+        {
+          "default": "100",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "max_iter"
+        },
+        {
+          "default": "1e-06",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "tol"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "distance_metric"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "sigma2_v1"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [
+        {
+          "location": "fit",
+          "parameter": "compute_hat_matrix"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_inference"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_local_r2"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "S_matrix_",
+        "X_train_",
+        "adjusted_percent_deviance_",
+        "bandwidth_",
+        "bandwidth_search_",
+        "bandwidth_selection_result_",
+        "bandwidth_selection_score_",
+        "coef_",
+        "coef_se_",
+        "coef_t_",
+        "coef_z_",
+        "context_train_",
+        "converged_",
+        "cooks_distance_",
+        "coords_train_",
+        "cv_contributions_",
+        "cv_residuals_",
+        "deviance_",
+        "deviance_residuals_",
+        "diagnostics_",
+        "exposure_train_",
+        "family_",
+        "feature_names_in_",
+        "final_working_weights_",
+        "fitted_values_",
+        "hat_matrix_",
+        "inference_enabled_",
+        "influence_",
+        "intercept_",
+        "intercept_se_",
+        "intercept_t_",
+        "intercept_z_",
+        "iteration_counts_",
+        "kernel_func_",
+        "linear_predictor_",
+        "local_condition_number_",
+        "local_converged_",
+        "local_r2_",
+        "local_rank_",
+        "log_likelihood_",
+        "mu_",
+        "n_features_in_",
+        "n_samples_",
+        "null_deviance_",
+        "offset_train_",
+        "parameter_covariance_diagonal_",
+        "parameter_standard_errors_",
+        "parameter_t_values_",
+        "parameter_z_values_",
+        "pearson_residuals_",
+        "percent_deviance_",
+        "rank_deficient_",
+        "residuals_",
+        "sigma2_",
+        "standardized_residuals_",
+        "times_train_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "exposure"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "offset"
+            },
+            {
+              "default": "False",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_hat_matrix"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_inference"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_local_r2"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "exposure"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "offset"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "exposure"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "offset"
+            }
+          ]
+        },
+        "score": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "exposure"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "offset"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_geodataframe": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "crs"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.GWGLM",
+      "prediction_result": {
+        "constructor": null,
+        "frame_schema": null,
+        "name": "Union[GWGLMPredictionResult, GWRPredictionResult]"
+      },
+      "public_module": "pygwrx.models.glm_gwr",
+      "root_import": "pygwrx.GWGLM"
+    },
+    "GWLasso": {
+      "constructor": [
+        {
+          "default": "'exponential'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "alpha"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "alpha_grid"
+        },
+        {
+          "default": "30",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "n_alphas"
+        },
+        {
+          "default": "0.001",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "alpha_min_ratio"
+        },
+        {
+          "default": "5",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "cv_folds"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "standardize"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "8",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "n_bandwidths"
+        },
+        {
+          "default": "5000",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "max_iter"
+        },
+        {
+          "default": "1e-06",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "tol"
+        },
+        {
+          "default": "1e-08",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "active_tol"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "distance_metric"
+        },
+        {
+          "default": "0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "random_state"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [],
+      "initialized_public_fitted_state": [
+        "X_train_",
+        "active_vars_",
+        "alpha_",
+        "bandwidth_",
+        "bandwidth_scores_",
+        "coef_",
+        "context_train_",
+        "converged_",
+        "coords_train_",
+        "diagnostics_",
+        "feature_names_in_",
+        "fitted_values_",
+        "hat_matrix_",
+        "intercept_",
+        "kernel_func_",
+        "local_alpha_cv_score_",
+        "local_objective_",
+        "local_r2_",
+        "mean_active_variables_",
+        "n_features_in_",
+        "n_iter_",
+        "n_samples_",
+        "parameter_names_",
+        "residuals_",
+        "selection_frequency_",
+        "times_train_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "score": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "VAR_KEYWORD",
+              "name": "kwargs"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_geodataframe": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "crs"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.GWLasso",
+      "prediction_result": null,
+      "public_module": "pygwrx.models.gw_lasso",
+      "root_import": "pygwrx.GWLasso"
+    },
+    "GWPCA": {
+      "constructor": [
+        {
+          "default": "2",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "n_components"
+        },
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "scaling"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "compute_scores"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [
+        {
+          "location": "constructor",
+          "parameter": "compute_scores"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "X_processed_",
+        "X_train_",
+        "bandwidth_",
+        "coords_train_",
+        "cumulative_pv_",
+        "cv_scores_",
+        "eval_coords_",
+        "feature_names_",
+        "focal_scores_",
+        "global_mean_",
+        "global_scale_",
+        "loadings_",
+        "local_means_",
+        "local_pv_",
+        "pca_global_",
+        "scores_",
+        "var_",
+        "weights_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "eval_coords"
+            },
+            {
+              "default": "False",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "compute_cv"
+            }
+          ]
+        },
+        "select_bandwidth": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "transform": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.GWPCA",
+      "prediction_result": null,
+      "public_module": "pygwrx.models.gwpca",
+      "root_import": "pygwrx.GWPCA"
+    },
+    "GWR": {
+      "constructor": [
+        {
+          "default": "'gaussian'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_method"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "'golden_section'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "optimization_method"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "distance_metric"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "sigma2_v1"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [
+        "fit(compute_hat_matrix_flag=...) is a legacy compatibility alias"
+      ],
+      "heavy_output_controls": [
+        {
+          "location": "fit",
+          "parameter": "compute_hat_matrix"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_hat_matrix_flag"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_inference"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_local_r2"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "S_matrix_",
+        "X_train_",
+        "bandwidth_",
+        "bandwidth_search_",
+        "coef_",
+        "coef_se_",
+        "coef_t_",
+        "context_train_",
+        "cooks_distance_",
+        "coords_train_",
+        "diagnostics_",
+        "feature_names_in_",
+        "fitted_values_",
+        "hat_matrix_",
+        "inference_enabled_",
+        "influence_",
+        "intercept_",
+        "intercept_se_",
+        "intercept_t_",
+        "kernel_func_",
+        "local_condition_number_",
+        "local_r2_",
+        "local_rank_",
+        "n_features_in_",
+        "n_samples_",
+        "parameter_covariance_diagonal_",
+        "parameter_standard_errors_",
+        "parameter_t_values_",
+        "rank_deficient_",
+        "residuals_",
+        "sigma2_",
+        "standardized_residuals_",
+        "times_train_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "False",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_hat_matrix"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_local_r2"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_inference"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_hat_matrix_flag"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "verbose"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "score": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "VAR_KEYWORD",
+              "name": "kwargs"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_geodataframe": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "crs"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.GWR",
+      "prediction_result": {
+        "constructor": [
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "predictions"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coords"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "feature_names"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef_standard_errors"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept_standard_errors"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef_t_values"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept_t_values"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "local_rank"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "local_condition_number"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "rank_deficient"
+          }
+        ],
+        "frame_schema": {
+          "always": [
+            "coord_0",
+            "coord_1",
+            "prediction",
+            "intercept"
+          ],
+          "optional": [
+            "intercept_se",
+            "intercept_t",
+            "local_rank",
+            "local_condition_number",
+            "rank_deficient"
+          ],
+          "per_feature": [
+            "coef_{feature}",
+            "se_{feature}",
+            "t_{feature}"
+          ]
+        },
+        "name": "GWRPredictionResult"
+      },
+      "public_module": "pygwrx.models.gwr",
+      "root_import": "pygwrx.GWR"
+    },
+    "GWSS": {
+      "constructor": [
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "quantile"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [],
+      "initialized_public_fitted_state": [
+        "X_data_",
+        "bandwidth_",
+        "coords_data_",
+        "coords_summary_",
+        "local_corr_",
+        "local_corr_spearman_",
+        "local_cov_",
+        "local_cv_",
+        "local_iqr_",
+        "local_mean_",
+        "local_median_",
+        "local_qi_",
+        "local_skewness_",
+        "local_std_",
+        "local_var_",
+        "var_names_",
+        "weights_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "summary_coords"
+            }
+          ]
+        },
+        "select_bandwidth": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "'mean'",
+              "kind": "KEYWORD_ONLY",
+              "name": "statistic"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.GWSS",
+      "prediction_result": null,
+      "public_module": "pygwrx.models.gwss",
+      "root_import": "pygwrx.GWSS"
+    },
+    "LCRGWR": {
+      "constructor": [
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_method"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "'golden_section'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "optimization_method"
+        },
+        {
+          "default": "0.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lambda_ridge"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lambda_adjust"
+        },
+        {
+          "default": "30.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "cn_thresh"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "distance_metric"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "sigma2_v1"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [
+        {
+          "location": "fit",
+          "parameter": "compute_hat_matrix"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_inference"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_local_r2"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "S_matrix_",
+        "X_train_",
+        "bandwidth_",
+        "bandwidth_cv_score_",
+        "bandwidth_search_",
+        "bandwidth_selection_result_",
+        "coef_",
+        "coef_se_",
+        "coef_t_",
+        "coefficients_",
+        "compensated_condition_numbers_",
+        "condition_numbers_",
+        "context_train_",
+        "cooks_distance_",
+        "coords_train_",
+        "cv_contributions_",
+        "cv_residuals_",
+        "design_scales_",
+        "diagnostics_",
+        "feature_names_in_",
+        "fitted_values_",
+        "hat_matrix_",
+        "inference_enabled_",
+        "influence_",
+        "intercept_",
+        "intercept_se_",
+        "intercept_t_",
+        "kernel_func_",
+        "local_condition_number_",
+        "local_condition_numbers_",
+        "local_lambda_",
+        "local_lambdas_",
+        "local_r2_",
+        "local_rank_",
+        "locally_compensated_mask_",
+        "n_features_in_",
+        "n_samples_",
+        "parameter_covariance_diagonal_",
+        "parameter_standard_errors_",
+        "parameter_t_values_",
+        "penalized_system_condition_numbers_",
+        "rank_deficient_",
+        "residuals_",
+        "ridge_applied_mask_",
+        "sigma2_",
+        "standardized_residuals_",
+        "times_train_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_hat_matrix"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_local_r2"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_inference"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_cv"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "verbose"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "score": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "VAR_KEYWORD",
+              "name": "kwargs"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_geodataframe": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "crs"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.LCRGWR",
+      "prediction_result": {
+        "constructor": [
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "predictions"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coords"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "feature_names"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef_standard_errors"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept_standard_errors"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef_t_values"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept_t_values"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "local_rank"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "local_condition_number"
+          },
+          {
+            "default": "None",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "rank_deficient"
+          }
+        ],
+        "frame_schema": {
+          "always": [
+            "coord_0",
+            "coord_1",
+            "prediction",
+            "intercept"
+          ],
+          "optional": [
+            "intercept_se",
+            "intercept_t",
+            "local_rank",
+            "local_condition_number",
+            "rank_deficient"
+          ],
+          "per_feature": [
+            "coef_{feature}",
+            "se_{feature}",
+            "t_{feature}"
+          ]
+        },
+        "name": "GWRPredictionResult"
+      },
+      "public_module": "pygwrx.models.lcr_gwr",
+      "root_import": "pygwrx.LCRGWR"
+    },
+    "LGGWR": {
+      "constructor": [
+        {
+          "default": "2",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "latent_dim"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "'gaussian'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'joint'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "geometry"
+        },
+        {
+          "default": "0.05",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "learning_rate"
+        },
+        {
+          "default": "100",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "max_iter"
+        },
+        {
+          "default": "1e-06",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "tol"
+        },
+        {
+          "default": "0.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "lambda_reg"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "orthogonal_constraint"
+        },
+        {
+          "default": "10.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "grad_clip"
+        },
+        {
+          "default": "20",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "patience"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "select_bandwidth"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "random_state"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "standardize_geometry"
+        },
+        {
+          "default": "'coordinate'",
+          "kind": "KEYWORD_ONLY",
+          "name": "initialization"
+        },
+        {
+          "default": "1",
+          "kind": "KEYWORD_ONLY",
+          "name": "n_restarts"
+        },
+        {
+          "default": "'frobenius'",
+          "kind": "KEYWORD_ONLY",
+          "name": "scale_constraint"
+        },
+        {
+          "default": "1",
+          "kind": "KEYWORD_ONLY",
+          "name": "bandwidth_updates"
+        }
+      ],
+      "deprecations": [
+        "orthogonal_constraint is deprecated; use scale_constraint"
+      ],
+      "heavy_output_controls": [],
+      "initialized_public_fitted_state": [
+        "A_",
+        "B_",
+        "X_design_",
+        "X_train_",
+        "attr_center_",
+        "attr_scale_",
+        "attrs_geometry_",
+        "attrs_train_",
+        "bandwidth_",
+        "bandwidth_history_",
+        "best_loss_",
+        "coef_",
+        "coefficients_",
+        "constant_attribute_mask_",
+        "converged_",
+        "coord_center_",
+        "coord_scale_",
+        "coords_geometry_",
+        "coords_train_",
+        "diagnostics_",
+        "feature_names_",
+        "feature_names_in_",
+        "final_loo_loss_",
+        "fitted_values_",
+        "geometry_feature_names_",
+        "hat_matrix_",
+        "intercept_",
+        "latent_coords_",
+        "loss_history_",
+        "metric_contributions_",
+        "metric_matrix_",
+        "n_features_in_",
+        "n_iter_",
+        "residuals_",
+        "restart_scores_",
+        "stop_reason_",
+        "u_train_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "attributes"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "attributes"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "attributes"
+            }
+          ]
+        },
+        "results_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.LGGWR",
+      "prediction_result": {
+        "constructor": [
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "predictions"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coefficients"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercepts"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coords"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "latent_coords"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "feature_names"
+          }
+        ],
+        "frame_schema": {
+          "always": [
+            "coord_0",
+            "coord_1",
+            "prediction",
+            "intercept"
+          ],
+          "optional": [],
+          "per_feature": [
+            "coef_{feature}"
+          ],
+          "repeated": [
+            "latent_{index}"
+          ]
+        },
+        "name": "LGGWRPredictionResult"
+      },
+      "public_module": "pygwrx.models.lg_gwr",
+      "root_import": "pygwrx.LGGWR"
+    },
+    "MGTWR": {
+      "constructor": [
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidths"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "taus"
+        },
+        {
+          "default": "'bisquare'",
+          "kind": "KEYWORD_ONLY",
+          "name": "kernel"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "adaptive"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'aicc'",
+          "kind": "KEYWORD_ONLY",
+          "name": "bandwidth_method"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "(0.0, 4.0)",
+          "kind": "KEYWORD_ONLY",
+          "name": "tau_range"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "init_bandwidth"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "init_tau"
+        },
+        {
+          "default": "1e-06",
+          "kind": "KEYWORD_ONLY",
+          "name": "tol"
+        },
+        {
+          "default": "1e-05",
+          "kind": "KEYWORD_ONLY",
+          "name": "tol_multi"
+        },
+        {
+          "default": "200",
+          "kind": "KEYWORD_ONLY",
+          "name": "max_iter"
+        },
+        {
+          "default": "False",
+          "kind": "KEYWORD_ONLY",
+          "name": "rss_score"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "calculate_inference"
+        },
+        {
+          "default": "1",
+          "kind": "KEYWORD_ONLY",
+          "name": "n_chunks"
+        },
+        {
+          "default": "False",
+          "kind": "KEYWORD_ONLY",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [],
+      "initialized_public_fitted_state": [
+        "ENP_j_",
+        "X_train_",
+        "adjusted_alpha_by_variable_",
+        "aic_",
+        "aicc_",
+        "bandwidth_",
+        "bandwidth_history_",
+        "bandwidths_",
+        "bic_",
+        "coef_",
+        "coef_se_",
+        "coef_t_",
+        "context_train_",
+        "converged_",
+        "convergence_history_",
+        "cooks_distance_",
+        "coords_train_",
+        "critical_t_values_",
+        "diagnostics_",
+        "effective_params_",
+        "effective_params_by_variable_",
+        "feature_names_in_",
+        "fitted_values_",
+        "hat_matrix_",
+        "inference_enabled_",
+        "influence_",
+        "initial_bandwidth_",
+        "initial_tau_",
+        "intercept_",
+        "intercept_se_",
+        "intercept_t_",
+        "kernel_func_",
+        "local_r2_",
+        "n_features_in_",
+        "n_iter_",
+        "n_samples_",
+        "parameter_contributions_",
+        "parameter_covariance_diagonal_",
+        "parameter_standard_errors_",
+        "parameter_t_values_",
+        "params_",
+        "partial_hat_matrices_",
+        "r2_",
+        "residuals_",
+        "rss_",
+        "sigma2_",
+        "standardized_residuals_",
+        "tau_history_",
+        "taus_",
+        "temporal_bandwidths_",
+        "times_train_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "times"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "times"
+            }
+          ]
+        },
+        "score": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "VAR_KEYWORD",
+              "name": "kwargs"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_geodataframe": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "crs"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.MGTWR",
+      "prediction_result": null,
+      "public_module": "pygwrx.models.mgtwr",
+      "root_import": "pygwrx.MGTWR"
+    },
+    "MGWR": {
+      "constructor": [
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidths"
+        },
+        {
+          "default": "'aicc'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_method"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_ranges"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "init_bandwidth"
+        },
+        {
+          "default": "'golden_section'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "optimization_method"
+        },
+        {
+          "default": "1e-06",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "search_tol"
+        },
+        {
+          "default": "200",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "search_max_iter"
+        },
+        {
+          "default": "200",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "max_iter"
+        },
+        {
+          "default": "1e-05",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "tol"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "rss_score"
+        },
+        {
+          "default": "5",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bws_same_times"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "distance_metric"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "sigma2_v1"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [
+        {
+          "location": "fit",
+          "parameter": "compute_hat_matrix"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_inference"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "ENP_j_",
+        "X_train_",
+        "adjusted_alpha_by_variable_",
+        "bandwidth_",
+        "bandwidth_history_",
+        "bandwidths_",
+        "coef_",
+        "coef_se_",
+        "coef_t_",
+        "context_train_",
+        "converged_",
+        "convergence_history_",
+        "cooks_distance_",
+        "coords_train_",
+        "critical_t_values_",
+        "diagnostics_",
+        "effective_params_by_variable_",
+        "feature_names_in_",
+        "fitted_values_",
+        "hat_matrix_",
+        "inference_enabled_",
+        "influence_",
+        "initial_bandwidth_",
+        "intercept_",
+        "intercept_se_",
+        "intercept_t_",
+        "kernel_func_",
+        "local_r2_",
+        "n_features_in_",
+        "n_iter_",
+        "n_samples_",
+        "parameter_contributions_",
+        "parameter_covariance_diagonal_",
+        "parameter_standard_errors_",
+        "parameter_t_values_",
+        "partial_hat_matrices_",
+        "residuals_",
+        "sigma2_",
+        "standardized_residuals_",
+        "times_train_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "False",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_hat_matrix"
+            },
+            {
+              "default": "False",
+              "kind": "KEYWORD_ONLY",
+              "name": "store_partial_hat_matrices"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_inference"
+            },
+            {
+              "default": "1",
+              "kind": "KEYWORD_ONLY",
+              "name": "n_chunks"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "verbose"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "score": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "VAR_KEYWORD",
+              "name": "kwargs"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_geodataframe": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "crs"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.MGWR",
+      "prediction_result": null,
+      "public_module": "pygwrx.models.mgwr",
+      "root_import": "pygwrx.MGWR"
+    },
+    "MixedGWR": {
+      "constructor": [
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'aicc'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "'aicc'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_method"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "local_vars"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "global_vars"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "intercept_fixed"
+        },
+        {
+          "default": "0.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "ridge"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "'golden_section'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "optimization_method"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "distance_metric"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [],
+      "initialized_public_fitted_state": [
+        "X_train_",
+        "aic_",
+        "aicc_",
+        "bandwidth_",
+        "bic_",
+        "coef_",
+        "coef_global_",
+        "coef_local_",
+        "context_train_",
+        "coords_train_",
+        "diagnostics_",
+        "enp_",
+        "feature_names_in_",
+        "fitted_values_",
+        "global_var_indices_",
+        "hat_matrix_",
+        "intercept_",
+        "kernel_func_",
+        "local_r2_",
+        "local_var_indices_",
+        "n_features_in_",
+        "n_samples_",
+        "residuals_",
+        "selection_history_",
+        "times_train_",
+        "trace_StS_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "True",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "compute_enp"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "score": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "VAR_KEYWORD",
+              "name": "kwargs"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_geodataframe": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "crs"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.MixedGWR",
+      "prediction_result": null,
+      "public_module": "pygwrx.models.mixed_gwr",
+      "root_import": "pygwrx.MixedGWR"
+    },
+    "RGWR": {
+      "constructor": [
+        {
+          "default": "'gaussian'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_method"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "'golden_section'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "optimization_method"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "distance_metric"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "sigma2_v1"
+        },
+        {
+          "default": "'automatic'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "method"
+        },
+        {
+          "default": "20",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "max_iter"
+        },
+        {
+          "default": "1e-05",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "tol"
+        },
+        {
+          "default": "2.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "cut1"
+        },
+        {
+          "default": "3.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "cut2"
+        },
+        {
+          "default": "3.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "cut_filter"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [
+        {
+          "location": "fit",
+          "parameter": "compute_hat_matrix"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_hat_matrix_flag"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_inference"
+        },
+        {
+          "location": "fit",
+          "parameter": "compute_local_r2"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "S_matrix_",
+        "X_train_",
+        "bandwidth_",
+        "bandwidth_search_",
+        "coef_",
+        "coef_se_",
+        "coef_t_",
+        "context_train_",
+        "converged_",
+        "convergence_history_",
+        "cooks_distance_",
+        "coords_train_",
+        "diagnostics_",
+        "downweighted_mask_",
+        "feature_names_in_",
+        "fitted_values_",
+        "hat_matrix_",
+        "inference_enabled_",
+        "influence_",
+        "initial_diagnostics_",
+        "initial_fitted_values_",
+        "initial_residuals_",
+        "initial_studentized_residuals_",
+        "intercept_",
+        "intercept_se_",
+        "intercept_t_",
+        "kernel_func_",
+        "local_condition_number_",
+        "local_r2_",
+        "local_rank_",
+        "mse_history_",
+        "n_features_in_",
+        "n_iter_",
+        "n_samples_",
+        "outlier_mask_",
+        "parameter_covariance_diagonal_",
+        "parameter_standard_errors_",
+        "parameter_t_values_",
+        "rank_deficient_",
+        "residuals_",
+        "robust_method_",
+        "robust_residual_scores_",
+        "robust_scale_",
+        "robust_weights_",
+        "sigma2_",
+        "standardized_residuals_",
+        "times_train_",
+        "weight_history_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_hat_matrix"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_local_r2"
+            },
+            {
+              "default": "True",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_inference"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "compute_hat_matrix_flag"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "verbose"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "score": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "VAR_KEYWORD",
+              "name": "kwargs"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_geodataframe": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "None",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "crs"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.RGWR",
+      "prediction_result": {
+        "constructor": null,
+        "frame_schema": null,
+        "name": "GWRPredictionResult"
+      },
+      "public_module": "pygwrx.models.rgwr",
+      "root_import": "pygwrx.RGWR"
+    },
+    "SGTWR": {
+      "constructor": [
+        {
+          "default": "'aicc'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "spatial_bandwidth"
+        },
+        {
+          "default": "'aicc'",
+          "kind": "KEYWORD_ONLY",
+          "name": "temporal_bandwidth"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "adaptive"
+        },
+        {
+          "default": "'aicc'",
+          "kind": "KEYWORD_ONLY",
+          "name": "alpha"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "similarity_vars"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "standardize_similarity"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "spatial_bandwidth_candidates"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "temporal_bandwidth_candidates"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "alpha_candidates"
+        },
+        {
+          "default": "False",
+          "kind": "KEYWORD_ONLY",
+          "name": "causal"
+        },
+        {
+          "default": "'auto'",
+          "kind": "KEYWORD_ONLY",
+          "name": "time_unit"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "KEYWORD_ONLY",
+          "name": "distance_metric"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "sigma2_v1"
+        },
+        {
+          "default": "0.0",
+          "kind": "KEYWORD_ONLY",
+          "name": "ridge"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "store_weights"
+        },
+        {
+          "default": "False",
+          "kind": "KEYWORD_ONLY",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [
+        {
+          "location": "constructor",
+          "parameter": "store_weights"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "X_design_",
+        "X_train_",
+        "alpha_",
+        "coef_",
+        "coef_se_",
+        "coef_t_",
+        "coefficients_",
+        "combined_weights_",
+        "coords_train_",
+        "diagnostics_",
+        "feature_names_",
+        "fitted_values_",
+        "hat_matrix_",
+        "influence_",
+        "intercept_",
+        "intercept_se_",
+        "intercept_t_",
+        "parameter_covariance_diagonal_",
+        "parameter_standard_errors_",
+        "parameter_t_values_",
+        "parameters_",
+        "residuals_",
+        "selection_history_",
+        "sigma2_",
+        "similarity_feature_names_",
+        "similarity_indices_",
+        "similarity_mean_",
+        "similarity_scale_",
+        "similarity_weights_",
+        "spatial_bandwidth_",
+        "spatiotemporal_weights_",
+        "temporal_bandwidth_",
+        "time_converter_",
+        "time_unit_",
+        "times_train_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "times"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "times"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "times"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.SGTWR",
+      "prediction_result": {
+        "constructor": [
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "predictions"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coords"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "times"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "feature_names"
+          }
+        ],
+        "frame_schema": {
+          "always": [
+            "coord_0",
+            "coord_1",
+            "time",
+            "prediction",
+            "intercept"
+          ],
+          "optional": [],
+          "per_feature": [
+            "coef_{feature}"
+          ]
+        },
+        "name": "SGTWRPredictionResult"
+      },
+      "public_module": "pygwrx.models.sgtwr",
+      "root_import": "pygwrx.SGTWR"
+    },
+    "SGWR": {
+      "constructor": [
+        {
+          "default": "'aicc'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "adaptive"
+        },
+        {
+          "default": "'bisquare'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "'aicc'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "alpha"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "similarity_vars"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "standardize_similarity"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "bandwidth_kernel"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "bandwidth_range"
+        },
+        {
+          "default": "(0.01, 1.0)",
+          "kind": "KEYWORD_ONLY",
+          "name": "alpha_range"
+        },
+        {
+          "default": "21",
+          "kind": "KEYWORD_ONLY",
+          "name": "alpha_grid_size"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "KEYWORD_ONLY",
+          "name": "distance_metric"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "sigma2_v1"
+        },
+        {
+          "default": "0.0",
+          "kind": "KEYWORD_ONLY",
+          "name": "ridge"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "store_weights"
+        },
+        {
+          "default": "False",
+          "kind": "KEYWORD_ONLY",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [
+        {
+          "location": "constructor",
+          "parameter": "store_weights"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "X_design_",
+        "X_train_",
+        "alpha_",
+        "alpha_score_",
+        "alpha_search_history_",
+        "bandwidth_",
+        "bandwidth_selector_",
+        "coef_",
+        "coef_se_",
+        "coef_t_",
+        "coefficients_",
+        "combined_weights_",
+        "cooks_distance_",
+        "coords_train_",
+        "diagnostics_",
+        "feature_names_",
+        "fitted_values_",
+        "hat_matrix_",
+        "influence_",
+        "intercept_",
+        "intercept_se_",
+        "intercept_t_",
+        "kernel_func_",
+        "local_r2_",
+        "parameter_covariance_diagonal_",
+        "parameter_standard_errors_",
+        "parameter_t_values_",
+        "parameters_",
+        "residuals_",
+        "sigma2_",
+        "similarity_feature_names_",
+        "similarity_indices_",
+        "similarity_mean_",
+        "similarity_scale_",
+        "similarity_weights_",
+        "spatial_weights_",
+        "standardized_residuals_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "results_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.SGWR",
+      "prediction_result": {
+        "constructor": [
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "predictions"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coords"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "feature_names"
+          }
+        ],
+        "frame_schema": null,
+        "name": "SGWRPredictionResult"
+      },
+      "public_module": "pygwrx.models.sgwr",
+      "root_import": "pygwrx.SGWR"
+    },
+    "STWR": {
+      "constructor": [
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "spatial_bandwidth"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "adaptive"
+        },
+        {
+          "default": "'bisquare'",
+          "kind": "KEYWORD_ONLY",
+          "name": "kernel"
+        },
+        {
+          "default": "0.3",
+          "kind": "KEYWORD_ONLY",
+          "name": "alpha"
+        },
+        {
+          "default": "0.0",
+          "kind": "KEYWORD_ONLY",
+          "name": "theta"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "tick_nums"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "bandwidth_candidates"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "alpha_candidates"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "theta_candidates"
+        },
+        {
+          "default": "None",
+          "kind": "KEYWORD_ONLY",
+          "name": "tick_candidates"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "'euclidean'",
+          "kind": "KEYWORD_ONLY",
+          "name": "distance_metric"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "sigma2_v1"
+        },
+        {
+          "default": "0.0",
+          "kind": "KEYWORD_ONLY",
+          "name": "ridge"
+        },
+        {
+          "default": "True",
+          "kind": "KEYWORD_ONLY",
+          "name": "store_weights"
+        },
+        {
+          "default": "False",
+          "kind": "KEYWORD_ONLY",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [
+        {
+          "location": "constructor",
+          "parameter": "store_weights"
+        }
+      ],
+      "initialized_public_fitted_state": [
+        "X_stages_",
+        "alpha_",
+        "coef_",
+        "coef_se_",
+        "coef_t_",
+        "coefficients_",
+        "coords_stages_",
+        "diagnostics_",
+        "feature_names_",
+        "fitted_values_",
+        "influence_",
+        "intercept_",
+        "intercept_se_",
+        "intercept_t_",
+        "kernel_func_",
+        "parameter_covariance_diagonal_",
+        "parameter_standard_errors_",
+        "parameter_t_values_",
+        "parameters_",
+        "residuals_",
+        "selection_history_",
+        "sigma2_",
+        "smoother_rows_",
+        "spatial_bandwidth_",
+        "spatial_weights_",
+        "stage_slices_",
+        "temporal_weights_",
+        "theta_",
+        "tick_nums_",
+        "time_intervals_",
+        "weights_",
+        "y_stages_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X_list"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y_list"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords_list"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "time_intervals"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "reference_y"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "None",
+              "kind": "KEYWORD_ONLY",
+              "name": "reference_y"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.STWR",
+      "prediction_result": {
+        "constructor": [
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "predictions"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coef"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "intercept"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coords"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "feature_names"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "reference_y"
+          }
+        ],
+        "frame_schema": {
+          "always": [
+            "coord_0",
+            "coord_1",
+            "prediction",
+            "reference_y",
+            "intercept"
+          ],
+          "optional": [],
+          "per_feature": [
+            "coef_{feature}"
+          ]
+        },
+        "name": "STWRPredictionResult"
+      },
+      "public_module": "pygwrx.models.stwr",
+      "root_import": "pygwrx.STWR"
+    },
+    "ScalableGWR": {
+      "constructor": [
+        {
+          "default": "100",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "bandwidth"
+        },
+        {
+          "default": "'gaussian'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "kernel"
+        },
+        {
+          "default": "4",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "polynomial"
+        },
+        {
+          "default": "'cv'",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "criterion"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "optimize_bandwidth"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "scale"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "penalty"
+        },
+        {
+          "default": "True",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "fit_intercept"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "sample_size"
+        },
+        {
+          "default": "None",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "random_state"
+        },
+        {
+          "default": "200",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "optimizer_maxiter"
+        },
+        {
+          "default": "0.0",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "numerical_jitter"
+        },
+        {
+          "default": "False",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "name": "verbose"
+        }
+      ],
+      "deprecations": [],
+      "heavy_output_controls": [],
+      "initialized_public_fitted_state": [
+        "X_train_",
+        "adjusted_r2_",
+        "aic_",
+        "aicc_",
+        "bandwidth_",
+        "base_bandwidth_",
+        "coef_",
+        "coef_standard_errors_",
+        "coefficients_",
+        "coords_train_",
+        "cv_score_",
+        "design_feature_names_",
+        "diagnostics_",
+        "effective_df_",
+        "effective_n_params_",
+        "feature_names_in_",
+        "fitted_values_",
+        "global_cross_product_",
+        "global_response_product_",
+        "intercept_",
+        "intercept_standard_errors_",
+        "n_features_in_",
+        "optimization_result_",
+        "p_values_",
+        "penalty_",
+        "r2_",
+        "residuals_",
+        "scale_",
+        "sigma_",
+        "standard_errors_",
+        "t_values_",
+        "trace_S_",
+        "trace_StS_",
+        "y_train_"
+      ],
+      "methods": {
+        "fit": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "y"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            }
+          ]
+        },
+        "predict_result": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "X"
+            },
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "coords"
+            },
+            {
+              "default": "False",
+              "kind": "KEYWORD_ONLY",
+              "name": "return_standard_errors"
+            }
+          ]
+        },
+        "summary": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        },
+        "to_frame": {
+          "parameters": [
+            {
+              "default": "<required>",
+              "kind": "POSITIONAL_OR_KEYWORD",
+              "name": "self"
+            }
+          ]
+        }
+      },
+      "models_import": "pygwrx.models.ScalableGWR",
+      "prediction_result": {
+        "constructor": [
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "predictions"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coefficients"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "standard_errors"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "coords"
+          },
+          {
+            "default": "<required>",
+            "kind": "POSITIONAL_OR_KEYWORD",
+            "name": "feature_names"
+          }
+        ],
+        "frame_schema": null,
+        "name": "ScalableGWRPredictionResult"
+      },
+      "public_module": "pygwrx.models.scalable_gwr",
+      "root_import": "pygwrx.ScalableGWR"
+    }
+  },
+  "non_contractual": [
+    "MRO and concrete parent classes",
+    "private attributes and private helper signatures",
+    "internal engine/provider/policy implementation"
+  ],
+  "purpose": "Tier-A public estimator API/capability freeze for the pyGWRx 0.2 architecture refactor",
+  "schema_version": 1
+}
