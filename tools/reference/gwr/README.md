@@ -10,6 +10,8 @@ This directory contains reproducible generators for validating `pygwrx.GWR` agai
 
 The deterministic calibration data live in `tests/reference_data/gwr/input.csv`; independent prediction targets live in `tests/reference_data/gwr/prediction.csv`.
 
+A second validation layer uses the package's 49-neighbourhood Columbus dataset with `CRIME ~ INC + HOVAL` and coordinates `X`, `Y`. Compact frozen outputs are stored under `tests/reference_data/gwr/real_columbus/frozen/`; full comparison tables and the human-readable report are stored under `validation_results/gwr/real_columbus/`. The real-data suite checks fixed and adaptive Gaussian/bisquare calibration, five genuinely held-out locations, controlled adaptive-bandwidth criteria, and the near-saturated `k=4` boundary.
+
 ## Validation policy
 
 Only quantities with matching mathematical definitions are used as strict numerical references. A feature is not forced into a three-package comparison when package semantics differ.
@@ -48,5 +50,7 @@ install.packages(c("jsonlite", "sp", "spgwr", "GWmodel"))
 ```bash
 Rscript tools/reference/gwr/generate_r_references.R
 ```
+
+Columbus real-data references can be regenerated with `generate_columbus_mgwr.py`, `generate_columbus_r_references.R`, and `generate_columbus_bandwidth_curves.py`, then compared with `compare_columbus_references.py` and compacted with `finalize_columbus_validation.py`.
 
 Generated JSON files are frozen under `tests/reference_data/gwr/` and consumed by tests marked `reference`. Normal CI therefore validates against frozen outputs without requiring R at test time.
