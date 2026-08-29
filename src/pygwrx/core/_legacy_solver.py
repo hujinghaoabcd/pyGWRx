@@ -14,6 +14,9 @@ more stable for ill-conditioned or rank-deficient local designs.
 
 No ridge term is preserved here. The former hidden ``1e-8`` ridge variant is
 intentionally omitted because standard GWR is now unpenalized by default.
+
+Author:
+    Jinghao Hu
 """
 
 from __future__ import annotations
