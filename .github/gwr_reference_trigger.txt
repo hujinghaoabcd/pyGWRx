@@ -1,1 +1,0 @@
-Regenerate frozen external GWR references after making the temporary workflow push fast-forward safe.
