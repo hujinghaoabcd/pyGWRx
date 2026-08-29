@@ -13,8 +13,7 @@ import numpy as np
 import pandas as pd
 
 import pygwrx.core as core
-from pygwrx.core import utils
-from pygwrx.core import validation
+from pygwrx.core import utils, validation
 
 
 def test_validation_module_is_canonical_and_legacy_utils_reexports() -> None:
