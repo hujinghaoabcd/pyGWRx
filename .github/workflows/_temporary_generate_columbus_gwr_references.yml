@@ -1,0 +1,80 @@
+name: Temporary Columbus GWR reference generation
+
+on:
+  push:
+    branches: [gwr-reference-validation]
+
+permissions:
+  contents: read
+
+env:
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+  NUMEXPR_NUM_THREADS: "1"
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: "utf-8"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: gwr-reference-validation
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install Python reference environment
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test,reference]"
+          python - <<'PY'
+          import mgwr
+          print("mgwr", mgwr.__version__)
+          assert mgwr.__version__ == "2.2.1"
+          PY
+
+      - name: Generate Python Columbus references
+        run: |
+          python tools/reference/gwr/generate_columbus_mgwr.py
+          python tools/reference/gwr/generate_columbus_bandwidth_curves.py
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::jsonlite
+            any::sp
+            any::GWmodel
+            any::spgwr
+          cache-version: 1
+
+      - name: Verify R reference versions
+        shell: Rscript {0}
+        run: |
+          stopifnot(as.character(packageVersion("GWmodel")) == "2.4-1")
+          stopifnot(as.character(packageVersion("spgwr")) == "0.6-37")
+          cat("GWmodel", as.character(packageVersion("GWmodel")), "\n")
+          cat("spgwr", as.character(packageVersion("spgwr")), "\n")
+
+      - name: Generate R Columbus references
+        run: Rscript tools/reference/gwr/generate_columbus_r_references.R
+
+      - name: List generated references
+        run: |
+          find tests/reference_data/gwr/real_columbus -maxdepth 1 -type f -print -exec wc -c {} \;
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: gwr-columbus-real-data-references
+          path: tests/reference_data/gwr/real_columbus/
+          if-no-files-found: error
+          retention-days: 7
