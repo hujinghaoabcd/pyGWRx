@@ -57,6 +57,7 @@ The published GWR idea and the pyGWRx class are closely aligned, but the softwar
 - fixed-distance or adaptive-neighbour bandwidths;
 - built-in Gaussian, bisquare, exponential, tricube and boxcar kernels, or a callable kernel;
 - automatic bandwidth selection by CV, AIC, AICc or BIC;
+- fitted-model bandwidth-search provenance including criterion, search method, search range, evaluated trace, best score and boundary-solution flag;
 - optional storage of the full hat matrix while always retaining its traces and influence diagnostics;
 - local standard errors, t statistics, local R², standardised residuals and Cook's distance;
 - target-location prediction by recalibrating local coefficients from the stored training data.
@@ -77,7 +78,7 @@ GeoPandas is only needed for GeoDataFrame-oriented output. NumPy arrays and pand
 |---|---:|---|---|
 | `X` | `(n, p)` | Numeric predictors. Do not manually add an intercept when `fit_intercept=True`. | No missing or infinite values; DataFrame column order is preserved and checked during prediction. |
 | `y` | `(n,)` | Continuous numeric response. | Same row order and sample count as `X` and `coords`. |
-| `coords` | `(n, d)`; normally `(n, 2)` | Coordinates used to calculate neighbourhood distances. | Use a projected CRS for planar metrics, or `[longitude, latitude]` in degrees with `distance_metric="haversine"`. |
+| `coords` | `(n, 2)` | Two-dimensional coordinates used to calculate neighbourhood distances. | Use a projected CRS for planar metrics, or `[longitude, latitude]` in degrees with `distance_metric="haversine"`. |
 
 For Euclidean distance, the bandwidth has the same unit as the coordinates. Coordinates in metres produce a fixed bandwidth in metres. The Haversine implementation expects longitude first, latitude second, and returns kilometres with its default Earth radius.
 
@@ -124,6 +125,7 @@ model = GWR(
 )
 
 print("selected neighbour count:", model.bandwidth_)
+print("bandwidth search:", model.bandwidth_search_)
 print(model.get_diagnostics())
 print(model.to_frame().head())
 
@@ -166,8 +168,8 @@ GWR(
 | `bandwidth` | Positive number, `"cv"`, `"aic"`, `"aicc"`, `"bic"`, or `None`; default `"cv"` | Sets or selects the shared spatial scale. | With `adaptive=False`, a number is a distance. With `adaptive=True`, it must be an integer neighbour count. A string directly chooses the automatic criterion. `None` delegates to `bandwidth_method`. |
 | `bandwidth_method` | `"cv"`, `"aic"`, `"aicc"`, `"bic"`; default `"cv"` | Automatic criterion used only when `bandwidth=None`. | It does not override `bandwidth="aicc"` or another explicit criterion string. AICc is often a useful inferential default; CV directly targets leave-one-out prediction error. Record the chosen criterion. |
 | `adaptive` | Boolean; default `False` | Chooses fixed-distance versus nearest-neighbour bandwidth semantics. | Compare adaptive bandwidths when sampling density is uneven. Never interpret an adaptive bandwidth as metres or kilometres. |
-| `bandwidth_range` | `(lower, upper)` or `None` | Restricts automatic search. | Use scientifically defensible bounds or bounds that prevent underdetermined local fits. Adaptive bounds must represent integer neighbour counts. Check whether the selected value lies on a boundary. |
-| `optimization_method` | `"golden_section"`, `"brent"`, or `"grid"`; default `"golden_section"` | Numerical search used for automatic bandwidth selection. | Grid search is transparent and useful for sensitivity checks. Continuous methods are usually faster for fixed-distance bandwidths. Adaptive searches ultimately evaluate integer neighbour counts. |
+| `bandwidth_range` | `(lower, upper)` or `None` | Restricts automatic search. | Use scientifically defensible bounds or bounds that prevent underdetermined local fits. Adaptive bounds must represent integer neighbour counts. Without explicit fixed bounds, pyGWRx searches from half the smallest positive pairwise distance to twice the largest pairwise distance so isolated locations are not removed by percentile trimming. Check whether the selected value lies on a boundary. |
+| `optimization_method` | `"golden_section"`, `"brent"`, or `"grid"`; default `"golden_section"` | Numerical search used for automatic bandwidth selection. | Grid search is transparent and useful for sensitivity checks. Continuous methods are usually faster for fixed-distance bandwidths. Adaptive searches evaluate every valid integer neighbour count regardless of this setting. |
 | `fit_intercept` | Boolean; default `True` | Adds a spatially varying intercept. | Leave enabled unless the scientific model genuinely requires a zero response at zero predictors. Do not add an all-ones column to `X` when it is enabled. |
 | `distance_metric` | `"euclidean"`, `"manhattan"`/`"cityblock"`, `"chebyshev"`, `"minkowski"`, `"haversine"`; default `"euclidean"` | Defines geographic proximity. | Euclidean is appropriate for projected planar coordinates. Haversine expects `[longitude, latitude]` degrees. Alternative metrics must be scientifically justified because they change the neighbourhood itself. |
 | `sigma2_v1` | Boolean; default `True` | Selects the residual-variance denominator. | `True` uses `RSS / (n - trace(S))`; `False` uses `RSS / (n - 2 trace(S) + trace(S'S))`. Keep this setting fixed when comparing reported standard errors across models. |
@@ -177,7 +179,7 @@ GWR(
 
 A smaller bandwidth gives a more local and flexible surface but uses less information per fit. It can increase variance, local singularity and sensitivity to individual observations. A larger bandwidth smooths coefficients and approaches a more global relationship.
 
-With an adaptive bandwidth, the local distance threshold changes by location so that each local regression is based on approximately the same number of nearest observations. With compact kernels, the number of positive-weight observations is especially important. pyGWRx warns and applies numerical ridge stabilisation when a local fit has fewer positive-weight observations than design columns; that warning should prompt a larger bandwidth or a simpler design, not be silently ignored.
+With an adaptive bandwidth, the local distance threshold changes by location so that each local regression is based on approximately the same number of nearest observations. With compact kernels, the number of positive-weight observations is especially important. If a local fit has fewer positive-weight observations than design columns, pyGWRx warns and returns the Moore-Penrose minimum-norm **unpenalized** WLS solution; it does not silently add ridge regularisation. Treat the warning as a reason to increase the bandwidth, simplify the design, or inspect local collinearity.
 
 ## Fitting
 
@@ -189,7 +191,6 @@ model.fit(
     compute_hat_matrix=True,
     compute_local_r2=True,
     compute_inference=True,
-    compute_hat_matrix_flag=None,
     verbose=None,
 )
 ```
@@ -199,12 +200,13 @@ model.fit(
 | `compute_hat_matrix` | `True` | Stores the full `n × n` smoother matrix. Set to `False` for larger samples. The trace, `trace(S'S)`, influence, AIC/AICc/BIC and effective-parameter diagnostics are still computed. |
 | `compute_local_r2` | `True` | Computes a weighted local R² at every calibration location. Disable only when it is not needed and fit time matters. Local R² is descriptive and should not replace residual checks. |
 | `compute_inference` | `True` | Computes covariance diagonals, local standard errors and local t statistics. Disable for prediction-only workflows or exploratory timing tests. |
-| `compute_hat_matrix_flag` | `None` | Compatibility alias for older pyGWRx code. New code should use `compute_hat_matrix`. |
 | `verbose` | `None` | Optional per-fit override of the constructor setting. |
+
+`compute_hat_matrix_flag` remains accepted only as a backward-compatibility alias for older pyGWRx code; new workflows should use `compute_hat_matrix`.
 
 ### Memory guidance
 
-The full hat matrix requires roughly `8 × n²` bytes before Python-array overhead. For example, `n=10,000` implies about 800 MB for one float64 matrix. Use `compute_hat_matrix=False` unless the actual matrix entries are required; diagnostics do not require it to be retained.
+The full hat matrix requires roughly `8 × n²` bytes before Python-array overhead. For example, `n=10,000` implies about 800 MB for one float64 matrix. Use `compute_hat_matrix=False` unless the actual matrix entries are required; diagnostics do not require it to be retained. Standard GWR currently still forms a full pairwise distance matrix during calibration, so disabling hat-matrix storage does **not** yet remove all `O(n²)` memory use.
 
 ## Prediction and target-location coefficients
 
@@ -228,6 +230,7 @@ The rows and columns of `X_new` must correspond to `coords_new` and to the train
 | Attribute | Shape or type | Interpretation |
 |---|---|---|
 | `bandwidth_` | scalar | Selected fixed distance or adaptive neighbour count. |
+| `bandwidth_search_` | dictionary or `None` | Automatic-search provenance: criterion, search method/range, selected value, best score, evaluated trace and `boundary_solution`. It is `None` when a numeric bandwidth is supplied directly. |
 | `coef_` | `(n, p)` | Local slope estimates at calibration locations. |
 | `intercept_` | `(n,)` | Local intercepts, or zeros when no intercept is fitted. |
 | `fitted_values_` | `(n,)` | Calibration-location fitted responses. |
@@ -251,6 +254,7 @@ Fit and inspect an ordinary linear model using the same response and predictors.
 
 ### 2. Inspect the selected bandwidth
 
+- Inspect `bandwidth_search_` rather than only `bandwidth_`; it records the criterion, evaluated search trace and whether the selected value is a search-boundary solution.
 - A selected boundary value indicates that the search range may be constraining the result.
 - A very large adaptive bandwidth suggests weak evidence for strongly local variation.
 - A very small bandwidth can produce unstable coefficients even when fit statistics improve.
@@ -303,7 +307,7 @@ A reproducible GWR analysis should report:
 | Topic | Published GWR concept | pyGWRx contract |
 |---|---|---|
 | Coefficients | Location-specific weighted regressions | Gaussian local WLS at calibration or target locations. |
-| Spatial scale | One kernel bandwidth | Fixed distance or adaptive neighbour count; manual or CV/AIC/AICc/BIC selected. |
+| Spatial scale | One kernel bandwidth | Fixed distance or adaptive neighbour count; manual or CV/AIC/AICc/BIC selected. Automatic searches retain their evaluated provenance on the fitted model. |
 | Prediction | Local calibration may be performed at arbitrary locations | Explicit `predict_result()` recalibrates coefficients from stored training observations. |
 | Diagnostics | Weighting-function and bandwidth choice are central | Smoother traces, information criteria, local R², inference, leverage, Cook's distance and export helpers. |
 | Large samples | Conventional repeated local fitting can be expensive | Full distance calculations remain part of standard GWR; use memory switches or `ScalableGWR` when needed. |
