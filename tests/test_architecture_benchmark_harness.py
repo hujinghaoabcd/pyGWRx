@@ -66,15 +66,13 @@ def test_structural_execution_markers_are_preserved_in_baseline():
     scenarios = json.loads(BASELINE.read_text(encoding="utf-8"))["scenarios"]
 
     assert scenarios["gwr_manual_streaming"]["checks"]["hat_matrix_is_none"] is True
-    assert scenarios["gwr_manual_streaming"]["retained_dense_square_arrays"] == []
+    assert scenarios["gwr_manual_streaming"]["retained_dense_square_buffers"] == []
 
-    hat_arrays = {
-        item["attribute"]
-        for item in scenarios["gwr_manual_hat"]["retained_dense_square_arrays"]
-    }
-    assert "hat_matrix_" in hat_arrays or "S_matrix_" in hat_arrays
+    hat_buffers = scenarios["gwr_manual_hat"]["retained_dense_square_buffers"]
+    assert len(hat_buffers) == 1
+    assert set(hat_buffers[0]["attributes"]) == {"S_matrix_", "hat_matrix_"}
 
-    assert scenarios["scalable_gwr_large_n"]["retained_dense_square_arrays"] == []
+    assert scenarios["scalable_gwr_large_n"]["retained_dense_square_buffers"] == []
 
-    sgwr_arrays = scenarios["sgwr_weight_heavy"]["retained_dense_square_arrays"]
-    assert len(sgwr_arrays) >= 2
+    sgwr_buffers = scenarios["sgwr_weight_heavy"]["retained_dense_square_buffers"]
+    assert len(sgwr_buffers) >= 3

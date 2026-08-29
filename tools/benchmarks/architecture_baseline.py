@@ -251,17 +251,28 @@ def _peak_rss_mb() -> float | None:
 
 
 def _dense_square_inventory(model: Any, n: int) -> list[dict[str, Any]]:
-    arrays = []
+    buffers: dict[tuple[int, int], dict[str, Any]] = {}
     for name, value in vars(model).items():
-        if isinstance(value, np.ndarray) and value.ndim == 2 and value.shape == (n, n):
-            arrays.append(
-                {
-                    "attribute": name,
-                    "shape": [n, n],
-                    "megabytes": value.nbytes / (1024.0 * 1024.0),
-                }
-            )
-    return sorted(arrays, key=lambda item: item["attribute"])
+        if not (
+            isinstance(value, np.ndarray) and value.ndim == 2 and value.shape == (n, n)
+        ):
+            continue
+        address = int(value.__array_interface__["data"][0])
+        key = (address, int(value.nbytes))
+        item = buffers.setdefault(
+            key,
+            {
+                "attributes": [],
+                "shape": [n, n],
+                "megabytes": value.nbytes / (1024.0 * 1024.0),
+            },
+        )
+        item["attributes"].append(name)
+
+    result = list(buffers.values())
+    for item in result:
+        item["attributes"].sort()
+    return sorted(result, key=lambda item: item["attributes"][0])
 
 
 def _fingerprint(model: Any) -> dict[str, Any]:
@@ -297,7 +308,7 @@ def _run_worker(name: str) -> dict[str, Any]:
     rss_after = _peak_rss_mb()
 
     n = int(metadata["n"])
-    dense_arrays = _dense_square_inventory(model, n)
+    dense_buffers = _dense_square_inventory(model, n)
     return {
         "scenario": name,
         "n": n,
@@ -314,10 +325,10 @@ def _run_worker(name: str) -> dict[str, Any]:
                 else max(0.0, rss_after - rss_before)
             ),
             "retained_dense_square_megabytes": sum(
-                item["megabytes"] for item in dense_arrays
+                item["megabytes"] for item in dense_buffers
             ),
         },
-        "retained_dense_square_arrays": dense_arrays,
+        "retained_dense_square_buffers": dense_buffers,
         "checks": metadata["checks"],
         "fingerprint": _fingerprint(model),
     }

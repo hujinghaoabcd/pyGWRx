@@ -8,7 +8,7 @@ The baseline harness lives at `tools/benchmarks/architecture_baseline.py`. It ru
 - process CPU time;
 - peak Python-tracked allocations (`tracemalloc`);
 - process peak RSS and the increase above the post-import starting point when the platform exposes it;
-- directly retained `n × n` NumPy arrays and their total size;
+- unique directly retained `n × n` NumPy buffers, grouping aliasing attributes, and their total size;
 - scenario-specific structural checks and small numerical fingerprints.
 
 ## Required A4 scenarios
