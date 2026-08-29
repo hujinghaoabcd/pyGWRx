@@ -37,6 +37,18 @@ from pygwrx.core.base import (
     SpatiotemporalMixin,
 )
 
+# Distance helpers and cache/stream primitives
+from pygwrx.core.distance import (
+    DistanceCache,
+    chebyshev_distance,
+    chunked_computation,
+    compute_distance_matrix,
+    euclidean_distance,
+    haversine_distance,
+    manhattan_distance,
+    minkowski_distance,
+)
+
 # Spatial kernels
 from pygwrx.core.kernels import (
     bisquare_kernel,
@@ -77,18 +89,10 @@ from pygwrx.core.solver import (
     weighted_least_squares,
 )
 
-# Distance, validation, and data helpers
+# Validation and data helpers
 from pygwrx.core.utils import (
-    DistanceCache,
     add_intercept,
-    chebyshev_distance,
-    chunked_computation,
-    compute_distance_matrix,
-    euclidean_distance,
     extract_geopandas_coords,
-    haversine_distance,
-    manhattan_distance,
-    minkowski_distance,
     validate_coords,
     validate_data,
 )
