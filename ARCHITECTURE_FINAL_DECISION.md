@@ -1255,11 +1255,11 @@ plotting/ 不调用 np.linalg.svd 做模型诊断
 | ID | 工作 | 状态 | PR | Merge SHA | 数值 gate | 备注 |
 |---|---|---|---|---|---|---|
 | Z0 | 第一次全项目审计 master plan | DONE | #30 | `da506c6f37b6154aa16105042464bc8960f8f036` | full CI + GWR refs | 历史审计文件保留 |
-| Z1 | 三线独立二次审计 + 最终架构裁决 | IN PROGRESS | — | — | docs-only | 本文件所在 PR 合并后改 DONE |
-| A1 | Public API & capability snapshot | PENDING | — | — | characterization | **下一项代码工作** |
-| A2 | 19-model fitted-state atomicity freeze | PENDING | — | — | characterization | 可拆多个 PR，但先完成核心模型 |
-| A3 | 19-model migration risk matrix | PENDING | — | — | n/a | machine-readable + docs |
-| A4 | performance/memory baseline harness | PENDING | — | — | benchmark | 不做 noisy CI timing gate |
+| Z1 | 三线独立二次审计 + 最终架构裁决 | DONE | #31 | `a7374d65296adc77a8a390ea9e97c76e8116352f` | docs-only | 最终架构宪章已冻结 |
+| A1 | Public API & capability snapshot | DONE | #34 | `888f9ceac8fd2c988afb4a004056d5c523302290` | characterization | 19-estimator Public API / Capability Freeze |
+| A2 | 19-model fitted-state atomicity freeze | DONE | #35 | `b655688f7201aaa9677fe153f2cbc15e6e63afb6` | characterization | failed-refit atomicity contract 覆盖 19 estimator |
+| A3 | 19-model migration risk matrix | DONE | #36 | `dc150ef09fed370a45e5a6e62f14846979fff643` | n/a | machine-readable matrix + docs + contract tests；无 runtime 数值变更 |
+| A4 | performance/memory baseline harness | PENDING | — | — | benchmark | **下一项代码工作**；不做 noisy CI timing gate |
 | A5 | pre-refactor contract/message hygiene | PENDING | — | — | model tests | 含 GTWR misleading ridge warning |
 | B1 | private `_protocols.py` | PENDING | — | — | no behavior | 不 public export |
 | B2 | validation split | PENDING | — | — | core + all tests | compatibility re-export |
