@@ -7089,6 +7089,7 @@
 <li>automatic bandwidth selection by CV, AIC, AICc or BIC;</li>
 <li>fitted-model bandwidth-search provenance including criterion, search method, search range, evaluated trace, best score and boundary-solution flag;</li>
 <li>optional storage of the full hat matrix while always retaining its traces and influence diagnostics;</li>
+<li>bounded-block target-to-training distance evaluation during calibration, local R² calculation and prediction;</li>
 <li>local numerical-rank and condition diagnostics for every fitted weighted design;</li>
 <li>local standard errors and t statistics only where the local parameterisation is numerically identifiable;</li>
 <li>local R², standardised residuals and Cook's distance;</li>
@@ -7323,7 +7324,8 @@
 </table>
 <p><code>compute_hat_matrix_flag</code> remains accepted only as a backward-compatibility alias for older pyGWRx code; new workflows should use <code>compute_hat_matrix</code>.</p>
 <h3 id="memory-guidance">Memory guidance<a class="headerlink" href="#memory-guidance" title="Permanent link">&para;</a></h3>
-<p>The full hat matrix requires roughly <code>8 × n²</code> bytes before Python-array overhead. For example, <code>n=10,000</code> implies about 800 MB for one float64 matrix. Use <code>compute_hat_matrix=False</code> unless the actual matrix entries are required; diagnostics do not require it to be retained. Standard GWR currently still forms a full pairwise distance matrix during calibration, so disabling hat-matrix storage does <strong>not</strong> yet remove all <code>O(n²)</code> memory use.</p>
+<p>The full hat matrix requires roughly <code>8 × n²</code> bytes before Python-array overhead. For example, <code>n=10,000</code> implies about 800 MB for one float64 matrix. Use <code>compute_hat_matrix=False</code> unless the actual matrix entries are required; diagnostics do not require it to be retained.</p>
+<p>After the bandwidth is known, standard GWR calibration, local R² calculation and target-location prediction evaluate target-to-training distances in bounded row blocks rather than retaining a complete pairwise matrix. With a <strong>numeric bandwidth</strong> and <code>compute_hat_matrix=False</code>, the calibration distance working set therefore scales linearly with the number of training observations instead of storing another <code>n × n</code> array. Automatic bandwidth selection remains a separate exception: the current CV/AIC/AICc/BIC selectors precompute the training pairwise distance matrix so they can score many candidate bandwidths without recomputing distances. If automatic selection is the memory bottleneck, use a defensible numeric bandwidth or <code>ScalableGWR</code> until the selector path is also streamed.</p>
 <h2 id="prediction-and-target-location-coefficients">Prediction and target-location coefficients<a class="headerlink" href="#prediction-and-target-location-coefficients" title="Permanent link">&para;</a></h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">coords_new</span><span class="p">)</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_result</span><span class="p">(</span><span class="n">X_new</span><span class="p">,</span> <span class="n">coords_new</span><span class="p">)</span>
@@ -7575,7 +7577,7 @@
 <tr>
 <td>Prediction</td>
 <td>Local calibration may be performed at arbitrary locations</td>
-<td>Explicit <code>predict_result()</code> recalibrates coefficients from stored training observations.</td>
+<td>Explicit <code>predict_result()</code> recalibrates coefficients from stored training observations using bounded target-to-training distance blocks.</td>
 </tr>
 <tr>
 <td>Diagnostics</td>
@@ -7590,7 +7592,7 @@
 <tr>
 <td>Large samples</td>
 <td>Conventional repeated local fitting can be expensive</td>
-<td>Full distance calculations remain part of standard GWR; use memory switches or <code>ScalableGWR</code> when needed.</td>
+<td>Calibration and prediction stream distance blocks; storing the full hat matrix and current automatic bandwidth selection can still require <code>O(n²)</code> memory. Use <code>compute_hat_matrix=False</code>, a numeric bandwidth, or <code>ScalableGWR</code> when needed.</td>
 </tr>
 </tbody>
 </table>
