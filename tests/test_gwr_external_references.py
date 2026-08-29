@@ -32,6 +32,11 @@ def _load_json(name: str) -> dict[str, Any]:
     return json.loads((DATA_DIR / name).read_text(encoding="utf-8"))
 
 
+def _vector(value: Any) -> np.ndarray:
+    """Normalize reference vectors stored as either (n,) or (n, 1)."""
+    return np.asarray(value, dtype=float).reshape(-1)
+
+
 @pytest.fixture(scope="module")
 def gwr_data() -> dict[str, Any]:
     frame = pd.read_csv(DATA_DIR / "input.csv")
@@ -150,16 +155,22 @@ def test_gwr_calibration_matches_external_references(
         _params(model), reference["params"], rtol=1e-7, atol=CORE_ATOL
     )
     np.testing.assert_allclose(
-        model.fitted_values_, reference["predy"], rtol=1e-7, atol=CORE_ATOL
+        model.fitted_values_, _vector(reference["predy"]), rtol=1e-7, atol=CORE_ATOL
     )
     np.testing.assert_allclose(
-        model.residuals_, reference["residuals"], rtol=1e-7, atol=CORE_ATOL
+        model.residuals_,
+        _vector(reference["residuals"]),
+        rtol=1e-7,
+        atol=CORE_ATOL,
     )
 
     # GWmodel's Local_R2 uses a different convention and is intentionally excluded.
     if implementation != "GWmodel":
         np.testing.assert_allclose(
-            model.local_r2_, reference["local_r2"], rtol=1e-7, atol=CORE_ATOL
+            model.local_r2_,
+            _vector(reference["local_r2"]),
+            rtol=1e-7,
+            atol=CORE_ATOL,
         )
 
 
@@ -297,7 +308,7 @@ def test_gwr_new_location_prediction_matches_external_references(
     )
     np.testing.assert_allclose(
         result.predictions,
-        expected["predictions"],
+        _vector(expected["predictions"]),
         rtol=1e-8,
         atol=PREDICTION_ATOL,
     )
@@ -319,13 +330,22 @@ def test_gwr_spgwr_fixed_tricube_matches(
         _params(model), reference["params"], rtol=1e-7, atol=CORE_ATOL
     )
     np.testing.assert_allclose(
-        model.fitted_values_, reference["predy"], rtol=1e-7, atol=CORE_ATOL
+        model.fitted_values_,
+        _vector(reference["predy"]),
+        rtol=1e-7,
+        atol=CORE_ATOL,
     )
     np.testing.assert_allclose(
-        model.residuals_, reference["residuals"], rtol=1e-7, atol=CORE_ATOL
+        model.residuals_,
+        _vector(reference["residuals"]),
+        rtol=1e-7,
+        atol=CORE_ATOL,
     )
     np.testing.assert_allclose(
-        model.local_r2_, reference["local_r2"], rtol=1e-7, atol=CORE_ATOL
+        model.local_r2_,
+        _vector(reference["local_r2"]),
+        rtol=1e-7,
+        atol=CORE_ATOL,
     )
 
 
