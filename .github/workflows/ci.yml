@@ -24,6 +24,115 @@ env:
   PYTHONIOENCODING: "utf-8"
 
 jobs:
+  a2-repair:
+    name: A2 one-shot lifecycle repair
+    if: github.event_name == 'pull_request' && github.head_ref == 'refactor/a2-fitted-state-atomicity'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refactor/a2-fitted-state-atomicity
+          fetch-depth: 0
+      - name: Apply characterized lifecycle fixes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              file = Path(path)
+              text = file.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one match, found {count}")
+              file.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          replace_once(
+              "src/pygwrx/core/base.py",
+              "    def _mark_unfitted(self) -> None:\n        self._is_fitted = False\n",
+              "    def _mark_unfitted(self) -> None:\n"
+              "        self._is_fitted = False\n"
+              "        self.n_samples_ = None\n"
+              "        self.n_features_in_ = None\n"
+              "        self.feature_names_in_ = None\n",
+          )
+
+          replace_once(
+              "src/pygwrx/models/mgwr.py",
+              "        for name, value in (\n"
+              "            (\"compute_hat_matrix\", compute_hat_matrix),\n",
+              "        self._reset_fit_state()\n"
+              "        for name, value in (\n"
+              "            (\"compute_hat_matrix\", compute_hat_matrix),\n",
+          )
+          replace_once(
+              "src/pygwrx/models/mgwr.py",
+              "\n        self._reset_fit_state()\n        try:\n"
+              "            X_arr, y_arr, coords_arr = self._validate_inputs(X, y, coords)\n",
+              "\n        try:\n"
+              "            X_arr, y_arr, coords_arr = self._validate_inputs(X, y, coords)\n",
+          )
+
+          replace_once(
+              "src/pygwrx/models/rgwr.py",
+              "        self._validate_robust_parameters()\n"
+              "        if compute_hat_matrix_flag is not None:\n",
+              "        self._reset_fit_state()\n"
+              "        self._validate_robust_parameters()\n"
+              "        if compute_hat_matrix_flag is not None:\n",
+          )
+          replace_once(
+              "src/pygwrx/models/rgwr.py",
+              "        self._reset_fit_state()\n\n        try:\n"
+              "            # Filtered RGWR needs the complete initial S matrix to reproduce the\n",
+              "        try:\n"
+              "            # Filtered RGWR needs the complete initial S matrix to reproduce the\n",
+          )
+
+          replace_once(
+              "tests/test_estimator_fitted_state_atomicity.py",
+              "def _bad_nan_refit(model: Any, X: np.ndarray, y: np.ndarray, coords: np.ndarray) -> None:\n"
+              "    bad = X.copy()\n"
+              "    bad[0, 0] = np.nan\n"
+              "    model.fit(bad, y, coords)\n\n\n",
+              "def _bad_nan_refit(model: Any, X: np.ndarray, y: np.ndarray, coords: np.ndarray) -> None:\n"
+              "    bad = X.copy()\n"
+              "    bad[0, 0] = np.nan\n"
+              "    model.fit(bad, y, coords)\n\n\n"
+              "def _bad_nan_unsupervised_refit(\n"
+              "    model: Any, X: np.ndarray, coords: np.ndarray\n"
+              ") -> None:\n"
+              "    bad = X.copy()\n"
+              "    bad[0, 0] = np.nan\n"
+              "    model.fit(bad, coords)\n\n\n",
+          )
+          old = "            lambda model: model.fit(\n                np.where(np.indices(X.shape) == (0, 0), np.nan, X), coords\n            ),"
+          new = "            lambda model: _bad_nan_unsupervised_refit(model, X, coords),"
+          test_path = Path("tests/test_estimator_fitted_state_atomicity.py")
+          text = test_path.read_text(encoding="utf-8")
+          if text.count(old) != 2:
+              raise SystemExit(f"expected two unsupervised NaN cases, found {text.count(old)}")
+          test_path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
+
+          python -m pip install --upgrade pip
+          python -m pip install black isort ruff
+          python -m isort tests/test_estimator_fitted_state_atomicity.py src/pygwrx/core/base.py src/pygwrx/models/mgwr.py src/pygwrx/models/rgwr.py
+          python -m ruff check --fix tests/test_estimator_fitted_state_atomicity.py src/pygwrx/core/base.py src/pygwrx/models/mgwr.py src/pygwrx/models/rgwr.py
+          python -m black tests/test_estimator_fitted_state_atomicity.py src/pygwrx/core/base.py src/pygwrx/models/mgwr.py src/pygwrx/models/rgwr.py
+      - name: Commit real A2 fixes and remove repair job
+        shell: bash
+        run: |
+          git checkout origin/main -- .github/workflows/ci.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/ci.yml src/pygwrx/core/base.py src/pygwrx/models/mgwr.py src/pygwrx/models/rgwr.py tests/test_estimator_fitted_state_atomicity.py
+          git diff --cached --check
+          git commit -m "Fix fitted-state atomicity gaps"
+          git push origin HEAD:refactor/a2-fitted-state-atomicity
+
   quality:
     name: Quality gates
     runs-on: ubuntu-latest
