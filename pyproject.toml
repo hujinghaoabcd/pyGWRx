@@ -164,6 +164,7 @@ files = [
     "src/pygwrx/_optional.py",
     "src/pygwrx/core/_protocols.py",
     "src/pygwrx/core/_summary.py",
+    "src/pygwrx/core/distance.py",
     "src/pygwrx/core/kernels.py",
     "src/pygwrx/core/solver.py",
     "src/pygwrx/core/validation.py",
