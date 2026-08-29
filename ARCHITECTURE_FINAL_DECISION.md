@@ -1259,7 +1259,7 @@ plotting/ 不调用 np.linalg.svd 做模型诊断
 | A1 | Public API & capability snapshot | DONE | #34 | `888f9ceac8fd2c988afb4a004056d5c523302290` | characterization | 19-estimator Public API / Capability Freeze |
 | A2 | 19-model fitted-state atomicity freeze | DONE | #35 | `b655688f7201aaa9677fe153f2cbc15e6e63afb6` | characterization | failed-refit atomicity contract 覆盖 19 estimator |
 | A3 | 19-model migration risk matrix | DONE | #36 | `dc150ef09fed370a45e5a6e62f14846979fff643` | n/a | machine-readable matrix + docs + contract tests；无 runtime 数值变更 |
-| A4 | performance/memory baseline harness | PENDING | — | — | benchmark | **下一项代码工作**；不做 noisy CI timing gate |
+| A4 | performance/memory baseline harness | DONE | #38 | `de64389163fc5094ab46b72671872d26f35b9733` | benchmark + structural memory | observational timing/RSS baseline + live retained-`n × n` guards；无 estimator runtime 变更 |
 | A5 | pre-refactor contract/message hygiene | PENDING | — | — | model tests | 含 GTWR misleading ridge warning |
 | B1 | private `_protocols.py` | PENDING | — | — | no behavior | 不 public export |
 | B2 | validation split | PENDING | — | — | core + all tests | compatibility re-export |
