@@ -150,7 +150,7 @@ def test_local_intercept_is_returned_as_surface(mixed_data):
     assert model.coef_local_.shape == (mixed_data["n"], 1)
 
 
-def test_collinear_local_design_has_deterministic_solution_not_neighbour_copy():
+def test_collinear_local_design_uses_deterministic_minimum_norm_solution():
     coords = np.column_stack([np.arange(20.0), np.zeros(20)])
     x = np.linspace(-1.0, 1.0, 20)
     X = np.column_stack([x, x])
@@ -164,9 +164,10 @@ def test_collinear_local_design_has_deterministic_solution_not_neighbour_copy():
         verbose=False,
     ).fit(X, y, coords, compute_enp=False)
     assert np.all(np.isfinite(model.coef_local_))
-    # A copied-neighbour fallback creates exact repeated adjacent rows. The
-    # deterministic pseudo-inverse solution changes smoothly with location.
-    assert np.any(np.linalg.norm(np.diff(model.coef_local_, axis=0), axis=1) > 1e-12)
+    # With two identical columns, the Moore-Penrose minimum-norm solution splits
+    # the slope equally. This is deterministic across LAPACK/BLAS implementations.
+    np.testing.assert_allclose(model.coef_local_, 1.0, atol=1e-12, rtol=1e-12)
+    np.testing.assert_allclose(model.fitted_values_, y, atol=1e-12, rtol=1e-12)
 
 
 def test_ridge_is_explicit_and_changes_collinear_fit():
