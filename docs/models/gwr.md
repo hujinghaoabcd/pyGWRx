@@ -59,6 +59,7 @@ The published GWR idea and the pyGWRx class are closely aligned, but the softwar
 - automatic bandwidth selection by CV, AIC, AICc or BIC;
 - fitted-model bandwidth-search provenance including criterion, search method, search range, evaluated trace, best score and boundary-solution flag;
 - optional storage of the full hat matrix while always retaining its traces and influence diagnostics;
+- bounded-block target-to-training distance evaluation during calibration, local R² calculation and prediction;
 - local numerical-rank and condition diagnostics for every fitted weighted design;
 - local standard errors and t statistics only where the local parameterisation is numerically identifiable;
 - local R², standardised residuals and Cook's distance;
@@ -211,7 +212,9 @@ model.fit(
 
 ### Memory guidance
 
-The full hat matrix requires roughly `8 × n²` bytes before Python-array overhead. For example, `n=10,000` implies about 800 MB for one float64 matrix. Use `compute_hat_matrix=False` unless the actual matrix entries are required; diagnostics do not require it to be retained. Standard GWR currently still forms a full pairwise distance matrix during calibration, so disabling hat-matrix storage does **not** yet remove all `O(n²)` memory use.
+The full hat matrix requires roughly `8 × n²` bytes before Python-array overhead. For example, `n=10,000` implies about 800 MB for one float64 matrix. Use `compute_hat_matrix=False` unless the actual matrix entries are required; diagnostics do not require it to be retained.
+
+After the bandwidth is known, standard GWR calibration, local R² calculation and target-location prediction evaluate target-to-training distances in bounded row blocks rather than retaining a complete pairwise matrix. With a **numeric bandwidth** and `compute_hat_matrix=False`, the calibration distance working set therefore scales linearly with the number of training observations instead of storing another `n × n` array. Automatic bandwidth selection remains a separate exception: the current CV/AIC/AICc/BIC selectors precompute the training pairwise distance matrix so they can score many candidate bandwidths without recomputing distances. If automatic selection is the memory bottleneck, use a defensible numeric bandwidth or `ScalableGWR` until the selector path is also streamed.
 
 ## Prediction and target-location coefficients
 
@@ -322,10 +325,10 @@ A reproducible GWR analysis should report:
 |---|---|---|
 | Coefficients | Location-specific weighted regressions | Gaussian local WLS at calibration or target locations; one SVD supplies the minimum-norm solution and numerical rank. |
 | Spatial scale | One kernel bandwidth | Fixed distance or adaptive neighbour count; manual or CV/AIC/AICc/BIC selected. Automatic searches retain their evaluated provenance on the fitted model. |
-| Prediction | Local calibration may be performed at arbitrary locations | Explicit `predict_result()` recalibrates coefficients from stored training observations. |
+| Prediction | Local calibration may be performed at arbitrary locations | Explicit `predict_result()` recalibrates coefficients from stored training observations using bounded target-to-training distance blocks. |
 | Diagnostics | Weighting-function and bandwidth choice are central | Smoother traces, information criteria, local R², inference, leverage, Cook's distance, local rank/condition diagnostics and export helpers. |
 | Rank-deficient local fit | Local normal equations may be singular or ill conditioned | Preserve the Moore-Penrose minimum-norm fitted solution, flag the location, and suppress coefficient SE/t inference with `NaN`. |
-| Large samples | Conventional repeated local fitting can be expensive | Full distance calculations remain part of standard GWR; use memory switches or `ScalableGWR` when needed. |
+| Large samples | Conventional repeated local fitting can be expensive | Calibration and prediction stream distance blocks; storing the full hat matrix and current automatic bandwidth selection can still require `O(n²)` memory. Use `compute_hat_matrix=False`, a numeric bandwidth, or `ScalableGWR` when needed. |
 
 ## References
 
