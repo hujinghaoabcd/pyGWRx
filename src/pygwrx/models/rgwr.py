@@ -406,6 +406,7 @@ class RGWR(GWR):
             RuntimeError: If robust filtering leaves too few usable
                 observations for local calibration.
         """
+        self._reset_fit_state()
         self._validate_robust_parameters()
         if compute_hat_matrix_flag is not None:
             if not isinstance(compute_hat_matrix_flag, (bool, np.bool_)):
@@ -418,8 +419,6 @@ class RGWR(GWR):
         ):
             if not isinstance(value, (bool, np.bool_)):
                 raise TypeError(f"{name} must be boolean.")
-        self._reset_fit_state()
-
         try:
             # Filtered RGWR needs the complete initial S matrix to reproduce the
             # studentized residual definition in GWmodel::gwr.basic.

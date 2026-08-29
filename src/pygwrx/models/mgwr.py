@@ -1020,6 +1020,7 @@ class MGWR(BaseMultiscaleRegressor):
         Returns:
             The fitted model instance.
         """
+        self._reset_fit_state()
         for name, value in (
             ("compute_hat_matrix", compute_hat_matrix),
             ("store_partial_hat_matrices", store_partial_hat_matrices),
@@ -1032,7 +1033,6 @@ class MGWR(BaseMultiscaleRegressor):
                 raise TypeError("verbose must be boolean or None.")
             self.verbose = bool(verbose)
 
-        self._reset_fit_state()
         try:
             X_arr, y_arr, coords_arr = self._validate_inputs(X, y, coords)
             feature_names = (

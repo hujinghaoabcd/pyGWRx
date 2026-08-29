@@ -83,6 +83,9 @@ class BaseSpatialEstimator(ABC):
 
     def _mark_unfitted(self) -> None:
         self._is_fitted = False
+        self.n_samples_ = None
+        self.n_features_in_ = None
+        self.feature_names_in_ = None
 
     def _check_is_fitted(self) -> None:
         if not self._is_fitted:

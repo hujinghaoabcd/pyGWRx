@@ -20,7 +20,6 @@ import pytest
 
 import pygwrx
 
-
 _CONTRACT_PATH = (
     Path(__file__).resolve().parents[1] / "architecture_contracts" / "estimators.json"
 )
@@ -111,10 +110,18 @@ def _assert_value_matches_baseline(actual: Any, expected: Any, *, label: str) ->
     assert actual == expected, label
 
 
-def _bad_nan_refit(model: Any, X: np.ndarray, y: np.ndarray, coords: np.ndarray) -> None:
+def _bad_nan_refit(
+    model: Any, X: np.ndarray, y: np.ndarray, coords: np.ndarray
+) -> None:
     bad = X.copy()
     bad[0, 0] = np.nan
     model.fit(bad, y, coords)
+
+
+def _bad_nan_unsupervised_refit(model: Any, X: np.ndarray, coords: np.ndarray) -> None:
+    bad = X.copy()
+    bad[0, 0] = np.nan
+    model.fit(bad, coords)
 
 
 def _build_cases() -> dict[str, _FitCase]:
@@ -283,9 +290,7 @@ def _build_cases() -> dict[str, _FitCase]:
                 n_components=2, bandwidth=18, adaptive=True, verbose=False
             ),
             lambda model: model.fit(X, coords),
-            lambda model: model.fit(
-                np.where(np.indices(X.shape) == (0, 0), np.nan, X), coords
-            ),
+            lambda model: _bad_nan_unsupervised_refit(model, X, coords),
         ),
         "GWDA": _FitCase(
             lambda: pygwrx.GWDA(
@@ -300,9 +305,7 @@ def _build_cases() -> dict[str, _FitCase]:
         "GWSS": _FitCase(
             lambda: pygwrx.GWSS(bandwidth=4.0, verbose=False),
             lambda model: model.fit(X, coords),
-            lambda model: model.fit(
-                np.where(np.indices(X.shape) == (0, 0), np.nan, X), coords
-            ),
+            lambda model: _bad_nan_unsupervised_refit(model, X, coords),
         ),
         "BootstrapGWR": _FitCase(
             lambda: pygwrx.BootstrapGWR(
@@ -334,7 +337,9 @@ def test_failed_refit_restores_constructor_fitted_state(name: str):
     case = _CASES[name]
     model = case.factory()
     tracked = _CONTRACT["estimators"][name]["initialized_public_fitted_state"]
-    baseline = {attribute: _snapshot(getattr(model, attribute)) for attribute in tracked}
+    baseline = {
+        attribute: _snapshot(getattr(model, attribute)) for attribute in tracked
+    }
 
     with np.errstate(all="ignore"):
         case.success(model)
@@ -348,12 +353,18 @@ def test_failed_refit_restores_constructor_fitted_state(name: str):
         case.failure(model)
 
     if hasattr(model, "_is_fitted"):
-        assert model._is_fitted is False, f"{name} kept _is_fitted=True after failed refit"
+        assert (
+            model._is_fitted is False
+        ), f"{name} kept _is_fitted=True after failed refit"
     if hasattr(type(model), "is_fitted_"):
-        assert model.is_fitted_ is False, f"{name} kept is_fitted_=True after failed refit"
+        assert (
+            model.is_fitted_ is False
+        ), f"{name} kept is_fitted_=True after failed refit"
 
     for attribute in tracked:
-        assert hasattr(model, attribute), f"{name}.{attribute} disappeared after failed refit"
+        assert hasattr(
+            model, attribute
+        ), f"{name}.{attribute} disappeared after failed refit"
         _assert_value_matches_baseline(
             getattr(model, attribute),
             baseline[attribute],
