@@ -1,0 +1,8 @@
+criterion,reference,interpretation,common_k_min,common_k_max,n_candidates,pygwrx_argmin,reference_argmin,match
+cv_sse,mgwr,strict,4,49,46,11,11,True
+cv_sse,GWmodel,strict,5,49,45,11,11,True
+aic,mgwr,strict,4,49,46,4,4,True
+aicc,mgwr,strict,5,49,45,24,24,True
+aicc,GWmodel,strict,5,49,45,24,24,True
+bic,mgwr,strict,4,49,46,4,4,True
+bic,GWmodel,different_definition,4,49,46,4,4,True

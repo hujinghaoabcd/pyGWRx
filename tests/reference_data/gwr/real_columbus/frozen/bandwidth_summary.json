@@ -1,0 +1,156 @@
+{
+  "criteria": {
+    "aic": {
+      "pygwrx_k_ge_5_argmin": 5,
+      "pygwrx_raw_argmin": 4,
+      "references": {
+        "mgwr": {
+          "common_raw_domain": [
+            4,
+            49
+          ],
+          "interpretation": "strict",
+          "k_ge_5_argmin": {
+            "pygwrx": 5,
+            "reference": 5
+          },
+          "k_ge_5_max_abs_diff": 3.6148478613995394e-05,
+          "k_ge_5_max_rel_diff": 1.5334418345757384e-07,
+          "raw_argmin": {
+            "pygwrx": 4,
+            "reference": 4
+          }
+        }
+      }
+    },
+    "aicc": {
+      "pygwrx_k_ge_5_argmin": 24,
+      "pygwrx_raw_argmin": 24,
+      "references": {
+        "GWmodel": {
+          "common_raw_domain": [
+            5,
+            49
+          ],
+          "interpretation": "strict",
+          "k_ge_5_argmin": {
+            "pygwrx": 24,
+            "reference": 24
+          },
+          "k_ge_5_max_abs_diff": 0.01280205776947696,
+          "k_ge_5_max_rel_diff": 5.3607577195134934e-06,
+          "raw_argmin": {
+            "pygwrx": 24,
+            "reference": 24
+          }
+        },
+        "mgwr": {
+          "common_raw_domain": [
+            5,
+            49
+          ],
+          "interpretation": "strict",
+          "k_ge_5_argmin": {
+            "pygwrx": 24,
+            "reference": 24
+          },
+          "k_ge_5_max_abs_diff": 0.010106415962582105,
+          "k_ge_5_max_rel_diff": 4.23198438240629e-06,
+          "raw_argmin": {
+            "pygwrx": 24,
+            "reference": 24
+          }
+        }
+      }
+    },
+    "bic": {
+      "pygwrx_k_ge_5_argmin": 5,
+      "pygwrx_raw_argmin": 4,
+      "references": {
+        "GWmodel": {
+          "common_raw_domain": [
+            4,
+            49
+          ],
+          "interpretation": "different_definition",
+          "k_ge_5_argmin": {
+            "pygwrx": 5,
+            "reference": 5
+          },
+          "k_ge_5_max_abs_diff": 52.891880679527276,
+          "k_ge_5_max_rel_diff": 0.1960043423380172,
+          "raw_argmin": {
+            "pygwrx": 4,
+            "reference": 4
+          }
+        },
+        "mgwr": {
+          "common_raw_domain": [
+            4,
+            49
+          ],
+          "interpretation": "strict",
+          "k_ge_5_argmin": {
+            "pygwrx": 5,
+            "reference": 5
+          },
+          "k_ge_5_max_abs_diff": 1.9669220591822523e-05,
+          "k_ge_5_max_rel_diff": 6.094402092705449e-08,
+          "raw_argmin": {
+            "pygwrx": 4,
+            "reference": 4
+          }
+        }
+      }
+    },
+    "cv_sse": {
+      "pygwrx_k_ge_5_argmin": 11,
+      "pygwrx_raw_argmin": 11,
+      "references": {
+        "GWmodel": {
+          "common_raw_domain": [
+            5,
+            49
+          ],
+          "interpretation": "strict",
+          "k_ge_5_argmin": {
+            "pygwrx": 11,
+            "reference": 11
+          },
+          "k_ge_5_max_abs_diff": 153.891051128885,
+          "k_ge_5_max_rel_diff": 0.0010286113237213746,
+          "raw_argmin": {
+            "pygwrx": 11,
+            "reference": 11
+          }
+        },
+        "mgwr": {
+          "common_raw_domain": [
+            4,
+            49
+          ],
+          "interpretation": "strict",
+          "k_ge_5_argmin": {
+            "pygwrx": 11,
+            "reference": 11
+          },
+          "k_ge_5_max_abs_diff": 153.89049748997786,
+          "k_ge_5_max_rel_diff": 0.0010286076269925895,
+          "raw_argmin": {
+            "pygwrx": 11,
+            "reference": 11
+          }
+        }
+      }
+    }
+  },
+  "near_saturated_boundary": {
+    "k": 4,
+    "pygwrx_trace_S": 48.999588003105764,
+    "reason": "trace(S) is approximately n; AICc is non-finite in pyGWRx and the point is retained only for transparency"
+  },
+  "raw_candidate_domain": [
+    4,
+    49
+  ]
+}
