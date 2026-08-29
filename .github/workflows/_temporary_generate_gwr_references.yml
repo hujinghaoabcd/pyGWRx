@@ -20,6 +20,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: gwr-reference-validation
+          fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
@@ -52,4 +53,6 @@ jobs:
           git add tools/reference/gwr/generate_r_references.R tests/reference_data/gwr/*.json
           git diff --cached --check
           git commit -m "Generate external GWR reference fixtures"
+          git fetch origin gwr-reference-validation
+          git rebase origin/gwr-reference-validation
           git push origin HEAD:gwr-reference-validation
