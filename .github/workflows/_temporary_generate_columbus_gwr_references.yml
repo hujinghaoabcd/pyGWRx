@@ -66,13 +66,19 @@ jobs:
       - name: Generate R Columbus references
         run: Rscript tools/reference/gwr/generate_columbus_r_references.R
 
-      - name: List generated references
+      - name: Compare pyGWRx with Columbus references
+        run: python tools/reference/gwr/compare_columbus_references.py
+
+      - name: List generated references and reports
         run: |
           find tests/reference_data/gwr/real_columbus -maxdepth 1 -type f -print -exec wc -c {} \;
+          find validation_results/gwr/real_columbus -maxdepth 1 -type f -print -exec wc -c {} \;
 
       - uses: actions/upload-artifact@v7
         with:
-          name: gwr-columbus-real-data-references
-          path: tests/reference_data/gwr/real_columbus/
+          name: gwr-columbus-real-data-validation
+          path: |
+            tests/reference_data/gwr/real_columbus/
+            validation_results/gwr/real_columbus/
           if-no-files-found: error
           retention-days: 7
