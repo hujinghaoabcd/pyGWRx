@@ -28,7 +28,22 @@ jobs:
           python-version: "3.13"
           cache: pip
       - name: Apply exhaustive adaptive-bandwidth patch
-        run: python tools/_temporary_adaptive_bandwidth_search.py
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("tools/_temporary_adaptive_bandwidth_search.py")
+          text = path.read_text(encoding="utf-8")
+          text = text.replace(
+              '"45 tests marked `reference`, separate from 361 non-reference tests",',
+              '"The current repository contains **45 tests marked `reference`** across the independent numerical-reference suite. They run separately from the 361 non-reference tests in blocking CI.",',
+          )
+          text = text.replace(
+              '"45 tests marked `reference`, separate from 377 non-reference tests",',
+              '"The current repository contains **45 tests marked `reference`** across the independent numerical-reference suite. They run separately from the 377 non-reference tests in blocking CI.",',
+          )
+          path.write_text(text, encoding="utf-8")
+          PY
+          python tools/_temporary_adaptive_bandwidth_search.py
       - name: Install verification environment
         run: |
           python -m pip install --upgrade pip
