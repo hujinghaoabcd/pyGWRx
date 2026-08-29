@@ -7,8 +7,6 @@ BANDWIDTH = Path("src/pygwrx/core/bandwidth.py")
 GWR_TEST = Path("tests/test_gwr_distance_streaming.py")
 BW_TEST = Path("tests/test_bandwidth_distance_streaming.py")
 
-
-utils_text = UTILS.read_text(encoding="utf-8")
 helper = '''
 
 _DEFAULT_DISTANCE_BLOCK_ROWS = 128
@@ -16,12 +14,14 @@ _DEFAULT_DISTANCE_BLOCK_ROWS = 128
 
 def _iter_distance_blocks(
     target_coords: CoordinateInput,
-    source_coords: CoordinateInput,
+    source_coords: Optional[CoordinateInput] = None,
     *,
-    metric: str = "euclidean",
+    distance_metric: str = "euclidean",
     block_rows: int = _DEFAULT_DISTANCE_BLOCK_ROWS,
 ) -> Iterator[np.ndarray]:
     """Yield bounded target-to-source pairwise distance blocks."""
+    if source_coords is None:
+        source_coords = target_coords
     targets, sources = _validate_coordinate_pair(target_coords, source_coords)
     if isinstance(block_rows, (bool, np.bool_)) or not isinstance(block_rows, Integral):
         raise TypeError("block_rows must be a positive integer.")
@@ -35,7 +35,7 @@ def _iter_distance_blocks(
             compute_distance_matrix(
                 targets[start:stop],
                 sources,
-                metric=metric,
+                metric=distance_metric,
             ),
             dtype=float,
         )
@@ -49,24 +49,24 @@ def _iter_distance_blocks(
 
 def _iter_distance_rows(
     target_coords: CoordinateInput,
-    source_coords: CoordinateInput,
+    source_coords: Optional[CoordinateInput] = None,
     *,
-    metric: str = "euclidean",
+    distance_metric: str = "euclidean",
     block_rows: int = _DEFAULT_DISTANCE_BLOCK_ROWS,
 ) -> Iterator[np.ndarray]:
     """Yield target-to-source distance rows from bounded-size blocks."""
     for block in _iter_distance_blocks(
         target_coords,
         source_coords,
-        metric=metric,
+        distance_metric=distance_metric,
         block_rows=block_rows,
     ):
         yield from block
 '''
-if "def _iter_distance_blocks(" in utils_text:
-    raise RuntimeError("shared distance helper already exists")
-utils_text = utils_text.rstrip() + helper + "\n"
-UTILS.write_text(utils_text, encoding="utf-8")
+
+utils_text = UTILS.read_text(encoding="utf-8")
+assert "def _iter_distance_blocks(" not in utils_text
+UTILS.write_text(utils_text.rstrip() + helper + "\n", encoding="utf-8")
 
 
 gwr_text = GWR.read_text(encoding="utf-8")
@@ -93,7 +93,7 @@ replacement = '''    def _iter_distance_rows(self, target_coords: np.ndarray) ->
         return _iter_core_distance_rows(
             targets,
             self.coords_train_,
-            metric=self.distance_metric,
+            distance_metric=self.distance_metric,
         )
 '''
 gwr_text, count = pattern.subn(replacement, gwr_text, count=1)
@@ -119,19 +119,13 @@ pattern = re.compile(
 )
 bw_text, count = pattern.subn("", bw_text, count=1)
 assert count == 1
-# Shared helper uses the core metric keyword rather than selector-specific naming.
-bw_text = bw_text.replace(
-    "_iter_distance_rows(coords, distance_metric=distance_metric)",
-    "_iter_distance_rows(coords, coords, metric=distance_metric)",
-)
 BANDWIDTH.write_text(bw_text, encoding="utf-8")
 
 
 gwr_test = GWR_TEST.read_text(encoding="utf-8")
-gwr_test = gwr_test.replace("import importlib\n\n", "import importlib\n\n")
 gwr_test = gwr_test.replace(
-    "gwr_module = importlib.import_module(\"pygwrx.models.gwr\")\n",
-    "core_utils = importlib.import_module(\"pygwrx.core.utils\")\n",
+    'gwr_module = importlib.import_module("pygwrx.models.gwr")\n',
+    'core_utils = importlib.import_module("pygwrx.core.utils")\n',
 )
 gwr_test = gwr_test.replace(
     "    original = gwr_module.compute_distance_matrix\n",
@@ -142,8 +136,8 @@ gwr_test = gwr_test.replace(
     "        if first.shape[0] > core_utils._DEFAULT_DISTANCE_BLOCK_ROWS:\n",
 )
 gwr_test = gwr_test.replace(
-    "    monkeypatch.setattr(gwr_module, \"compute_distance_matrix\", tracked)\n",
-    "    monkeypatch.setattr(core_utils, \"compute_distance_matrix\", tracked)\n",
+    '    monkeypatch.setattr(gwr_module, "compute_distance_matrix", tracked)\n',
+    '    monkeypatch.setattr(core_utils, "compute_distance_matrix", tracked)\n',
 )
 gwr_test = gwr_test.replace(
     "    assert max(rows for rows, _ in calls) <= gwr_module._DISTANCE_BLOCK_ROWS\n",
@@ -154,16 +148,16 @@ GWR_TEST.write_text(gwr_test, encoding="utf-8")
 
 bw_test = BW_TEST.read_text(encoding="utf-8")
 bw_test = bw_test.replace(
-    "bandwidth_module = importlib.import_module(\"pygwrx.core.bandwidth\")\n",
-    "core_utils = importlib.import_module(\"pygwrx.core.utils\")\n",
+    'bandwidth_module = importlib.import_module("pygwrx.core.bandwidth")\n',
+    'core_utils = importlib.import_module("pygwrx.core.utils")\n',
 )
 bw_test = bw_test.replace(
     "    original = bandwidth_module.compute_distance_matrix\n",
     "    original = core_utils.compute_distance_matrix\n",
 )
 bw_test = bw_test.replace(
-    "    monkeypatch.setattr(bandwidth_module, \"compute_distance_matrix\", tracked)\n",
-    "    monkeypatch.setattr(core_utils, \"compute_distance_matrix\", tracked)\n",
+    '    monkeypatch.setattr(bandwidth_module, "compute_distance_matrix", tracked)\n',
+    '    monkeypatch.setattr(core_utils, "compute_distance_matrix", tracked)\n',
 )
 bw_test = bw_test.replace(
     "    assert max(left_rows for left_rows, _ in calls) <= 128\n",
