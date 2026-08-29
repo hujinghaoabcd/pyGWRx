@@ -235,6 +235,13 @@ class BootstrapGWR:
 
     @staticmethod
     def _full_local_parameters(model: GWR) -> Tuple[np.ndarray, np.ndarray]:
+        if model.rank_deficient_ is not None and np.any(model.rank_deficient_):
+            count = int(np.count_nonzero(model.rank_deficient_))
+            raise np.linalg.LinAlgError(
+                f"The fitted GWR contains {count} rank deficient local weighted "
+                "design(s); BootstrapGWR requires identifiable local coefficient "
+                "inference."
+            )
         if model.coef_ is None or model.coef_se_ is None:
             raise RuntimeError("The fitted GWR model did not produce local inference.")
         if model.fit_intercept:
