@@ -34,9 +34,7 @@ def test_gtwr_sparse_local_warning_describes_minimum_norm_unpenalized_solution()
     model.y_train_ = response.copy()
     model.bandwidth_ = 1.0
 
-    def focal_only_kernel(
-        distance_row: np.ndarray, bandwidth: float
-    ) -> np.ndarray:
+    def focal_only_kernel(distance_row: np.ndarray, bandwidth: float) -> np.ndarray:
         return np.where(distance_row < bandwidth, 1.0, 0.0)
 
     model.kernel_func_ = focal_only_kernel
