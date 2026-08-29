@@ -13,6 +13,9 @@ the package root.
 
 from __future__ import annotations
 
+__author__ = "Jinghao Hu"
+__license__ = "MIT"
+
 from collections.abc import Mapping
 from typing import Protocol
 
