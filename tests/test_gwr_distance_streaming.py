@@ -11,7 +11,6 @@ import numpy as np
 
 from pygwrx import GWR
 
-
 gwr_module = importlib.import_module("pygwrx.models.gwr")
 
 
@@ -19,12 +18,7 @@ def _make_data(n_samples: int = 300):
     rng = np.random.default_rng(20260829)
     coords = rng.uniform(0.0, 1.0, size=(n_samples, 2))
     X = rng.normal(size=(n_samples, 2))
-    y = (
-        2.5
-        + 1.2 * X[:, 0]
-        - 0.7 * X[:, 1]
-        + rng.normal(0.0, 0.1, n_samples)
-    )
+    y = 2.5 + 1.2 * X[:, 0] - 0.7 * X[:, 1] + rng.normal(0.0, 0.1, n_samples)
     return X, y, coords
 
 
