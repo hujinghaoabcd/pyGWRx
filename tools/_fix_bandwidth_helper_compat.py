@@ -1,0 +1,96 @@
+from pathlib import Path
+import re
+
+path = Path("src/pygwrx/core/bandwidth.py")
+text = path.read_text(encoding="utf-8")
+
+pattern = re.compile(
+    r"def _automatic_bandwidth_range\(.*?\n\n\ndef _normalize_candidate\(",
+    re.S,
+)
+replacement = '''def _automatic_bandwidth_range(
+    distances: np.ndarray,
+    *,
+    adaptive: bool,
+    n_samples: int,
+    n_features: int,
+) -> tuple[Bandwidth, Bandwidth]:
+    """Derive the historical automatic range from a precomputed distance matrix."""
+    if adaptive:
+        lower = max(n_features + 1, 2, int(np.ceil(0.05 * n_samples)))
+        upper = n_samples
+        if lower > upper:
+            raise ValueError(
+                "Adaptive bandwidth selection is not possible: the sample size is too "
+                "small for the number of design-matrix columns."
+            )
+        return lower, upper
+
+    upper_triangle = distances[np.triu_indices_from(distances, k=1)]
+    positive_distances = upper_triangle[
+        np.isfinite(upper_triangle) & (upper_triangle > 0)
+    ]
+    if positive_distances.size == 0:
+        raise ValueError(
+            "Cannot select a fixed bandwidth because all pairwise coordinate distances "
+            "are zero. Use distinct coordinates or an adaptive specification "
+            "with valid non-zero neighbour distances."
+        )
+
+    minimum_positive = float(np.min(positive_distances))
+    maximum_positive = float(np.max(positive_distances))
+    lower = max(np.nextafter(0.0, 1.0), 0.5 * minimum_positive)
+    upper = 2.0 * maximum_positive
+    if not np.isfinite(upper):
+        upper = float(np.nextafter(maximum_positive, np.inf))
+    if upper <= lower:
+        upper = float(np.nextafter(lower, np.inf))
+    return float(lower), float(upper)
+
+
+def _automatic_bandwidth_range_from_coords(
+    coords: np.ndarray,
+    *,
+    distance_metric: str,
+    adaptive: bool,
+    n_samples: int,
+    n_features: int,
+) -> tuple[Bandwidth, Bandwidth]:
+    """Derive an automatic range without retaining a full distance matrix."""
+    if adaptive:
+        lower = max(n_features + 1, 2, int(np.ceil(0.05 * n_samples)))
+        upper = n_samples
+        if lower > upper:
+            raise ValueError(
+                "Adaptive bandwidth selection is not possible: the sample size is too "
+                "small for the number of design-matrix columns."
+            )
+        return lower, upper
+
+    minimum_positive, maximum_positive = _positive_pairwise_distance_extrema(
+        coords,
+        distance_metric=distance_metric,
+    )
+    lower = max(np.nextafter(0.0, 1.0), 0.5 * minimum_positive)
+    upper = 2.0 * maximum_positive
+    if not np.isfinite(upper):
+        upper = float(np.nextafter(maximum_positive, np.inf))
+    if upper <= lower:
+        upper = float(np.nextafter(lower, np.inf))
+    return float(lower), float(upper)
+
+
+def _normalize_candidate('''
+text, count = pattern.subn(replacement, text, count=1)
+assert count == 1
+
+old = '''            lower, upper = _automatic_bandwidth_range(
+                coords_arr,
+                distance_metric=distance_metric,'''
+new = '''            lower, upper = _automatic_bandwidth_range_from_coords(
+                coords_arr,
+                distance_metric=distance_metric,'''
+assert text.count(old) == 1
+text = text.replace(old, new, 1)
+
+path.write_text(text, encoding="utf-8")
