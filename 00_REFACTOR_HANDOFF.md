@@ -49,6 +49,7 @@
 - A3 — 19-model migration risk matrix：**DONE**，PR #36，merge SHA `dc150ef09fed370a45e5a6e62f14846979fff643`。
 - A4 — performance/memory baseline harness：**DONE**，PR #38，merge SHA `de64389163fc5094ab46b72671872d26f35b9733`。
 - A5 — pre-refactor contract/message hygiene：**DONE**，PR #40，merge SHA `595a632076025eb9b45794caaff37e3b3747a700`。GTWR 正权重样本不足时的误导性 `ridge regularized` warning 已改为真实的 rank-aware minimum-norm unpenalized WLS 描述，并用回归测试同时锁定 warning 文案与 minimum-norm 行为；未改变 solver、公式或估计结果。
-- 下一项固定为：**B1 — private `_protocols.py`**。
+- B1 — private `_protocols.py`：**DONE**，PR #42，merge SHA `039bceee97a4b62518b7efc686350f3cb1beeaf2`。新增 fitted lifecycle、regression surface、parameter inference、temporal view、multiscale view、weight provider、stored weight components 七类 private structural Protocol；加入 mypy gate，并用架构测试锁定七类能力且确认未从 `pygwrx.core` 或包根公开导出；未修改 estimator、base、solver、统计公式或执行策略。
+- 下一项固定为：**B2 — validation split**。
 
-A1/A2/A3/A4/A5 共同构成进入 Phase B 前的安全冻结：Public API / capability、failed-refit atomicity、迁移风险、性能/内存现状、明确的用户可观察契约与提示信息必须同时守住；标准 GWR 的独立 reference evidence 继续作为 blocking numerical gate。A4 的 timing/RSS 仅作为 observational baseline，不设置 noisy wall-time CI gate；live structural memory guards 用于阻止 streamed GWR 与 large-n ScalableGWR 意外引入 retained `n × n` buffer，并保留 dense-hat GWR 的显式 dense 行为。B1 只允许建立 private structural Protocol，不得 public export，不得开始 Base 重写、concrete inheritance 移除、性能优化或统计公式修改。
+A1/A2/A3/A4/A5 与 B1 共同构成进入后续 Phase B 的安全冻结：Public API / capability、failed-refit atomicity、迁移风险、性能/内存现状、用户可观察契约，以及 private capability spine 必须同时守住；标准 GWR 的独立 reference evidence 继续作为 blocking numerical gate。A4 的 timing/RSS 仅作为 observational baseline，不设置 noisy wall-time CI gate；live structural memory guards 用于阻止 streamed GWR 与 large-n ScalableGWR 意外引入 retained `n × n` buffer，并保留 dense-hat GWR 的显式 dense 行为。B2 只允许从 `utils.py` 拆出纯 validation，并保留旧 import compatibility re-export；不得开始 distance/time/weights/solver 迁移，不得 Base 重写、concrete inheritance 移除、性能优化或统计公式修改。

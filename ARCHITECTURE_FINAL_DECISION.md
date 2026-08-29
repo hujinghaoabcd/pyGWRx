@@ -1261,7 +1261,7 @@ plotting/ 不调用 np.linalg.svd 做模型诊断
 | A3 | 19-model migration risk matrix | DONE | #36 | `dc150ef09fed370a45e5a6e62f14846979fff643` | n/a | machine-readable matrix + docs + contract tests；无 runtime 数值变更 |
 | A4 | performance/memory baseline harness | DONE | #38 | `de64389163fc5094ab46b72671872d26f35b9733` | benchmark + structural memory | observational timing/RSS baseline + live retained-`n × n` guards；无 estimator runtime 变更 |
 | A5 | pre-refactor contract/message hygiene | DONE | #40 | `595a632076025eb9b45794caaff37e3b3747a700` | model tests + full CI | 修正 GTWR misleading ridge warning；新增 minimum-norm warning contract test；无算法/solver 变更 |
-| B1 | private `_protocols.py` | PENDING | — | — | no behavior | 不 public export |
+| B1 | private `_protocols.py` | DONE | #42 | `039bceee97a4b62518b7efc686350f3cb1beeaf2` | type/API tests + full CI | 七类 private structural Protocol；mypy gate；不 public export；无 estimator/base/runtime 行为变更 |
 | B2 | validation split | PENDING | — | — | core + all tests | compatibility re-export |
 | B3 | distance split + metric spec | PENDING | — | — | core + GWR refs | keep streaming |
 | B4 | time-axis utility | PENDING | — | — | GTWR/SGTWR tests | no ST formula change |
