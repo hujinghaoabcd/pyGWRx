@@ -5,7 +5,7 @@ on:
     branches: [gwr-reference-validation]
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   OMP_NUM_THREADS: "1"
@@ -17,11 +17,13 @@ env:
 
 jobs:
   generate:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           ref: gwr-reference-validation
+          fetch-depth: 0
 
       - uses: actions/setup-python@v6
         with:
@@ -66,12 +68,28 @@ jobs:
       - name: Generate R Columbus references
         run: Rscript tools/reference/gwr/generate_columbus_r_references.R
 
-      - name: Compare pyGWRx with Columbus references
-        run: python tools/reference/gwr/compare_columbus_references.py
+      - name: Compare and finalize Columbus validation
+        run: |
+          python tools/reference/gwr/compare_columbus_references.py
+          python tools/reference/gwr/finalize_columbus_validation.py
+
+      - name: Commit compact frozen fixtures and reports
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/reference_data/gwr/real_columbus/frozen validation_results/gwr/real_columbus
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "No Columbus validation changes to commit."
+          else
+            git commit -m "Freeze Columbus real-data GWR validation [skip ci]"
+            git push origin HEAD:gwr-reference-validation
+          fi
 
       - name: List generated references and reports
         run: |
-          find tests/reference_data/gwr/real_columbus -maxdepth 1 -type f -print -exec wc -c {} \;
+          find tests/reference_data/gwr/real_columbus -maxdepth 2 -type f -print -exec wc -c {} \;
           find validation_results/gwr/real_columbus -maxdepth 1 -type f -print -exec wc -c {} \;
 
       - uses: actions/upload-artifact@v7
