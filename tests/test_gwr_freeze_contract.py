@@ -3,6 +3,8 @@
 
 """Freeze-contract regression tests for standard GWR."""
 
+import inspect
+
 import numpy as np
 import pytest
 
@@ -15,6 +17,11 @@ def _data(n_samples: int = 36):
     X = rng.normal(size=(n_samples, 2))
     y = 1.25 + 0.9 * X[:, 0] - 0.4 * X[:, 1] + rng.normal(0.0, 0.05, n_samples)
     return X, y, coords
+
+
+def test_gwr_fit_signature_defaults_to_compact_hat_storage():
+    parameter = inspect.signature(GWR.fit).parameters["compute_hat_matrix"]
+    assert parameter.default is False
 
 
 def test_gwr_default_does_not_store_full_hat_matrix():
