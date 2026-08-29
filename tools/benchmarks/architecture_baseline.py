@@ -30,7 +30,6 @@ import numpy as np
 
 import pygwrx
 
-
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT = ROOT / "benchmarks" / "architecture_baseline.json"
 
@@ -375,7 +374,9 @@ def _run_parent(names: list[str], output: Path) -> dict[str, Any]:
         "scenarios": results,
     }
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps(document, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     return document
 
 

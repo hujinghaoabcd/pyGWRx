@@ -7,7 +7,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).parents[1]
 HARNESS = ROOT / "tools" / "benchmarks" / "architecture_baseline.py"
 BASELINE = ROOT / "benchmarks" / "architecture_baseline.json"
@@ -42,7 +41,12 @@ def test_committed_baseline_is_observational_not_a_timing_gate():
     assert REQUIRED_SCENARIOS <= set(document["scenarios"])
     assert set(document["scenario_order"]) == set(document["scenarios"])
 
-    forbidden = {"max_wall_seconds", "max_memory_mb", "timing_threshold", "fail_if_slow"}
+    forbidden = {
+        "max_wall_seconds",
+        "max_memory_mb",
+        "timing_threshold",
+        "fail_if_slow",
+    }
     assert not forbidden.intersection(document)
 
     for name, result in document["scenarios"].items():

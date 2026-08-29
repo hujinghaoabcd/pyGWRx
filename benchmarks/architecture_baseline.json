@@ -1,0 +1,387 @@
+{
+  "environment": {
+    "implementation": "CPython",
+    "machine": "x86_64",
+    "mkl_num_threads": "1",
+    "numpy": "2.5.2",
+    "omp_num_threads": "1",
+    "openblas_num_threads": "1",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.13.15",
+    "scipy": "1.18.1"
+  },
+  "generated_at_utc": "2026-08-29T15:37:04.098779+00:00",
+  "git_sha": "6c6192e0ca36288c35f0a97ce63d2ae95f0a9922",
+  "purpose": "Observational pre-refactor baseline only; wall time and memory values are not CI pass/fail thresholds.",
+  "scenario_order": [
+    "gwr_manual_streaming",
+    "gwr_manual_hat",
+    "gwr_auto_bandwidth",
+    "mgwr_backfit",
+    "gtwr_fit",
+    "mgtwr_small",
+    "sgwr_weight_heavy",
+    "scalable_gwr_large_n"
+  ],
+  "scenarios": {
+    "gtwr_fit": {
+      "checks": {
+        "hat_matrix_is_none": true
+      },
+      "fingerprint": {
+        "bandwidth_": 4.0,
+        "coef__shape": [
+          160,
+          2
+        ],
+        "coef__sum": 117.53324193254377,
+        "fitted_values__shape": [
+          160
+        ],
+        "fitted_values__sum": 236.29131522777186
+      },
+      "metrics": {
+        "cpu_seconds": 0.2958148650000001,
+        "process_peak_rss_delta_megabytes": 22.8125,
+        "process_peak_rss_megabytes": 150.80859375,
+        "python_peak_megabytes": 6.730328559875488,
+        "retained_dense_square_megabytes": 0.5859375,
+        "wall_seconds": 0.2958599829999997
+      },
+      "n": 160,
+      "p": 2,
+      "path": "representative fixed-bandwidth spatiotemporal fit",
+      "retained_dense_square_arrays": [
+        {
+          "attribute": "spatial_distance_matrix_",
+          "megabytes": 0.1953125,
+          "shape": [
+            160,
+            160
+          ]
+        },
+        {
+          "attribute": "spatiotemporal_distance_matrix_",
+          "megabytes": 0.1953125,
+          "shape": [
+            160,
+            160
+          ]
+        },
+        {
+          "attribute": "temporal_distance_matrix_",
+          "megabytes": 0.1953125,
+          "shape": [
+            160,
+            160
+          ]
+        }
+      ],
+      "scenario": "gtwr_fit"
+    },
+    "gwr_auto_bandwidth": {
+      "checks": {
+        "inside_requested_range": true,
+        "selected_bandwidth": 30
+      },
+      "fingerprint": {
+        "bandwidth_": 30.0,
+        "coef__shape": [
+          120,
+          2
+        ],
+        "coef__sum": 97.3562261320863,
+        "fitted_values__shape": [
+          120
+        ],
+        "fitted_values__sum": 176.18487564338025
+      },
+      "metrics": {
+        "cpu_seconds": 1.372063858,
+        "process_peak_rss_delta_megabytes": 22.16015625,
+        "process_peak_rss_megabytes": 150.15625,
+        "python_peak_megabytes": 5.695369720458984,
+        "retained_dense_square_megabytes": 0,
+        "wall_seconds": 1.3722047870000011
+      },
+      "n": 120,
+      "p": 2,
+      "path": "automatic adaptive CV bandwidth selection + streamed final fit",
+      "retained_dense_square_arrays": [],
+      "scenario": "gwr_auto_bandwidth"
+    },
+    "gwr_manual_hat": {
+      "checks": {
+        "hat_matrix_shape": [
+          500,
+          500
+        ]
+      },
+      "fingerprint": {
+        "bandwidth_": 3.0,
+        "coef__shape": [
+          500,
+          3
+        ],
+        "coef__sum": 604.9554734048049,
+        "fitted_values__shape": [
+          500
+        ],
+        "fitted_values__sum": 757.2723519210035
+      },
+      "metrics": {
+        "cpu_seconds": 0.47500794699999993,
+        "process_peak_rss_delta_megabytes": 25.43359375,
+        "process_peak_rss_megabytes": 153.4296875,
+        "python_peak_megabytes": 8.603002548217773,
+        "retained_dense_square_megabytes": 3.814697265625,
+        "wall_seconds": 0.4750548930000065
+      },
+      "n": 500,
+      "p": 3,
+      "path": "manual fixed bandwidth; full GWR hat retained",
+      "retained_dense_square_arrays": [
+        {
+          "attribute": "S_matrix_",
+          "megabytes": 1.9073486328125,
+          "shape": [
+            500,
+            500
+          ]
+        },
+        {
+          "attribute": "hat_matrix_",
+          "megabytes": 1.9073486328125,
+          "shape": [
+            500,
+            500
+          ]
+        }
+      ],
+      "scenario": "gwr_manual_hat"
+    },
+    "gwr_manual_streaming": {
+      "checks": {
+        "hat_matrix_is_none": true
+      },
+      "fingerprint": {
+        "bandwidth_": 3.0,
+        "coef__shape": [
+          500,
+          3
+        ],
+        "coef__sum": 593.8823055222015,
+        "fitted_values__shape": [
+          500
+        ],
+        "fitted_values__sum": 762.1950788221889
+      },
+      "metrics": {
+        "cpu_seconds": 0.505564941,
+        "process_peak_rss_delta_megabytes": 25.42578125,
+        "process_peak_rss_megabytes": 153.421875,
+        "python_peak_megabytes": 7.553735733032227,
+        "retained_dense_square_megabytes": 0,
+        "wall_seconds": 0.5190072470000047
+      },
+      "n": 500,
+      "p": 3,
+      "path": "manual fixed bandwidth; streamed GWR fit; hat disabled",
+      "retained_dense_square_arrays": [],
+      "scenario": "gwr_manual_streaming"
+    },
+    "mgtwr_small": {
+      "checks": {
+        "bandwidth_count": 3,
+        "tau_count": 3
+      },
+      "fingerprint": {
+        "bandwidth_": 4.0,
+        "bandwidths_": [
+          4.0,
+          3.5,
+          4.5
+        ],
+        "coef__shape": [
+          80,
+          2
+        ],
+        "coef__sum": 67.89505798840878,
+        "fitted_values__shape": [
+          80
+        ],
+        "fitted_values__sum": 120.13093744784638,
+        "params__shape": [
+          80,
+          3
+        ],
+        "params__sum": 192.72693165805524
+      },
+      "metrics": {
+        "cpu_seconds": 0.54189854,
+        "process_peak_rss_delta_megabytes": 22.37109375,
+        "process_peak_rss_megabytes": 150.3671875,
+        "python_peak_megabytes": 5.904949188232422,
+        "retained_dense_square_megabytes": 0,
+        "wall_seconds": 0.5419602620000035
+      },
+      "n": 80,
+      "p": 2,
+      "path": "small representative multiscale spatiotemporal backfit",
+      "retained_dense_square_arrays": [],
+      "scenario": "mgtwr_small"
+    },
+    "mgwr_backfit": {
+      "checks": {
+        "bandwidth_count": 3,
+        "iterations": 3
+      },
+      "fingerprint": {
+        "bandwidth_": 45.0,
+        "bandwidths_": [
+          45.0,
+          45.0,
+          45.0
+        ],
+        "coef__shape": [
+          100,
+          2
+        ],
+        "coef__sum": 79.80646955197263,
+        "fitted_values__shape": [
+          100
+        ],
+        "fitted_values__sum": 148.41838548182426
+      },
+      "metrics": {
+        "cpu_seconds": 0.8613747610000001,
+        "process_peak_rss_delta_megabytes": 23.26953125,
+        "process_peak_rss_megabytes": 151.265625,
+        "python_peak_megabytes": 6.258715629577637,
+        "retained_dense_square_megabytes": 0,
+        "wall_seconds": 0.8614900390000031
+      },
+      "n": 100,
+      "p": 2,
+      "path": "representative multiscale backfit with repeated-use distances",
+      "retained_dense_square_arrays": [],
+      "scenario": "mgwr_backfit"
+    },
+    "scalable_gwr_large_n": {
+      "checks": {
+        "coefficient_rows": 2500,
+        "training_rows": 2500
+      },
+      "fingerprint": {
+        "bandwidth_": 100.0,
+        "coef__shape": [
+          2500,
+          3
+        ],
+        "coef__sum": 2999.929137744679,
+        "coefficients__shape": [
+          2500,
+          4
+        ],
+        "coefficients__sum": 6683.204708856787,
+        "fitted_values__shape": [
+          2500
+        ],
+        "fitted_values__sum": 3727.64395693774
+      },
+      "metrics": {
+        "cpu_seconds": 0.6621606709999999,
+        "process_peak_rss_delta_megabytes": 76.40234375,
+        "process_peak_rss_megabytes": 204.3984375,
+        "python_peak_megabytes": 57.17796802520752,
+        "retained_dense_square_megabytes": 0,
+        "wall_seconds": 0.6623004420000029
+      },
+      "n": 2500,
+      "p": 3,
+      "path": "large-n cKDTree/compressed ScaGWR fit",
+      "retained_dense_square_arrays": [],
+      "scenario": "scalable_gwr_large_n"
+    },
+    "sgwr_weight_heavy": {
+      "checks": {
+        "combined_weights__shape": [
+          300,
+          300
+        ],
+        "similarity_weights__shape": [
+          300,
+          300
+        ],
+        "spatial_weights__shape": [
+          300,
+          300
+        ]
+      },
+      "fingerprint": {
+        "bandwidth_": 3.0,
+        "coef__shape": [
+          300,
+          3
+        ],
+        "coef__sum": 377.7774942356747,
+        "coefficients__shape": [
+          300,
+          3
+        ],
+        "coefficients__sum": 377.7774942356747,
+        "fitted_values__shape": [
+          300
+        ],
+        "fitted_values__sum": 369.3642956602351
+      },
+      "metrics": {
+        "cpu_seconds": 0.29084903800000006,
+        "process_peak_rss_delta_megabytes": 25.7421875,
+        "process_peak_rss_megabytes": 153.73828125,
+        "python_peak_megabytes": 10.377768516540527,
+        "retained_dense_square_megabytes": 2.74658203125,
+        "wall_seconds": 0.31333844299999214
+      },
+      "n": 300,
+      "p": 3,
+      "path": "weight-heavy SGWR fit with dense weight retention enabled",
+      "retained_dense_square_arrays": [
+        {
+          "attribute": "combined_weights_",
+          "megabytes": 0.6866455078125,
+          "shape": [
+            300,
+            300
+          ]
+        },
+        {
+          "attribute": "hat_matrix_",
+          "megabytes": 0.6866455078125,
+          "shape": [
+            300,
+            300
+          ]
+        },
+        {
+          "attribute": "similarity_weights_",
+          "megabytes": 0.6866455078125,
+          "shape": [
+            300,
+            300
+          ]
+        },
+        {
+          "attribute": "spatial_weights_",
+          "megabytes": 0.6866455078125,
+          "shape": [
+            300,
+            300
+          ]
+        }
+      ],
+      "scenario": "sgwr_weight_heavy"
+    }
+  },
+  "schema_version": 1
+}
