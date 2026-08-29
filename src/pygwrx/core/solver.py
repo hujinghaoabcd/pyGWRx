@@ -15,7 +15,7 @@ __author__ = "Jinghao Hu"
 __license__ = "MIT"
 
 import warnings
-from typing import Callable, Optional, Tuple, Union
+from typing import Callable, NamedTuple, Optional, Tuple, Union
 
 import numpy as np
 
@@ -30,6 +30,16 @@ __all__ = [
 
 
 _DEFAULT_RIDGE = 0.0
+
+
+class _WeightedLeastSquaresResult(NamedTuple):
+    """Private numerical details from one weighted SVD solve."""
+
+    beta: np.ndarray
+    inverse_normal: np.ndarray
+    rank: int
+    singular_values: np.ndarray
+    condition_number: float
 
 
 def _validate_nonnegative_scalar(value: float, name: str) -> float:
@@ -238,6 +248,68 @@ def _compute_kernel_weights(
     return weights
 
 
+def _weighted_least_squares_details(
+    X: np.ndarray,
+    y: np.ndarray,
+    weights: np.ndarray,
+    *,
+    ridge: float = _DEFAULT_RIDGE,
+) -> _WeightedLeastSquaresResult:
+    """Solve WLS once by SVD and retain private numerical-rank diagnostics."""
+    X_arr = _validate_design_matrix(X)
+    y_arr = _validate_response(y, X_arr.shape[0])
+    weights_arr = _validate_weights(weights, X_arr.shape[0])
+    ridge_value = _validate_nonnegative_scalar(ridge, "ridge")
+
+    positive = weights_arr > 0.0
+    sqrt_w = np.sqrt(weights_arr[positive])
+    Xw = X_arr[positive] * sqrt_w[:, None]
+    yw = y_arr[positive] * sqrt_w
+
+    if ridge_value > 0.0:
+        design = np.vstack(
+            [Xw, np.sqrt(ridge_value) * np.eye(X_arr.shape[1], dtype=float)]
+        )
+        response = np.concatenate([yw, np.zeros(X_arr.shape[1], dtype=float)])
+    else:
+        design = Xw
+        response = yw
+
+    u, singular_values, vt = np.linalg.svd(design, full_matrices=False)
+    if singular_values.size == 0 or singular_values[0] <= 0.0:
+        raise np.linalg.LinAlgError("Weighted design has zero numerical rank.")
+
+    cutoff = np.finfo(float).eps * max(design.shape) * singular_values[0]
+    retained = singular_values > cutoff
+    rank = int(np.count_nonzero(retained))
+    if rank == 0:
+        raise np.linalg.LinAlgError("Weighted design has zero numerical rank.")
+
+    singular_retained = singular_values[retained]
+    v = vt[retained].T
+    u_retained = u[:, retained]
+    beta = v @ ((u_retained.T @ response) / singular_retained)
+    inverse_normal = (v * (1.0 / singular_retained**2)) @ v.T
+    inverse_normal = 0.5 * (inverse_normal + inverse_normal.T)
+
+    condition_number = (
+        float(singular_values[0] / singular_retained[-1])
+        if rank == design.shape[1]
+        else np.inf
+    )
+
+    if not np.all(np.isfinite(beta)) or not np.all(np.isfinite(inverse_normal)):
+        raise np.linalg.LinAlgError("Weighted SVD solve produced non-finite values.")
+
+    return _WeightedLeastSquaresResult(
+        beta=np.asarray(beta, dtype=float),
+        inverse_normal=inverse_normal,
+        rank=rank,
+        singular_values=np.asarray(singular_values, dtype=float),
+        condition_number=float(condition_number),
+    )
+
+
 def weighted_least_squares(
     X: np.ndarray,
     y: np.ndarray,
@@ -248,36 +320,12 @@ def weighted_least_squares(
     """Solve weighted least squares from ``sqrt(W) @ X``.
 
     The default ``ridge=0.0`` is standard unpenalized WLS. Positive values
-    remain an explicit lower-level ridge option.
+    remain an explicit lower-level ridge option. The public two-value return
+    contract is preserved while one internal SVD provides both coefficients and
+    the inverse-normal operator.
     """
-    X_arr = _validate_design_matrix(X)
-    y_arr = _validate_response(y, X_arr.shape[0])
-    weights_arr = _validate_weights(weights, X_arr.shape[0])
-    ridge_value = _validate_nonnegative_scalar(ridge, "ridge")
-    positive = weights_arr > 0.0
-    sqrt_w = np.sqrt(weights_arr[positive])
-    Xw = X_arr[positive] * sqrt_w[:, None]
-    yw = y_arr[positive] * sqrt_w
-    if ridge_value > 0.0:
-        design = np.vstack(
-            [Xw, np.sqrt(ridge_value) * np.eye(X_arr.shape[1], dtype=float)]
-        )
-        response = np.concatenate([yw, np.zeros(X_arr.shape[1], dtype=float)])
-    else:
-        design = Xw
-        response = yw
-    beta = np.linalg.lstsq(design, response, rcond=None)[0]
-    _, singular_values, vt = np.linalg.svd(design, full_matrices=False)
-    if singular_values.size == 0 or singular_values[0] <= 0.0:
-        raise np.linalg.LinAlgError("Weighted design has zero numerical rank.")
-    cutoff = np.finfo(float).eps * max(design.shape) * singular_values[0]
-    retained = singular_values > cutoff
-    v = vt[retained].T
-    inverse_normal = (v * (1.0 / singular_values[retained] ** 2)) @ v.T
-    inverse_normal = 0.5 * (inverse_normal + inverse_normal.T)
-    if not np.all(np.isfinite(beta)) or not np.all(np.isfinite(inverse_normal)):
-        raise np.linalg.LinAlgError("Weighted SVD solve produced non-finite values.")
-    return np.asarray(beta, dtype=float), inverse_normal
+    result = _weighted_least_squares_details(X, y, weights, ridge=ridge)
+    return result.beta, result.inverse_normal
 
 
 def local_regression(
