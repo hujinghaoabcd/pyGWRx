@@ -9,6 +9,9 @@ implementation, estimator mathematics, validation policy, or execution policy.
 
 This module is private and must not be re-exported from :mod:`pygwrx.core` or
 the package root.
+
+Author:
+    Jinghao Hu
 """
 
 from __future__ import annotations
