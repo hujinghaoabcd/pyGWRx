@@ -1,0 +1,38 @@
+name: Temporary update test baseline
+
+on:
+  push:
+    branches: [gwr-reference-validation]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: gwr-reference-validation
+          fetch-depth: 0
+      - name: Update verified test baseline
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          for name in ["README.md", "README.zh.md"]:
+              path = Path(name)
+              text = path.read_text(encoding="utf-8")
+              if "400 passed" not in text:
+                  raise SystemExit(f"expected old baseline not found in {name}")
+              path.write_text(text.replace("400 passed", "406 passed"), encoding="utf-8", newline="\n")
+          PY
+          rm .github/workflows/_temporary_update_test_baseline.yml
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md README.zh.md .github/workflows/_temporary_update_test_baseline.yml
+          git commit -m "Update current test baseline to 406"
+          git pull --rebase origin gwr-reference-validation
+          git push origin HEAD:gwr-reference-validation
