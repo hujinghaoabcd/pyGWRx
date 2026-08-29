@@ -6779,6 +6779,7 @@
 </span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="nb">print</span><span class="p">(</span><span class="n">extract_geopandas_coords</span><span class="p">(</span><span class="n">gdf</span><span class="p">))</span>
 </span></code></pre></div>
 <h2 id="local-solvers">Local solvers<a class="headerlink" href="#local-solvers" title="Permanent link">&para;</a></h2>
+<p>The standard solver is unpenalized weighted least squares. Coefficients are estimated from <code>sqrt(W) @ X</code> using SVD-backed least squares, exact zero weights are preserved, and no hidden ridge penalty is added. The low-level <code>ridge=</code> argument remains an explicit opt-in.</p>
 <p>The maintained example below exercises the public symbols in this group. <a href="https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/04_solver.py">Open source</a>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># SPDX-FileCopyrightText: 2026 Jinghao Hu</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># SPDX-License-Identifier: MIT</span>
