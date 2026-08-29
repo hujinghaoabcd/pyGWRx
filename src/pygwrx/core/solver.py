@@ -29,7 +29,7 @@ __all__ = [
 ]
 
 
-_DEFAULT_RIDGE = 1e-8
+_DEFAULT_RIDGE = 0.0
 
 
 def _validate_nonnegative_scalar(value: float, name: str) -> float:
@@ -275,52 +275,39 @@ def weighted_least_squares(
     *,
     ridge: float = _DEFAULT_RIDGE,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Solve a weighted least-squares problem.
+    """Solve weighted least squares from ``sqrt(W) @ X``.
 
-    Args:
-        X: Regression design matrix.
-        y: Single-response target vector.
-        weights: Non-negative observation weights. Exact zeros are preserved, so zero-weight
-            observations are genuinely excluded from the local objective.
-        ridge: Non-negative diagonal regularization used to stabilize the local normal matrix.
-
-    Returns:
-        beta: Estimated coefficients.
-        inverse_normal_matrix: Inverse (or pseudo-inverse) of ``X.T @ W @ X + ridge * I``. This is the
-            unscaled coefficient covariance factor; a statistical covariance matrix also
-            requires multiplication by an appropriate residual-variance estimate.
-
-    Notes:
-        The function solves
-
-            min_beta  sum_i weights[i] * (y[i] - X[i] @ beta)^2
-                        + ridge * ||beta||_2^2.
-
-        Unlike the original implementation, zero weights are not replaced by ``1e-10``.
-        This preserves compact-support kernels and strict leave-one-out calculations.
+    The default ``ridge=0.0`` is standard unpenalized WLS. Positive values
+    remain an explicit lower-level ridge option.
     """
     X_arr = _validate_design_matrix(X)
     y_arr = _validate_response(y, X_arr.shape[0])
     weights_arr = _validate_weights(weights, X_arr.shape[0])
     ridge_value = _validate_nonnegative_scalar(ridge, "ridge")
-
-    system, XtWy, _ = _normal_equations(
-        X_arr,
-        y_arr,
-        weights_arr,
-        ridge=ridge_value,
-    )
-
-    beta = _solve_linear_system(system, XtWy)
-    inverse_normal_matrix = _solve_linear_system(
-        system,
-        np.eye(system.shape[0], dtype=float),
-    )
-
-    # Remove tiny asymmetric round-off introduced by the numerical solve.
-    inverse_normal_matrix = 0.5 * (inverse_normal_matrix + inverse_normal_matrix.T)
-
-    return beta, inverse_normal_matrix
+    positive = weights_arr > 0.0
+    sqrt_w = np.sqrt(weights_arr[positive])
+    Xw = X_arr[positive] * sqrt_w[:, None]
+    yw = y_arr[positive] * sqrt_w
+    if ridge_value > 0.0:
+        design = np.vstack(
+            [Xw, np.sqrt(ridge_value) * np.eye(X_arr.shape[1], dtype=float)]
+        )
+        response = np.concatenate([yw, np.zeros(X_arr.shape[1], dtype=float)])
+    else:
+        design = Xw
+        response = yw
+    beta = np.linalg.lstsq(design, response, rcond=None)[0]
+    _, singular_values, vt = np.linalg.svd(design, full_matrices=False)
+    if singular_values.size == 0 or singular_values[0] <= 0.0:
+        raise np.linalg.LinAlgError("Weighted design has zero numerical rank.")
+    cutoff = np.finfo(float).eps * max(design.shape) * singular_values[0]
+    retained = singular_values > cutoff
+    v = vt[retained].T
+    inverse_normal = (v * (1.0 / singular_values[retained] ** 2)) @ v.T
+    inverse_normal = 0.5 * (inverse_normal + inverse_normal.T)
+    if not np.all(np.isfinite(beta)) or not np.all(np.isfinite(inverse_normal)):
+        raise np.linalg.LinAlgError("Weighted SVD solve produced non-finite values.")
+    return np.asarray(beta, dtype=float), inverse_normal
 
 
 def local_regression(
@@ -424,7 +411,7 @@ def local_regression(
                 warnings.warn(
                     f"Location {i}: only {n_positive} positive-weight observations "
                     f"are available for {X_arr.shape[1]} design-matrix columns. "
-                    "Returning a ridge-regularized local solution; consider increasing "
+                    "Returning a minimum-norm unpenalized local solution; consider increasing "
                     "the bandwidth.",
                     RuntimeWarning,
                     stacklevel=2,
@@ -536,7 +523,7 @@ def compute_hat_matrix(
                 warnings.warn(
                     f"Location {i}: only {n_positive} positive-weight observations "
                     f"are available for {X_arr.shape[1]} design-matrix columns. "
-                    "The corresponding hat-matrix row is ridge regularized.",
+                    "The corresponding hat-matrix row uses the unpenalized WLS operator.",
                     RuntimeWarning,
                     stacklevel=2,
                 )

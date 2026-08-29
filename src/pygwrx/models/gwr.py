@@ -283,7 +283,7 @@ class GWR(BaseSpatialRegressor):
                 warnings.warn(
                     f"Location {index}: only {n_positive} positive-weight observations "
                     f"are available for {n_parameters} design columns. The local "
-                    "solution is ridge regularized; consider increasing the bandwidth.",
+                    "solution uses a minimum-norm unpenalized WLS estimate; consider increasing the bandwidth or checking local collinearity.",
                     RuntimeWarning,
                     stacklevel=2,
                 )

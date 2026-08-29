@@ -123,6 +123,8 @@ print(extract_geopandas_coords(gdf))
 
 ## Local solvers
 
+The standard solver is unpenalized weighted least squares. Coefficients are estimated from `sqrt(W) @ X` using SVD-backed least squares, exact zero weights are preserved, and no hidden ridge penalty is added. The low-level `ridge=` argument remains an explicit opt-in.
+
 The maintained example below exercises the public symbols in this group. [Open source](https://github.com/hujinghaoabcd/pyGWRx/blob/main/examples/core/04_solver.py).
 
 ```python
