@@ -1,0 +1,44 @@
+name: PR33 one-shot repair
+
+on:
+  push:
+    branches:
+      - refactor/a1-estimator-contract
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refactor/a1-estimator-contract
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install project quality tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+      - name: Generate frozen contract and normalize new files
+        run: |
+          python tools/architecture/generate_estimator_contract.py
+          python -m isort tests/test_estimator_architecture_contract.py tools/architecture/generate_estimator_contract.py
+          python -m ruff check --fix tests/test_estimator_architecture_contract.py tools/architecture/generate_estimator_contract.py
+          python -m black tests/test_estimator_architecture_contract.py tools/architecture/generate_estimator_contract.py
+          python -m ruff check tests/test_estimator_architecture_contract.py tools/architecture/generate_estimator_contract.py
+          python tools/architecture/generate_estimator_contract.py --check
+      - name: Commit the repair and remove this one-shot workflow
+        shell: bash
+        run: |
+          rm -f .github/workflows/pr33-repair.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add architecture_contracts/estimators.json tests/test_estimator_architecture_contract.py tools/architecture/generate_estimator_contract.py .github/workflows/pr33-repair.yml
+          git diff --cached --check
+          git commit -m "Fix estimator contract CI gates"
+          git push origin HEAD:refactor/a1-estimator-contract
