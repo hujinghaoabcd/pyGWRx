@@ -18,6 +18,9 @@ intentionally omitted because standard GWR is now unpenalized by default.
 
 from __future__ import annotations
 
+__author__ = "Jinghao Hu"
+__license__ = "MIT"
+
 from typing import Tuple
 
 import numpy as np
