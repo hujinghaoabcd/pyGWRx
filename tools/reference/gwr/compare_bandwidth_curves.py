@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Compare controlled GWR bandwidth criterion curves across implementations."""
+
 from __future__ import annotations
 
 import csv
@@ -169,9 +170,8 @@ def main() -> None:
     )
 
     # spgwr q=k/n is a semantic sensitivity curve, never an integer-k equality test.
-    spgwr_cv_domain = (
-        _finite_ks(points["pyGWRx"], "cv_sse", ks)
-        & _finite_ks(points["spgwr"], "cv_sse", ks)
+    spgwr_cv_domain = _finite_ks(points["pyGWRx"], "cv_sse", ks) & _finite_ks(
+        points["spgwr"], "cv_sse", ks
     )
 
     domains = {

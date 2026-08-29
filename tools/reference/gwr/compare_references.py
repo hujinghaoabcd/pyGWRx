@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Compare PyGWRx GWR against frozen mgwr, GWmodel, and spgwr references."""
+
 from __future__ import annotations
 
 import csv
@@ -339,9 +340,7 @@ def main() -> None:
         "rmse",
         "max_rel_diff",
     ]
-    with (OUT_DIR / "comparison.csv").open(
-        "w", newline="", encoding="utf-8"
-    ) as handle:
+    with (OUT_DIR / "comparison.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)

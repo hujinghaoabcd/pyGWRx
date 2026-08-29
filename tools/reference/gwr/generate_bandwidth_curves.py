@@ -5,6 +5,7 @@ The same integer-neighbour candidates are evaluated by PyGWRx and mgwr.  This
 separates criterion-definition agreement from differences in optimizer search
 strategy or default search bounds.
 """
+
 from __future__ import annotations
 
 import json
