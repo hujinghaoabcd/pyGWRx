@@ -281,7 +281,7 @@ mkdocs build --strict --clean
 当前稳定测试基线：
 
 ```text
-406 passed
+422 passed
 ```
 
 阻断式 GitHub Actions 工作流覆盖质量门、最低依赖、数值参考、覆盖率、发行包构建，以及 Windows/Linux/macOS × Python 3.11–3.14 的完整矩阵。

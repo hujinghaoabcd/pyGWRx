@@ -320,17 +320,6 @@ def _fit_local_model(
     return beta, hat_row
 
 
-def _integer_grid(lower: int, upper: int, n_intervals: int) -> np.ndarray:
-    """Create unique integer candidates including both endpoints."""
-    span = upper - lower + 1
-    if n_intervals >= span:
-        return np.arange(lower, upper + 1, dtype=int)
-
-    candidates = np.rint(np.linspace(lower, upper, n_intervals)).astype(int)
-    candidates = np.unique(np.concatenate(([lower], candidates, [upper])))
-    return candidates
-
-
 def _select_best_candidates(
     candidates: np.ndarray,
     objective: Callable[[Bandwidth], float],
@@ -387,6 +376,9 @@ class _BaseSelector(BandwidthSelector):
         self.n_intervals = _validate_positive_int(n_intervals, "n_intervals", minimum=2)
         self.adaptive = _validate_bool(adaptive, "adaptive")
         self.verbose = _validate_bool(verbose, "verbose")
+        self.search_trace_: tuple[tuple[Bandwidth, float], ...] = ()
+        self.best_score_: Optional[float] = None
+        self.search_range_: Optional[tuple[Bandwidth, Bandwidth]] = None
 
         if not isinstance(optimization_method, str):
             raise TypeError("optimization_method must be a string.")
@@ -477,7 +469,16 @@ class _BaseSelector(BandwidthSelector):
         lower: Bandwidth,
         upper: Bandwidth,
     ) -> tuple[Bandwidth, float]:
+        """Search the candidate domain and retain every evaluated score.
+
+        Adaptive bandwidths are discrete neighbour orders, so every integer ``k`` in
+        the validated range is evaluated exactly once. ``optimization_method`` and
+        ``n_intervals`` continue to control only fixed-distance bandwidth searches.
+        """
         cache: dict[Bandwidth, float] = {}
+        self.search_trace_ = ()
+        self.best_score_ = None
+        self.search_range_ = (lower, upper)
 
         def objective(candidate: float) -> float:
             try:
@@ -498,21 +499,18 @@ class _BaseSelector(BandwidthSelector):
                 cache[normalized] = score if np.isfinite(score) else np.inf
             return cache[normalized]
 
-        if self.adaptive and int(lower) == int(upper):
-            only_candidate = int(lower)
-            only_score = objective(only_candidate)
-            if not np.isfinite(only_score):
-                raise RuntimeError(
-                    "The only valid adaptive bandwidth candidate could not "
-                    "be estimated."
-                )
-            return only_candidate, float(only_score)
+        if self.adaptive:
+            candidates = np.arange(int(lower), int(upper) + 1, dtype=int)
+            best_bandwidth, best_score = _select_best_candidates(candidates, objective)
+            self.search_trace_ = tuple(
+                (int(candidate), float(cache[int(candidate)]))
+                for candidate in candidates
+            )
+            self.best_score_ = float(best_score)
+            return int(best_bandwidth), float(best_score)
 
         if self.optimization_method == "grid":
-            if self.adaptive:
-                candidates = _integer_grid(int(lower), int(upper), self.n_intervals)
-            else:
-                candidates = np.linspace(float(lower), float(upper), self.n_intervals)
+            candidates = np.linspace(float(lower), float(upper), self.n_intervals)
             best_bandwidth, best_score = _select_best_candidates(candidates, objective)
 
         elif self.optimization_method == "golden_section":
@@ -527,37 +525,23 @@ class _BaseSelector(BandwidthSelector):
                 objective,
                 float(lower),
                 float(upper),
-                adaptive=self.adaptive,
+                adaptive=False,
             )
             if not result.converged or not np.isfinite(result.score):
                 raise RuntimeError("Golden-section bandwidth search did not converge.")
 
             candidate = _normalize_candidate(
                 result.value,
-                adaptive=self.adaptive,
+                adaptive=False,
                 lower=lower,
                 upper=upper,
             )
-            if self.adaptive:
-                neighborhood = np.arange(
-                    max(int(lower), int(candidate) - 2),
-                    min(int(upper), int(candidate) + 2) + 1,
-                    dtype=int,
+            best_bandwidth = float(candidate)
+            best_score = objective(best_bandwidth)
+            if not np.isfinite(best_score):
+                raise RuntimeError(
+                    "Golden-section search returned an invalid bandwidth."
                 )
-                candidates = np.unique(
-                    np.concatenate(([int(lower), int(upper)], neighborhood))
-                )
-                best_bandwidth, best_score = _select_best_candidates(
-                    candidates,
-                    objective,
-                )
-            else:
-                best_bandwidth = float(candidate)
-                best_score = objective(best_bandwidth)
-                if not np.isfinite(best_score):
-                    raise RuntimeError(
-                        "Golden-section search returned an invalid bandwidth."
-                    )
 
         else:
             from pygwrx.core.optimization import BrentSearch
@@ -569,50 +553,44 @@ class _BaseSelector(BandwidthSelector):
 
             candidate = _normalize_candidate(
                 result.value,
-                adaptive=self.adaptive,
+                adaptive=False,
                 lower=lower,
                 upper=upper,
             )
-            if self.adaptive:
-                # Brent is continuous, while adaptive k is discrete.  The rounded result
-                # and its immediate integer neighbourhood are evaluated explicitly.
-                neighborhood = np.arange(
-                    max(int(lower), int(candidate) - 2),
-                    min(int(upper), int(candidate) + 2) + 1,
-                    dtype=int,
-                )
-                candidates = np.unique(
-                    np.concatenate(([int(lower), int(upper)], neighborhood))
-                )
-                best_bandwidth, best_score = _select_best_candidates(
-                    candidates,
-                    objective,
-                )
-            else:
-                best_bandwidth = float(candidate)
-                best_score = objective(best_bandwidth)
-                if not np.isfinite(best_score):
-                    raise RuntimeError("Brent search returned an invalid bandwidth.")
+            best_bandwidth = float(candidate)
+            best_score = objective(best_bandwidth)
+            if not np.isfinite(best_score):
+                raise RuntimeError("Brent search returned an invalid bandwidth.")
 
-        if self.adaptive:
-            return int(best_bandwidth), float(best_score)
+        self.search_trace_ = tuple(
+            (float(candidate), float(score))
+            for candidate, score in sorted(
+                cache.items(), key=lambda item: float(item[0])
+            )
+        )
+        self.best_score_ = float(best_score)
         return float(best_bandwidth), float(best_score)
 
     def _print_header(self, title: str, lower: Bandwidth, upper: Bandwidth) -> None:
         if not self.verbose:
             return
         print(f"\n{title}")
-        print(f"  Method: {self.optimization_method}")
         if self.adaptive:
+            print("  Method: exhaustive_integer")
             print(f"  Search range: [{int(lower)}, {int(upper)}]")
             print("  Type: Adaptive (integer neighbour-order bandwidth)")
         else:
+            print(f"  Method: {self.optimization_method}")
             print(f"  Search range: [{float(lower):.6g}, {float(upper):.6g}]")
             print("  Type: Fixed (distance bandwidth)")
 
 
 class CrossValidationSelector(_BaseSelector):
-    """Select bandwidth by strict leave-one-out squared prediction error."""
+    """Select bandwidth by strict leave-one-out squared prediction error.
+
+    Adaptive searches evaluate every integer neighbour order in the validated
+    range and retain the ordered ``search_trace_`` after selection.
+    """
 
     def select(
         self,
@@ -658,7 +636,11 @@ class CrossValidationSelector(_BaseSelector):
 
 
 class AICSelector(_BaseSelector):
-    """Select bandwidth using Gaussian GWR AIC or AICc."""
+    """Select bandwidth using Gaussian GWR AIC or AICc.
+
+    Adaptive searches evaluate every integer neighbour order in the validated
+    range and retain the ordered ``search_trace_`` after selection.
+    """
 
     def __init__(
         self,
@@ -733,7 +715,11 @@ class AICSelector(_BaseSelector):
 
 
 class BICSelector(_BaseSelector):
-    """Select bandwidth using Gaussian GWR BIC."""
+    """Select bandwidth using Gaussian GWR BIC.
+
+    Adaptive searches evaluate every integer neighbour order in the validated
+    range and retain the ordered ``search_trace_`` after selection.
+    """
 
     def select(
         self,

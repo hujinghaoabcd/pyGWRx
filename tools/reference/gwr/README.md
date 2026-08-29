@@ -12,7 +12,7 @@ The deterministic calibration data live in `tests/reference_data/gwr/input.csv`;
 
 A second validation layer uses the package's 49-neighbourhood Columbus dataset with `CRIME ~ INC + HOVAL` and coordinates `X`, `Y`. Compact frozen outputs are stored under `tests/reference_data/gwr/real_columbus/frozen/`; full comparison tables and the human-readable report are stored under `validation_results/gwr/real_columbus/`. The real-data suite checks fixed and adaptive Gaussian/bisquare calibration, five genuinely held-out locations, controlled adaptive-bandwidth criteria, and the near-saturated `k=4` boundary.
 
-The current repository contains **45 tests marked `reference`** across the independent numerical-reference suite. They run separately from the 361 non-reference tests in blocking CI.
+The current repository contains **45 tests marked `reference`** across the independent numerical-reference suite. They run separately from the 377 non-reference tests in blocking CI.
 
 ## Validation policy
 

@@ -288,7 +288,7 @@ Version **0.1.2** is an **Alpha research release**. The supported public tree is
 Current stable-suite baseline:
 
 ```text
-406 passed
+422 passed
 ```
 
 The blocking GitHub Actions workflow validates quality gates, minimum dependencies, numerical references, coverage, distributions, and the Windows/Linux/macOS × Python 3.11–3.14 matrix.

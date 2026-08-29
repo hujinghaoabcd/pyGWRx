@@ -357,28 +357,33 @@ def test_controlled_adaptive_bandwidth_argmins_match_external_references(
     coords = gwr_data["coords"].to_numpy(dtype=float)
     kernel = get_kernel_function("bisquare")
 
-    cv = CrossValidationSelector(
-        n_intervals=100,
+    cv_selector = CrossValidationSelector(
+        n_intervals=2,
         adaptive=True,
-        optimization_method="grid",
-    ).select(X_design, y, coords, kernel, bandwidth_range=(6, 40))
-    aic = AICSelector(
-        n_intervals=100,
+        optimization_method="golden_section",
+    )
+    aic_selector = AICSelector(
+        n_intervals=2,
         corrected=False,
         adaptive=True,
-        optimization_method="grid",
-    ).select(X_design, y, coords, kernel, bandwidth_range=(5, 40))
-    aicc = AICSelector(
-        n_intervals=100,
+        optimization_method="brent",
+    )
+    aicc_selector = AICSelector(
+        n_intervals=2,
         corrected=True,
         adaptive=True,
         optimization_method="grid",
-    ).select(X_design, y, coords, kernel, bandwidth_range=(5, 40))
-    bic = BICSelector(
-        n_intervals=100,
+    )
+    bic_selector = BICSelector(
+        n_intervals=2,
         adaptive=True,
-        optimization_method="grid",
-    ).select(X_design, y, coords, kernel, bandwidth_range=(5, 40))
+        optimization_method="golden_section",
+    )
+
+    cv = cv_selector.select(X_design, y, coords, kernel, bandwidth_range=(6, 40))
+    aic = aic_selector.select(X_design, y, coords, kernel, bandwidth_range=(5, 40))
+    aicc = aicc_selector.select(X_design, y, coords, kernel, bandwidth_range=(5, 40))
+    bic = bic_selector.select(X_design, y, coords, kernel, bandwidth_range=(5, 40))
 
     # Shared-candidate external validation gives these same minima:
     # CV: PyGWRx = mgwr = GWmodel = 15
@@ -389,6 +394,10 @@ def test_controlled_adaptive_bandwidth_argmins_match_external_references(
     assert aic == 5
     assert aicc == 22
     assert bic == 5
+
+    assert tuple(k for k, _ in cv_selector.search_trace_) == tuple(range(6, 41))
+    for selector in (aic_selector, aicc_selector, bic_selector):
+        assert tuple(k for k, _ in selector.search_trace_) == tuple(range(5, 41))
 
 
 def test_aicc_rejects_saturated_k4_boundary(gwr_data: dict[str, Any]) -> None:
