@@ -16,7 +16,6 @@ import pygwrx
 import pygwrx.core as core
 from pygwrx.core import distance, utils
 
-
 PUBLIC_DISTANCE_NAMES = (
     "euclidean_distance",
     "manhattan_distance",
