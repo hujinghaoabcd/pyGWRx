@@ -23,14 +23,14 @@ import numpy as np
 
 from pygwrx.core.distance import (  # noqa: F401
     _DEFAULT_DISTANCE_BLOCK_ROWS,
-    _iter_distance_blocks,
-    _iter_distance_rows,
     DistanceCache,
     chebyshev_distance,
     chunked_computation,
     compute_distance_matrix,
     euclidean_distance,
     haversine_distance,
+    _iter_distance_blocks,
+    _iter_distance_rows,
     manhattan_distance,
     minkowski_distance,
 )
