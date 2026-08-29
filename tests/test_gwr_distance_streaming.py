@@ -11,7 +11,7 @@ import numpy as np
 
 from pygwrx import GWR
 
-gwr_module = importlib.import_module("pygwrx.models.gwr")
+core_utils = importlib.import_module("pygwrx.core.utils")
 
 
 def _make_data(n_samples: int = 300):
@@ -23,20 +23,20 @@ def _make_data(n_samples: int = 300):
 
 
 def _track_distance_blocks(monkeypatch):
-    original = gwr_module.compute_distance_matrix
+    original = core_utils.compute_distance_matrix
     calls: list[tuple[int, int]] = []
 
     def tracked(coords1, coords2=None, metric="euclidean", **kwargs):
         first = np.asarray(coords1)
         second = first if coords2 is None else np.asarray(coords2)
         calls.append((first.shape[0], second.shape[0]))
-        if first.shape[0] > gwr_module._DISTANCE_BLOCK_ROWS:
+        if first.shape[0] > core_utils._DEFAULT_DISTANCE_BLOCK_ROWS:
             raise AssertionError(
                 "GWR requested more target rows than the bounded distance block size."
             )
         return original(coords1, coords2, metric=metric, **kwargs)
 
-    monkeypatch.setattr(gwr_module, "compute_distance_matrix", tracked)
+    monkeypatch.setattr(core_utils, "compute_distance_matrix", tracked)
     return calls
 
 
@@ -60,7 +60,7 @@ def test_numeric_bandwidth_fit_streams_calibration_and_local_r2_distances(
     assert np.all(np.isfinite(model.fitted_values_))
     assert np.all(np.isfinite(model.local_r2_))
     assert calls
-    assert max(rows for rows, _ in calls) <= gwr_module._DISTANCE_BLOCK_ROWS
+    assert max(rows for rows, _ in calls) <= core_utils._DEFAULT_DISTANCE_BLOCK_ROWS
     assert not any(
         rows == coords.shape[0] and cols == coords.shape[0] for rows, cols in calls
     )
@@ -88,7 +88,7 @@ def test_prediction_streams_target_to_training_distances(monkeypatch):
     assert predictions.shape == (n_targets,)
     assert np.all(np.isfinite(predictions))
     assert calls
-    assert max(rows for rows, _ in calls) <= gwr_module._DISTANCE_BLOCK_ROWS
+    assert max(rows for rows, _ in calls) <= core_utils._DEFAULT_DISTANCE_BLOCK_ROWS
     assert not any(
         rows == n_targets and cols == coords.shape[0] for rows, cols in calls
     )

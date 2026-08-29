@@ -15,12 +15,12 @@ __author__ = "Jinghao Hu"
 __license__ = "MIT"
 
 from abc import ABC, abstractmethod
-from typing import Callable, Iterator, Optional, Tuple, Union
+from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 
 from pygwrx.core.solver import weighted_least_squares
-from pygwrx.core.utils import compute_distance_matrix
+from pygwrx.core.utils import _iter_distance_rows
 
 Bandwidth = Union[int, float]
 BandwidthRange = Optional[Tuple[float, float]]
@@ -44,33 +44,6 @@ class _InvalidCandidateError(RuntimeError):
 # Standard GWR bandwidth scoring is unpenalized. The constant is retained internally
 # only to make that numerical policy explicit at the local-solver call site.
 _RIDGE = 0.0
-_DISTANCE_BLOCK_ROWS = 128
-
-
-def _iter_distance_rows(
-    coords: np.ndarray,
-    *,
-    distance_metric: str,
-) -> Iterator[np.ndarray]:
-    """Yield coordinate-to-coordinate distance rows from bounded-size blocks."""
-    n_samples = coords.shape[0]
-    for start in range(0, n_samples, _DISTANCE_BLOCK_ROWS):
-        stop = min(start + _DISTANCE_BLOCK_ROWS, n_samples)
-        block = np.asarray(
-            compute_distance_matrix(
-                coords[start:stop],
-                coords,
-                metric=distance_metric,
-            ),
-            dtype=float,
-        )
-        expected_shape = (stop - start, n_samples)
-        if block.shape != expected_shape:
-            raise ValueError("The computed distance block has an invalid shape.")
-        if not np.all(np.isfinite(block)) or np.any(block < 0):
-            raise ValueError("The computed distance block contains invalid distances.")
-        for distance_row in block:
-            yield distance_row
 
 
 def _positive_pairwise_distance_extrema(

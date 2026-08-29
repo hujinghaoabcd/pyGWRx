@@ -587,3 +587,60 @@ def chunked_computation(
     for start in range(0, n_items_int, chunk_size_int):
         end = min(start + chunk_size_int, n_items_int)
         yield start, end
+
+
+_DEFAULT_DISTANCE_BLOCK_ROWS = 128
+
+
+def _iter_distance_blocks(
+    target_coords: CoordinateInput,
+    source_coords: Optional[CoordinateInput] = None,
+    *,
+    distance_metric: str = "euclidean",
+    block_rows: int = _DEFAULT_DISTANCE_BLOCK_ROWS,
+) -> Iterator[np.ndarray]:
+    """Yield bounded target-to-source pairwise distance blocks."""
+    if source_coords is None:
+        source_coords = target_coords
+    targets, sources = _validate_coordinate_pair(target_coords, source_coords)
+    if isinstance(block_rows, (bool, np.bool_)) or not isinstance(block_rows, Integral):
+        raise TypeError("block_rows must be a positive integer.")
+    block_rows_int = int(block_rows)
+    if block_rows_int <= 0:
+        raise ValueError("block_rows must be greater than zero.")
+
+    n_sources = sources.shape[0]
+    for start, stop in chunked_computation(targets.shape[0], block_rows_int):
+        block = np.asarray(
+            compute_distance_matrix(
+                targets[start:stop],
+                sources,
+                metric=distance_metric,
+            ),
+            dtype=float,
+        )
+        expected_shape = (stop - start, n_sources)
+        if block.shape != expected_shape:
+            raise ValueError(
+                "The distance implementation returned an unexpected block shape."
+            )
+        if not np.all(np.isfinite(block)) or np.any(block < 0.0):
+            raise ValueError("The distance implementation returned invalid distances.")
+        yield block
+
+
+def _iter_distance_rows(
+    target_coords: CoordinateInput,
+    source_coords: Optional[CoordinateInput] = None,
+    *,
+    distance_metric: str = "euclidean",
+    block_rows: int = _DEFAULT_DISTANCE_BLOCK_ROWS,
+) -> Iterator[np.ndarray]:
+    """Yield target-to-source distance rows from bounded-size blocks."""
+    for block in _iter_distance_blocks(
+        target_coords,
+        source_coords,
+        distance_metric=distance_metric,
+        block_rows=block_rows,
+    ):
+        yield from block

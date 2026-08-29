@@ -11,7 +11,7 @@ import pytest
 from pygwrx.core.bandwidth import AICSelector, BICSelector, CrossValidationSelector
 from pygwrx.core.kernels import gaussian_kernel
 
-bandwidth_module = importlib.import_module("pygwrx.core.bandwidth")
+core_utils = importlib.import_module("pygwrx.core.utils")
 
 
 def _make_data(n_samples: int = 132):
@@ -23,7 +23,7 @@ def _make_data(n_samples: int = 132):
 
 
 def _track_distance_blocks(monkeypatch, n_samples: int):
-    original = bandwidth_module.compute_distance_matrix
+    original = core_utils.compute_distance_matrix
     calls = []
 
     def tracked(left, right, metric="euclidean"):
@@ -36,14 +36,19 @@ def _track_distance_blocks(monkeypatch, n_samples: int):
             )
         return original(left, right, metric=metric)
 
-    monkeypatch.setattr(bandwidth_module, "compute_distance_matrix", tracked)
+    monkeypatch.setattr(core_utils, "compute_distance_matrix", tracked)
     return calls
 
 
 def _assert_bounded_blocks(calls, n_samples: int):
     assert len(calls) >= 2
-    assert max(left_rows for left_rows, _ in calls) <= 128
-    assert any(left_rows < 128 for left_rows, _ in calls)
+    assert (
+        max(left_rows for left_rows, _ in calls)
+        <= core_utils._DEFAULT_DISTANCE_BLOCK_ROWS
+    )
+    assert any(
+        left_rows < core_utils._DEFAULT_DISTANCE_BLOCK_ROWS for left_rows, _ in calls
+    )
     assert {right_rows for _, right_rows in calls} == {n_samples}
 
 
