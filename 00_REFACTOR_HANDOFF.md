@@ -47,7 +47,7 @@
 - A1 — Public API & capability snapshot：**DONE**，PR #34，merge SHA `888f9ceac8fd2c988afb4a004056d5c523302290`。
 - A2 — 19-model fitted-state atomicity freeze：**DONE**，PR #35，merge SHA `b655688f7201aaa9677fe153f2cbc15e6e63afb6`。
 - A3 — 19-model migration risk matrix：**DONE**，PR #36，merge SHA `dc150ef09fed370a45e5a6e62f14846979fff643`。
-- A4 — performance/memory baseline harness：**IN PROGRESS**，分支 `refactor/a4-performance-memory-baseline`。
-- A4 完成后下一项固定为：**A5 — pre-refactor contract/message hygiene**。
+- A4 — performance/memory baseline harness：**DONE**，PR #38，merge SHA `de64389163fc5094ab46b72671872d26f35b9733`。
+- 下一项固定为：**A5 — pre-refactor contract/message hygiene**。
 
-A1/A2/A3 共同构成后续迁移的安全冻结：Public API / capability、failed-refit atomicity、迁移风险与执行约束必须同时守住；标准 GWR 的独立 reference evidence 继续作为 blocking numerical gate。A4 只建立可复现的性能/内存 baseline 与结构型 memory regression guard，不改变 estimator 数学、执行策略或统计公式，也不设置 noisy wall-time CI gate。
+A1/A2/A3/A4 共同构成后续迁移的安全冻结：Public API / capability、failed-refit atomicity、迁移风险、性能/内存现状与执行约束必须同时守住；标准 GWR 的独立 reference evidence 继续作为 blocking numerical gate。A4 的 timing/RSS 仅作为 observational baseline，不设置 noisy wall-time CI gate；live structural memory guards 用于阻止 streamed GWR 与 large-n ScalableGWR 意外引入 retained `n × n` buffer，并保留 dense-hat GWR 的显式 dense 行为。A5 只能处理明确的契约/提示信息问题，不得开始 base/core 重写。
