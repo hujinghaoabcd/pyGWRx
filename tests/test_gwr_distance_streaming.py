@@ -41,7 +41,9 @@ def _track_distance_blocks(monkeypatch):
     return calls
 
 
-def test_numeric_bandwidth_fit_streams_calibration_and_local_r2_distances(monkeypatch):
+def test_numeric_bandwidth_fit_streams_calibration_and_local_r2_distances(
+    monkeypatch,
+):
     X, y, coords = _make_data()
     calls = _track_distance_blocks(monkeypatch)
 
@@ -60,7 +62,10 @@ def test_numeric_bandwidth_fit_streams_calibration_and_local_r2_distances(monkey
     assert np.all(np.isfinite(model.local_r2_))
     assert calls
     assert max(rows for rows, _ in calls) <= gwr_module._DISTANCE_BLOCK_ROWS
-    assert all(not (rows == coords.shape[0] and cols == coords.shape[0]) for rows, cols in calls)
+    assert all(
+        not (rows == coords.shape[0] and cols == coords.shape[0])
+        for rows, cols in calls
+    )
 
 
 def test_prediction_streams_target_to_training_distances(monkeypatch):
@@ -86,4 +91,6 @@ def test_prediction_streams_target_to_training_distances(monkeypatch):
     assert np.all(np.isfinite(predictions))
     assert calls
     assert max(rows for rows, _ in calls) <= gwr_module._DISTANCE_BLOCK_ROWS
-    assert all(not (rows == n_targets and cols == coords.shape[0]) for rows, cols in calls)
+    assert all(
+        not (rows == n_targets and cols == coords.shape[0]) for rows, cols in calls
+    )
