@@ -40,6 +40,13 @@ def _track_distance_blocks(monkeypatch, n_samples: int):
     return calls
 
 
+def _assert_bounded_blocks(calls, n_samples: int):
+    assert len(calls) >= 2
+    assert max(left_rows for left_rows, _ in calls) <= 128
+    assert any(left_rows < 128 for left_rows, _ in calls)
+    assert {right_rows for _, right_rows in calls} == {n_samples}
+
+
 @pytest.mark.parametrize(
     "selector",
     [
@@ -59,9 +66,7 @@ def test_fixed_bandwidth_objectives_use_bounded_distance_blocks(monkeypatch, sel
         bandwidth_range=(0.25, 1.25),
     )
     assert np.isfinite(float(selected))
-    assert calls
-    assert max(left_rows for left_rows, _ in calls) <= 128
-    assert {right_rows for _, right_rows in calls} == {coords.shape[0]}
+    _assert_bounded_blocks(calls, coords.shape[0])
 
 
 def test_fixed_automatic_range_uses_bounded_distance_scan(monkeypatch):
@@ -71,8 +76,7 @@ def test_fixed_automatic_range_uses_bounded_distance_scan(monkeypatch):
     selected = selector.select(X, y, coords, gaussian_kernel)
     assert np.isfinite(float(selected))
     assert selector.search_range_ is not None
-    assert calls
-    assert max(left_rows for left_rows, _ in calls) <= 128
+    _assert_bounded_blocks(calls, coords.shape[0])
 
 
 def test_adaptive_bandwidth_objective_uses_bounded_distance_blocks(monkeypatch):
@@ -87,5 +91,4 @@ def test_adaptive_bandwidth_objective_uses_bounded_distance_blocks(monkeypatch):
         bandwidth_range=(8, 10),
     )
     assert int(selected) in {8, 9, 10}
-    assert calls
-    assert max(left_rows for left_rows, _ in calls) <= 128
+    _assert_bounded_blocks(calls, coords.shape[0])
