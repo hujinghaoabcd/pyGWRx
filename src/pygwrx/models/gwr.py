@@ -16,7 +16,7 @@ __license__ = "MIT"
 
 import warnings
 from dataclasses import dataclass
-from typing import Callable, Dict, Iterator, Optional, Tuple, Union
+from typing import Callable, Dict, Iterable, Iterator, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -89,6 +89,7 @@ class GWRPredictionResult:
 class _LocalFitResult:
     params: np.ndarray
     fitted_values: np.ndarray
+    distances: Iterable[np.ndarray]
     influence: np.ndarray
     trace_S: float
     trace_StS: float
@@ -423,6 +424,7 @@ class GWR(BaseSpatialRegressor):
         return _LocalFitResult(
             params=params,
             fitted_values=fitted,
+            distances=self._iter_distance_rows(self.coords_train_),
             influence=influence,
             trace_S=float(np.sum(influence)),
             trace_StS=float(trace_sts),
@@ -432,18 +434,14 @@ class GWR(BaseSpatialRegressor):
             local_condition_number=local_condition_number,
         )
 
-    def _compute_local_r2(self) -> np.ndarray:
-        if (
-            self.coords_train_ is None
-            or self.y_train_ is None
-            or self.residuals_ is None
-        ):
-            raise RuntimeError("Fitted values, residuals, and coordinates are unavailable.")
+    def _compute_local_r2_from_distance_rows(
+        self, distance_rows: Iterable[np.ndarray]
+    ) -> np.ndarray:
+        if self.y_train_ is None or self.residuals_ is None:
+            raise RuntimeError("Fitted values and residuals are unavailable.")
         local_r2 = np.full(self.y_train_.shape[0], np.nan, dtype=float)
         residual_sq = self.residuals_**2
-        for index, distance_row in enumerate(
-            self._iter_distance_rows(self.coords_train_)
-        ):
+        for index, distance_row in enumerate(distance_rows):
             weights = self._weights_from_distances(distance_row)
             weight_sum = float(np.sum(weights))
             if weight_sum <= np.finfo(float).eps:
@@ -460,6 +458,19 @@ class GWR(BaseSpatialRegressor):
             else:
                 local_r2[index] = 1.0 - local_rss / local_tss
         return local_r2
+
+    def _compute_local_r2_from_distances(
+        self, distances: Iterable[np.ndarray]
+    ) -> np.ndarray:
+        """Compatibility helper accepting an array or lazy distance-row iterable."""
+        return self._compute_local_r2_from_distance_rows(distances)
+
+    def _compute_local_r2(self) -> np.ndarray:
+        if self.coords_train_ is None:
+            raise RuntimeError("Training coordinates are unavailable.")
+        return self._compute_local_r2_from_distance_rows(
+            self._iter_distance_rows(self.coords_train_)
+        )
 
     def _set_inference_results(
         self,
