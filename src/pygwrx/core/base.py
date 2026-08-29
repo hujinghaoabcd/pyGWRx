@@ -269,8 +269,15 @@ class BaseSpatialRegressor(BaseSpatialEstimator):
             lower, upper = float(bandwidth_range[0]), float(bandwidth_range[1])
             if not np.isfinite(lower) or not np.isfinite(upper):
                 raise ValueError("bandwidth_range values must be finite.")
-            if lower <= 0 or upper <= 0 or lower > upper:
-                raise ValueError("bandwidth_range must satisfy 0 < lower <= upper.")
+            if adaptive:
+                if lower <= 0 or upper <= 0 or lower > upper:
+                    raise ValueError(
+                        "adaptive bandwidth_range must satisfy 0 < lower <= upper."
+                    )
+            elif lower <= 0 or upper <= 0 or lower >= upper:
+                raise ValueError(
+                    "fixed bandwidth_range must satisfy 0 < lower < upper."
+                )
             if adaptive and (not lower.is_integer() or not upper.is_integer()):
                 raise ValueError("adaptive bandwidth_range values must be integers.")
 

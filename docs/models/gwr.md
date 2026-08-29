@@ -194,7 +194,7 @@ model.fit(
     X,
     y,
     coords,
-    compute_hat_matrix=True,
+    compute_hat_matrix=False,
     compute_local_r2=True,
     compute_inference=True,
     verbose=None,
@@ -203,7 +203,7 @@ model.fit(
 
 | Fit argument | Default | Meaning and practical choice |
 |---|---:|---|
-| `compute_hat_matrix` | `True` | Stores the full `n × n` smoother matrix. Set to `False` for larger samples. The trace, `trace(S'S)`, influence, AIC/AICc/BIC and effective-parameter diagnostics are still computed. |
+| `compute_hat_matrix` | `False` | Does not store the full `n × n` smoother matrix by default. Set to `True` only when the matrix entries themselves are required. The trace, `trace(S'S)`, influence, AIC/AICc/BIC and effective-parameter diagnostics are still computed. |
 | `compute_local_r2` | `True` | Computes a weighted local R² at every calibration location. Disable only when it is not needed and fit time matters. Local R² is descriptive and should not replace residual checks. |
 | `compute_inference` | `True` | Computes covariance diagonals, local standard errors and local t statistics where the local weighted design is identifiable. Rank diagnostics are retained even when this option is disabled. |
 | `verbose` | `None` | Optional per-fit override of the constructor setting. |

@@ -478,7 +478,7 @@ class GWR(BaseSpatialRegressor):
         leverage_term = 1.0 - self.influence_
         self.standardized_residuals_ = np.full(self.n_samples_, np.nan, dtype=float)
         valid_leverage = leverage_term > np.finfo(float).eps
-        if np.isfinite(self.sigma2_) and self.sigma2_ >= 0.0:
+        if np.isfinite(self.sigma2_) and self.sigma2_ > np.finfo(float).eps:
             self.standardized_residuals_[valid_leverage] = self.residuals_[
                 valid_leverage
             ] / np.sqrt(self.sigma2_ * leverage_term[valid_leverage])
@@ -531,7 +531,7 @@ class GWR(BaseSpatialRegressor):
         y: Union[np.ndarray, pd.Series],
         coords: Union[np.ndarray, pd.DataFrame],
         *,
-        compute_hat_matrix: bool = True,
+        compute_hat_matrix: bool = False,
         compute_local_r2: bool = True,
         compute_inference: bool = True,
         compute_hat_matrix_flag: Optional[bool] = None,
@@ -543,7 +543,7 @@ class GWR(BaseSpatialRegressor):
         ``compute_hat_matrix=False`` avoids storing the full ``n x n`` smoother
         matrix. Calibration distances are evaluated in bounded row blocks, so a
         numeric-bandwidth fit does not also retain an ``n x n`` distance matrix.
-        Automatic bandwidth selection has its own distance-matrix policy.
+        Automatic bandwidth selection uses the same bounded distance backend.
 
         ``compute_hat_matrix_flag`` is retained as a compatibility alias for older
         PyGWRx code. New code should use ``compute_hat_matrix``.
@@ -844,15 +844,27 @@ class GWR(BaseSpatialRegressor):
             raise RuntimeError("Training data are unavailable.")
 
         X_global = add_intercept(self.X_train_) if self.fit_intercept else self.X_train_
-        global_beta = np.linalg.lstsq(X_global, self.y_train_, rcond=None)[0]
+        n, p = X_global.shape
+        global_solve = _weighted_least_squares_details(
+            X_global,
+            self.y_train_,
+            np.ones(n, dtype=float),
+        )
+        global_beta = global_solve.beta
         global_fitted = X_global @ global_beta
         global_residuals = self.y_train_ - global_fitted
         global_rss = float(np.dot(global_residuals, global_residuals))
-        n, p = X_global.shape
-        global_df = max(n - p, 1)
+        global_df = max(n - global_solve.rank, 1)
         global_sigma2 = global_rss / global_df
-        covariance = global_sigma2 * np.linalg.pinv(X_global.T @ X_global)
-        global_se = np.sqrt(np.maximum(np.diag(covariance), 0.0))
+        if global_solve.rank < p:
+            global_se = np.full(p, np.nan, dtype=float)
+        else:
+            global_se = np.sqrt(
+                np.maximum(
+                    np.diag(global_solve.inverse_normal) * global_sigma2,
+                    0.0,
+                )
+            )
 
         feature_names = (
             [str(name) for name in self.feature_names_in_]
