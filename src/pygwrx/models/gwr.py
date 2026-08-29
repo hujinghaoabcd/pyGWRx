@@ -31,7 +31,6 @@ from pygwrx.core.solver import (
 )
 from pygwrx.core.utils import add_intercept, compute_distance_matrix, validate_coords
 
-
 _DISTANCE_BLOCK_ROWS = 128
 
 
