@@ -16,7 +16,7 @@ __license__ = "MIT"
 
 import warnings
 from dataclasses import dataclass
-from typing import Callable, Dict, Optional, Tuple, Union
+from typing import Callable, Dict, Iterator, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -30,6 +30,9 @@ from pygwrx.core.solver import (
     adaptive_bandwidth_weights,
 )
 from pygwrx.core.utils import add_intercept, compute_distance_matrix, validate_coords
+
+
+_DISTANCE_BLOCK_ROWS = 128
 
 
 @dataclass(frozen=True)
@@ -86,7 +89,6 @@ class GWRPredictionResult:
 class _LocalFitResult:
     params: np.ndarray
     fitted_values: np.ndarray
-    distances: np.ndarray
     influence: np.ndarray
     trace_S: float
     trace_StS: float
@@ -306,6 +308,33 @@ class GWR(BaseSpatialRegressor):
             raise ValueError("The local kernel contains no positive weights.")
         return weights
 
+    def _iter_distance_rows(self, target_coords: np.ndarray) -> Iterator[np.ndarray]:
+        """Yield target-to-training distance rows from bounded-size blocks."""
+        if self.coords_train_ is None:
+            raise RuntimeError("Training coordinates are unavailable.")
+        targets = np.asarray(target_coords, dtype=float)
+        if targets.ndim != 2:
+            raise ValueError("target_coords must be a two-dimensional array.")
+
+        n_train = self.coords_train_.shape[0]
+        for start in range(0, targets.shape[0], _DISTANCE_BLOCK_ROWS):
+            stop = min(start + _DISTANCE_BLOCK_ROWS, targets.shape[0])
+            block = np.asarray(
+                compute_distance_matrix(
+                    targets[start:stop],
+                    self.coords_train_,
+                    metric=self.distance_metric,
+                ),
+                dtype=float,
+            )
+            expected_shape = (stop - start, n_train)
+            if block.shape != expected_shape:
+                raise ValueError(
+                    "The distance implementation returned an unexpected block shape."
+                )
+            for distance_row in block:
+                yield distance_row
+
     @staticmethod
     def _warn_rank_deficiency(
         rank_deficient: np.ndarray,
@@ -337,14 +366,6 @@ class GWR(BaseSpatialRegressor):
         if self.coords_train_ is None or self.y_train_ is None:
             raise RuntimeError("Training data are unavailable.")
 
-        distances = np.asarray(
-            compute_distance_matrix(
-                self.coords_train_,
-                self.coords_train_,
-                metric=self.distance_metric,
-            ),
-            dtype=float,
-        )
         n_samples, n_parameters = X_design.shape
         params = np.empty((n_samples, n_parameters), dtype=float)
         fitted = np.empty(n_samples, dtype=float)
@@ -361,7 +382,9 @@ class GWR(BaseSpatialRegressor):
         )
         trace_sts = 0.0
 
-        for index, distance_row in enumerate(distances):
+        for index, distance_row in enumerate(
+            self._iter_distance_rows(self.coords_train_)
+        ):
             weights = self._weights_from_distances(distance_row)
             solve = _weighted_least_squares_details(
                 X_design,
@@ -400,7 +423,6 @@ class GWR(BaseSpatialRegressor):
         return _LocalFitResult(
             params=params,
             fitted_values=fitted,
-            distances=distances,
             influence=influence,
             trace_S=float(np.sum(influence)),
             trace_StS=float(trace_sts),
@@ -410,12 +432,18 @@ class GWR(BaseSpatialRegressor):
             local_condition_number=local_condition_number,
         )
 
-    def _compute_local_r2_from_distances(self, distances: np.ndarray) -> np.ndarray:
-        if self.y_train_ is None or self.residuals_ is None:
-            raise RuntimeError("Fitted values and residuals are unavailable.")
+    def _compute_local_r2(self) -> np.ndarray:
+        if (
+            self.coords_train_ is None
+            or self.y_train_ is None
+            or self.residuals_ is None
+        ):
+            raise RuntimeError("Fitted values, residuals, and coordinates are unavailable.")
         local_r2 = np.full(self.y_train_.shape[0], np.nan, dtype=float)
         residual_sq = self.residuals_**2
-        for index, distance_row in enumerate(distances):
+        for index, distance_row in enumerate(
+            self._iter_distance_rows(self.coords_train_)
+        ):
             weights = self._weights_from_distances(distance_row)
             weight_sum = float(np.sum(weights))
             if weight_sum <= np.finfo(float).eps:
@@ -517,9 +545,10 @@ class GWR(BaseSpatialRegressor):
         """Fit the Gaussian GWR model and return ``self``.
 
         The smoother traces and influence values are always computed. Setting
-        ``compute_hat_matrix=False`` avoids storing the full ``n x n`` matrix while
-        retaining valid AIC/AICc/BIC, effective-parameter, residual-variance, and
-        influence diagnostics.
+        ``compute_hat_matrix=False`` avoids storing the full ``n x n`` smoother
+        matrix. Calibration distances are evaluated in bounded row blocks, so a
+        numeric-bandwidth fit does not also retain an ``n x n`` distance matrix.
+        Automatic bandwidth selection has its own distance-matrix policy.
 
         ``compute_hat_matrix_flag`` is retained as a compatibility alias for older
         PyGWRx code. New code should use ``compute_hat_matrix``.
@@ -603,11 +632,7 @@ class GWR(BaseSpatialRegressor):
                 trace_StS=local_fit.trace_StS,
             )
 
-            self.local_r2_ = (
-                self._compute_local_r2_from_distances(local_fit.distances)
-                if compute_local_r2
-                else None
-            )
+            self.local_r2_ = self._compute_local_r2() if compute_local_r2 else None
             self._set_inference_results(
                 local_fit.covariance_factors,
                 trace_S=local_fit.trace_S,
@@ -642,16 +667,13 @@ class GWR(BaseSpatialRegressor):
 
         coords_arr = validate_coords(coords)
         X_design = add_intercept(self.X_train_) if self.fit_intercept else self.X_train_
-        distances = compute_distance_matrix(
-            coords_arr, self.coords_train_, metric=self.distance_metric
-        )
         full_params = np.empty((coords_arr.shape[0], X_design.shape[1]), dtype=float)
         local_rank = np.empty(coords_arr.shape[0], dtype=int)
         local_condition_number = np.empty(coords_arr.shape[0], dtype=float)
         covariance_factors = (
             np.empty_like(full_params) if self.inference_enabled_ else None
         )
-        for index, distance_row in enumerate(distances):
+        for index, distance_row in enumerate(self._iter_distance_rows(coords_arr)):
             weights = self._weights_from_distances(distance_row)
             solve = _weighted_least_squares_details(
                 X_design,
