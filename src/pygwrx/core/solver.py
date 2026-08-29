@@ -334,14 +334,15 @@ def local_regression(
             ``adaptive=True``.
         distance_metric: Distance metric forwarded to ``compute_distance_matrix``.
         adaptive: Whether ``bandwidth`` is interpreted as a neighbour-order bandwidth.
-        ridge: Non-negative regularization shared with ``compute_hat_matrix``.
+        ridge: Optional non-negative ridge penalty. The default ``0.0`` is standard
+            unpenalized WLS; positive values are explicit lower-level regularization.
 
     Returns:
         local_coefs: Local coefficient vectors.
 
     Notes:
         If a location has fewer positive-weight observations than design-matrix columns,
-        the function emits a warning and returns the deterministic ridge-regularized
+        the default path warns and returns the Moore-Penrose minimum-norm unpenalized WLS
         solution. It never copies coefficients from a preceding location and never falls
         back silently to global OLS, so results do not depend on target ordering.
     """
@@ -452,8 +453,8 @@ def compute_hat_matrix(
         bandwidth: Fixed distance or adaptive neighbour-order bandwidth.
         distance_metric: Distance metric forwarded to ``compute_distance_matrix``.
         adaptive: Whether ``bandwidth`` is an adaptive neighbour-order bandwidth.
-        ridge: Non-negative regularization. The same value and normal-system construction are
-            used by ``weighted_least_squares`` and ``local_regression``.
+        ridge: Optional non-negative ridge penalty. The default ``0.0`` is unpenalized;
+            positive values explicitly regularize the standalone smoother calculation.
 
     Returns:
         hat_matrix: Full smoother matrix.

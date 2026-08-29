@@ -40,8 +40,8 @@ class _InvalidCandidateError(RuntimeError):
     """Internal exception used when a candidate bandwidth is not estimable."""
 
 
-# A single numerical regularization value is used for both coefficient fitting and
-# hat-matrix calculations, so the fitted values and trace(S) refer to the same smoother.
+# Standard GWR bandwidth scoring is unpenalized. The constant is retained internally
+# only to make that numerical policy explicit at the local-solver call site.
 _RIDGE = 0.0
 
 
