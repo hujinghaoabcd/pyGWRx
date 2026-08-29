@@ -1,0 +1,38 @@
+name: Apply GWR freeze follow-up
+
+on:
+  push:
+    branches:
+      - fix/gwr-freeze-contract
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/gwr-freeze-contract
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Apply follow-up patch
+        run: python tools/_apply_gwr_freeze_followup.py
+      - name: Format and test follow-up
+        run: |
+          python -m pip install -e ".[test]" black isort
+          python -m black src/pygwrx/models/gwr.py tests/test_gwr_freeze_contract.py
+          python -m isort src/pygwrx/models/gwr.py tests/test_gwr_freeze_contract.py
+          python -m pytest -q tests/test_gwr_freeze_contract.py tests/test_gwr_distance_streaming.py tests/test_gwr_bandwidth_provenance.py
+      - name: Commit clean branch state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/apply-gwr-freeze-followup.yml
+          git rm tools/_apply_gwr_freeze_followup.py
+          git add src/pygwrx/models/gwr.py docs/models/gwr.md tests/test_gwr_freeze_contract.py
+          git commit -m "Complete GWR fitted-state and prediction contract"
+          git push origin HEAD:fix/gwr-freeze-contract
