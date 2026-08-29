@@ -227,7 +227,7 @@ params = model.get_local_parameters(coords_new)
 | Method | Returns | Use case |
 |---|---|---|
 | `predict()` | One prediction per target row | Standard numeric prediction. |
-| `predict_result()` | Predictions, local slopes, intercepts, coordinates and optional standard errors/t statistics | Auditable prediction and coefficient inspection. Rank-deficient target recalibrations keep predictions but expose `NaN` coefficient inference. |
+| `predict_result()` | Predictions, local slopes, intercepts, coordinates, rank/condition diagnostics and optional standard errors/t statistics | Auditable prediction and coefficient inspection. Rank-deficient target recalibrations keep predictions, set coefficient inference to `NaN`, and expose the numerical-rank flags directly. |
 | `get_local_parameters()` | Dictionary containing target intercepts, slopes, coordinates, local rank, local condition number and rank-deficiency flag | Coefficient surfaces and numerical identifiability at target locations without applying target `X`. |
 | `get_local_coefficients()` | Slopes only | Compatibility helper; prefer `get_local_parameters()` when the intercept or rank diagnosis matters. |
 

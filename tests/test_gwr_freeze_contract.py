@@ -96,3 +96,58 @@ def test_summary_uses_shared_rank_aware_solver_not_normal_equation_pinv(monkeypa
     text = model.summary()
     assert "Global OLS reference" in text
     assert "GWR diagnostics" in text
+
+
+def test_failed_refit_clears_previous_fitted_state():
+    X, y, coords = _data()
+    model = GWR(kernel="gaussian", bandwidth=0.8).fit(X, y, coords)
+    assert model.is_fitted_
+
+    with pytest.raises(TypeError, match="compute_hat_matrix must be boolean"):
+        model.fit(X, y, coords, compute_hat_matrix="yes")
+
+    assert not model.is_fitted_
+    assert model.n_samples_ is None
+    assert model.n_features_in_ is None
+    assert model.feature_names_in_ is None
+    assert model.X_train_ is None
+    assert model.y_train_ is None
+    assert model.coords_train_ is None
+    assert model.coef_ is None
+    assert model.intercept_ is None
+    assert model.bandwidth_ is None
+    assert model.bandwidth_search_ is None
+
+
+def test_failed_parameter_validation_refit_also_clears_previous_state():
+    X, y, coords = _data()
+    model = GWR(kernel="gaussian", bandwidth=0.8).fit(X, y, coords)
+    model.bandwidth = -1.0
+
+    with pytest.raises(ValueError, match="numeric bandwidth"):
+        model.fit(X, y, coords)
+
+    assert not model.is_fitted_
+    assert model.n_samples_ is None
+    assert model.coef_ is None
+    assert model.bandwidth_ is None
+
+
+def test_prediction_result_exposes_rank_diagnostics_even_without_inference():
+    X, y, coords = _data()
+    model = GWR(kernel="gaussian", bandwidth=0.8).fit(
+        X, y, coords, compute_inference=False
+    )
+    result = model.predict_result(X[:4], coords[:4])
+
+    assert result.local_rank is not None
+    assert result.local_condition_number is not None
+    assert result.rank_deficient is not None
+    assert result.local_rank.shape == (4,)
+    assert result.local_condition_number.shape == (4,)
+    assert result.rank_deficient.shape == (4,)
+    assert result.coef_standard_errors is None
+    frame = result.to_frame()
+    assert "local_rank" in frame
+    assert "local_condition_number" in frame
+    assert "rank_deficient" in frame
