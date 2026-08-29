@@ -8,7 +8,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from pygwrx.core import compute_aic, compute_aicc, compute_bic
+from pygwrx.core import compute_aic, compute_aicc, compute_bic, compute_edf
 
 
 def _gaussian_log_likelihood_term(y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -38,3 +38,16 @@ def test_aicc_returns_infinity_when_small_sample_correction_is_undefined():
     y_true = np.arange(5.0)
     y_pred = y_true + 0.1
     assert np.isinf(compute_aicc(y_true, y_pred, n_params=3.0))
+
+
+def test_compute_edf_clamps_only_roundoff_scale_negative_zero():
+    trace_s = 40.0
+    trace_sts = 39.999999999999986
+    raw_edf = 40.0 - 2.0 * trace_s + trace_sts
+    assert raw_edf < 0.0
+    assert abs(raw_edf) < 1e-12
+    assert compute_edf(40, trace_s, trace_sts) == 0.0
+
+
+def test_compute_edf_preserves_materially_negative_values():
+    assert compute_edf(40, trace_S=30.0, trace_StS=10.0) == pytest.approx(-10.0)

@@ -537,8 +537,25 @@ def compute_edf(n: int, trace_S: float, trace_StS: float) -> float:
 
     trace_s_value = _validate_nonnegative_scalar(trace_S, "trace_S")
     trace_sts_value = _validate_nonnegative_scalar(trace_StS, "trace_StS")
+    edf = float(n - 2.0 * trace_s_value + trace_sts_value)
 
-    return float(n - 2.0 * trace_s_value + trace_sts_value)
+    # A saturated smoother can have theoretical EDF == 0 while independent
+    # floating-point trace calculations leave a tiny negative residue. Clamp only
+    # machine-roundoff-scale negative zero; materially negative EDF values remain
+    # negative so downstream validation still rejects an invalid diagnostic state.
+    roundoff_tolerance = (
+        16.0
+        * np.finfo(float).eps
+        * max(
+            1.0,
+            float(n),
+            2.0 * abs(trace_s_value),
+            abs(trace_sts_value),
+        )
+    )
+    if -roundoff_tolerance <= edf < 0.0:
+        return 0.0
+    return edf
 
 
 def compute_enp(trace_S: float, trace_StS: float) -> float:
