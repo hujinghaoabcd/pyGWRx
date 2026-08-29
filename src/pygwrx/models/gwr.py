@@ -29,9 +29,8 @@ from pygwrx.core.solver import (
     _weighted_least_squares_details,
     adaptive_bandwidth_weights,
 )
-from pygwrx.core.utils import add_intercept, compute_distance_matrix, validate_coords
-
-_DISTANCE_BLOCK_ROWS = 128
+from pygwrx.core.utils import _iter_distance_rows as _iter_core_distance_rows
+from pygwrx.core.utils import add_intercept, validate_coords
 
 
 @dataclass(frozen=True)
@@ -309,31 +308,17 @@ class GWR(BaseSpatialRegressor):
         return weights
 
     def _iter_distance_rows(self, target_coords: np.ndarray) -> Iterator[np.ndarray]:
-        """Yield target-to-training distance rows from bounded-size blocks."""
+        """Yield target-to-training distance rows from the shared bounded backend."""
         if self.coords_train_ is None:
             raise RuntimeError("Training coordinates are unavailable.")
         targets = np.asarray(target_coords, dtype=float)
         if targets.ndim != 2:
             raise ValueError("target_coords must be a two-dimensional array.")
-
-        n_train = self.coords_train_.shape[0]
-        for start in range(0, targets.shape[0], _DISTANCE_BLOCK_ROWS):
-            stop = min(start + _DISTANCE_BLOCK_ROWS, targets.shape[0])
-            block = np.asarray(
-                compute_distance_matrix(
-                    targets[start:stop],
-                    self.coords_train_,
-                    metric=self.distance_metric,
-                ),
-                dtype=float,
-            )
-            expected_shape = (stop - start, n_train)
-            if block.shape != expected_shape:
-                raise ValueError(
-                    "The distance implementation returned an unexpected block shape."
-                )
-            for distance_row in block:
-                yield distance_row
+        return _iter_core_distance_rows(
+            targets,
+            self.coords_train_,
+            distance_metric=self.distance_metric,
+        )
 
     @staticmethod
     def _warn_rank_deficiency(
