@@ -15,11 +15,12 @@ __author__ = "Jinghao Hu"
 __license__ = "MIT"
 
 from abc import ABC, abstractmethod
-from typing import Callable, Optional, Tuple, Union
+from typing import Callable, Iterator, Optional, Tuple, Union
 
 import numpy as np
 
 from pygwrx.core.solver import weighted_least_squares
+from pygwrx.core.utils import compute_distance_matrix
 
 Bandwidth = Union[int, float]
 BandwidthRange = Optional[Tuple[float, float]]
@@ -43,6 +44,61 @@ class _InvalidCandidateError(RuntimeError):
 # Standard GWR bandwidth scoring is unpenalized. The constant is retained internally
 # only to make that numerical policy explicit at the local-solver call site.
 _RIDGE = 0.0
+_DISTANCE_BLOCK_ROWS = 128
+
+
+def _iter_distance_rows(
+    coords: np.ndarray,
+    *,
+    distance_metric: str,
+) -> Iterator[np.ndarray]:
+    """Yield coordinate-to-coordinate distance rows from bounded-size blocks."""
+    n_samples = coords.shape[0]
+    for start in range(0, n_samples, _DISTANCE_BLOCK_ROWS):
+        stop = min(start + _DISTANCE_BLOCK_ROWS, n_samples)
+        block = np.asarray(
+            compute_distance_matrix(
+                coords[start:stop],
+                coords,
+                metric=distance_metric,
+            ),
+            dtype=float,
+        )
+        expected_shape = (stop - start, n_samples)
+        if block.shape != expected_shape:
+            raise ValueError("The computed distance block has an invalid shape.")
+        if not np.all(np.isfinite(block)) or np.any(block < 0):
+            raise ValueError("The computed distance block contains invalid distances.")
+        for distance_row in block:
+            yield distance_row
+
+
+def _positive_pairwise_distance_extrema(
+    coords: np.ndarray,
+    *,
+    distance_metric: str,
+) -> tuple[float, float]:
+    """Return min/max positive unique pairwise distances without full materialization."""
+    minimum_positive = np.inf
+    maximum_positive = -np.inf
+
+    for row_index, distance_row in enumerate(
+        _iter_distance_rows(coords, distance_metric=distance_metric)
+    ):
+        unique_tail = distance_row[row_index + 1 :]
+        positive = unique_tail[unique_tail > 0.0]
+        if positive.size == 0:
+            continue
+        minimum_positive = min(minimum_positive, float(np.min(positive)))
+        maximum_positive = max(maximum_positive, float(np.max(positive)))
+
+    if not np.isfinite(minimum_positive) or not np.isfinite(maximum_positive):
+        raise ValueError(
+            "Cannot select a fixed bandwidth because all pairwise coordinate distances "
+            "are zero. Use distinct coordinates or an adaptive specification "
+            "with valid non-zero neighbour distances."
+        )
+    return float(minimum_positive), float(maximum_positive)
 
 
 def _validate_positive_int(value: int, name: str, minimum: int = 1) -> int:
@@ -172,19 +228,19 @@ def _validate_bandwidth_range(
 
 
 def _automatic_bandwidth_range(
-    distances: np.ndarray,
+    coords: np.ndarray,
     *,
+    distance_metric: str,
     adaptive: bool,
     n_samples: int,
     n_features: int,
 ) -> tuple[Bandwidth, Bandwidth]:
-    """Derive a valid search interval from a precomputed distance matrix.
+    """Derive a valid search interval without retaining a full distance matrix.
 
-    Adaptive bandwidths use an integer neighbour-order domain. Fixed-distance
-    searches deliberately span the full observed pairwise distance scale instead
-    of trimming distance percentiles: percentile trimming can exclude isolated
-    locations from every compact-kernel candidate before the objective is even
-    evaluated.
+    Adaptive bandwidths use an integer neighbour-order domain and do not require
+    pairwise distances to establish the search range. Fixed-distance searches scan
+    bounded distance blocks only to recover the minimum and maximum positive unique
+    pairwise distances used by the existing search-range policy.
     """
     if adaptive:
         lower = max(n_features + 1, 2, int(np.ceil(0.05 * n_samples)))
@@ -196,25 +252,11 @@ def _automatic_bandwidth_range(
             )
         return lower, upper
 
-    upper_triangle = distances[np.triu_indices_from(distances, k=1)]
-    positive_distances = upper_triangle[
-        np.isfinite(upper_triangle) & (upper_triangle > 0)
-    ]
+    minimum_positive, maximum_positive = _positive_pairwise_distance_extrema(
+        coords,
+        distance_metric=distance_metric,
+    )
 
-    if positive_distances.size == 0:
-        raise ValueError(
-            "Cannot select a fixed bandwidth because all pairwise coordinate distances "
-            "are zero. Use distinct coordinates or an adaptive specification "
-            "with valid non-zero neighbour distances."
-        )
-
-    minimum_positive = float(np.min(positive_distances))
-    maximum_positive = float(np.max(positive_distances))
-
-    # Search below the smallest observed separation and beyond the largest observed
-    # separation.  The wider interval keeps sparse/isolated locations available to
-    # compact kernels and gives continuous optimizers at least one globally supported
-    # part of the domain without imposing a percentile-based spatial cutoff.
     lower = max(np.nextafter(0.0, 1.0), 0.5 * minimum_positive)
     upper = 2.0 * maximum_positive
     if not np.isfinite(upper):
@@ -405,30 +447,12 @@ class _BaseSelector(BandwidthSelector):
         kernel_func: KernelFunction,
         bandwidth_range: BandwidthRange,
         distance_metric: str,
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, Bandwidth, Bandwidth]:
-        from pygwrx.core.utils import compute_distance_matrix
-
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, Bandwidth, Bandwidth]:
         if not isinstance(distance_metric, str):
             raise TypeError("distance_metric must be a string.")
 
         X_arr, y_arr, coords_arr = _validate_selector_inputs(X, y, coords, kernel_func)
-        distances = compute_distance_matrix(
-            coords_arr,
-            coords_arr,
-            metric=distance_metric,
-        )
-        distances = np.asarray(distances, dtype=float)
-        if distances.shape != (X_arr.shape[0], X_arr.shape[0]):
-            raise ValueError("The computed distance matrix has an invalid shape.")
-        if not np.all(np.isfinite(distances)) or np.any(distances < 0):
-            raise ValueError("The computed distance matrix contains invalid distances.")
 
-        # Older PyGWRx model classes generate two invalid automatic ranges:
-        #   adaptive small-n: (20, n) when n < 20
-        #   fixed small-scale coordinates: (1, max_distance) when max_distance < 1
-        # Detect only these legacy signatures and rebuild the range here.
-        # Other reversed
-        # user-supplied ranges still raise a clear error.
         legacy_auto_range = False
         if (
             bandwidth_range is not None
@@ -455,7 +479,8 @@ class _BaseSelector(BandwidthSelector):
 
         if bandwidth_range is None or legacy_auto_range:
             lower, upper = _automatic_bandwidth_range(
-                distances,
+                coords_arr,
+                distance_metric=distance_metric,
                 adaptive=self.adaptive,
                 n_samples=X_arr.shape[0],
                 n_features=X_arr.shape[1],
@@ -468,7 +493,7 @@ class _BaseSelector(BandwidthSelector):
                 n_features=X_arr.shape[1],
             )
 
-        return X_arr, y_arr, coords_arr, distances, lower, upper
+        return X_arr, y_arr, coords_arr, lower, upper
 
     def _search(
         self,
@@ -608,7 +633,7 @@ class CrossValidationSelector(_BaseSelector):
         bandwidth_range: BandwidthRange = None,
         distance_metric: str = "euclidean",
     ) -> Bandwidth:
-        X_arr, y_arr, _, distances, lower, upper = self._prepare(
+        X_arr, y_arr, coords_arr, lower, upper = self._prepare(
             X,
             y,
             coords,
@@ -620,7 +645,9 @@ class CrossValidationSelector(_BaseSelector):
 
         def cv_objective(bandwidth: Bandwidth) -> float:
             squared_error = 0.0
-            for i, dists in enumerate(distances):
+            for i, dists in enumerate(
+                _iter_distance_rows(coords_arr, distance_metric=distance_metric)
+            ):
                 weights = _kernel_weights(
                     dists,
                     bandwidth,
@@ -676,7 +703,7 @@ class AICSelector(_BaseSelector):
     ) -> Bandwidth:
         from pygwrx.core.metrics import compute_aic, compute_aicc
 
-        X_arr, y_arr, _, distances, lower, upper = self._prepare(
+        X_arr, y_arr, coords_arr, lower, upper = self._prepare(
             X,
             y,
             coords,
@@ -692,7 +719,9 @@ class AICSelector(_BaseSelector):
             fitted = np.empty(n_samples, dtype=float)
             trace_s = 0.0
 
-            for i, dists in enumerate(distances):
+            for i, dists in enumerate(
+                _iter_distance_rows(coords_arr, distance_metric=distance_metric)
+            ):
                 weights = _kernel_weights(
                     dists,
                     bandwidth,
@@ -739,7 +768,7 @@ class BICSelector(_BaseSelector):
     ) -> Bandwidth:
         from pygwrx.core.metrics import compute_bic
 
-        X_arr, y_arr, _, distances, lower, upper = self._prepare(
+        X_arr, y_arr, coords_arr, lower, upper = self._prepare(
             X,
             y,
             coords,
@@ -754,7 +783,9 @@ class BICSelector(_BaseSelector):
             fitted = np.empty(n_samples, dtype=float)
             trace_s = 0.0
 
-            for i, dists in enumerate(distances):
+            for i, dists in enumerate(
+                _iter_distance_rows(coords_arr, distance_metric=distance_metric)
+            ):
                 weights = _kernel_weights(
                     dists,
                     bandwidth,

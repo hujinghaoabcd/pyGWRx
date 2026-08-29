@@ -23,7 +23,8 @@ def test_automatic_fixed_range_uses_full_observed_distance_scale() -> None:
     distances = compute_distance_matrix(coords, coords)
 
     lower, upper = _automatic_bandwidth_range(
-        distances,
+        coords,
+        distance_metric="euclidean",
         adaptive=False,
         n_samples=coords.shape[0],
         n_features=2,
