@@ -31,7 +31,12 @@ jobs:
           helper = Path('.github/workflows/d1-apply-rgwr-composition.yml').read_text(encoding='utf-8')
           match = re.search(r"echo '([A-Za-z0-9+/=]+)'\) \| base64 -d > /tmp/d1_apply\.py", helper)
           assert match is not None, 'prepared D1 migration payload not found'
-          Path('/tmp/d1_apply.py').write_bytes(base64.b64decode(match.group(1)))
+          script = base64.b64decode(match.group(1)).decode('utf-8')
+          broken = "initial_fit = initial_fit.replace(') -> \"GWR\":', ') -> \"RGWR\":, 1)"
+          fixed = "initial_fit = initial_fit.replace(') -> \"GWR\":', ') -> \"RGWR\":', 1)"
+          assert script.count(broken) == 1, 'expected D1 syntax defect not found exactly once'
+          script = script.replace(broken, fixed)
+          Path('/tmp/d1_apply.py').write_text(script, encoding='utf-8')
           PY
           python /tmp/d1_apply.py
       - name: Install test tooling
