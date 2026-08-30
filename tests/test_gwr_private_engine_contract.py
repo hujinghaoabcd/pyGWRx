@@ -25,8 +25,11 @@ def _selector_data(n_samples: int = 18) -> tuple[np.ndarray, np.ndarray, np.ndar
     coords = rng.uniform(0.0, 2.0, size=(n_samples, 2))
     x = rng.normal(size=n_samples)
     X = np.column_stack([np.ones(n_samples), x])
-    y = 1.5 + 0.7 * x + 0.08 * np.sin(coords[:, 0] * 2.0) + rng.normal(
-        0.0, 0.03, size=n_samples
+    y = (
+        1.5
+        + 0.7 * x
+        + 0.08 * np.sin(coords[:, 0] * 2.0)
+        + rng.normal(0.0, 0.03, size=n_samples)
     )
     return X, y, coords
 
