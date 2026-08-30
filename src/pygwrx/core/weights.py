@@ -35,7 +35,8 @@ BoundaryRule: TypeAlias = Literal["include_kth", "kernel_boundary"]
 ZeroDistanceRule: TypeAlias = Literal["smallest_positive", "stable_top_k"]
 TieRule: TypeAlias = Literal["distance_threshold", "stable_rank"]
 LoocvFocalExclusion: TypeAlias = Literal[
-    "after_weight_construction", "before_neighbour_selection"
+    "after_weight_construction",
+    "before_neighbour_selection",
 ]
 
 _ALLOWED_BOUNDARY_RULES = {"include_kth", "kernel_boundary"}
