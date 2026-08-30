@@ -21,16 +21,21 @@ from typing import Callable, Dict, Iterable, Iterator, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 
-from pygwrx.core.bandwidth import get_bandwidth_selector
 from pygwrx.core.base import BaseSpatialRegressor
 from pygwrx.core.kernels import get_kernel_function
 from pygwrx.core.metrics import compute_diagnostics
-from pygwrx.core.solver import (
-    _weighted_least_squares_details,
-    adaptive_bandwidth_weights,
-)
+from pygwrx.core.solver import _weighted_least_squares_details
 from pygwrx.core.utils import _iter_distance_rows as _iter_core_distance_rows
 from pygwrx.core.utils import add_intercept, validate_coords
+from pygwrx.models._gwr_engine import (
+    _collect_gwr_inference,
+    _compute_gwr_local_r2,
+    _fit_gwr_prediction_locations,
+    _fit_gwr_training_locations,
+    _get_gwr_bandwidth_selector,
+    _gwr_spatial_weights,
+    _GWRLocalFitResult,
+)
 
 
 @dataclass(frozen=True)
@@ -90,20 +95,6 @@ class GWRPredictionResult:
             feature_names=columns,
             crs=crs,
         )
-
-
-@dataclass
-class _LocalFitResult:
-    params: np.ndarray
-    fitted_values: np.ndarray
-    distances: Iterable[np.ndarray]
-    influence: np.ndarray
-    trace_S: float
-    trace_StS: float
-    covariance_factors: Optional[np.ndarray]
-    hat_matrix: Optional[np.ndarray]
-    local_rank: np.ndarray
-    local_condition_number: np.ndarray
 
 
 class GWR(BaseSpatialRegressor):
@@ -214,7 +205,7 @@ class GWR(BaseSpatialRegressor):
                     "GWR bandwidth selection method must be one of "
                     "'cv', 'aic', 'aicc', or 'bic'."
                 )
-            selector = get_bandwidth_selector(
+            selector = _get_gwr_bandwidth_selector(
                 method,
                 adaptive=self.adaptive,
                 verbose=self.verbose,
@@ -305,19 +296,12 @@ class GWR(BaseSpatialRegressor):
     def _weights_from_distances(self, distances: np.ndarray) -> np.ndarray:
         if self.bandwidth_ is None or self.kernel_func_ is None:
             raise RuntimeError("The fitted bandwidth and kernel are unavailable.")
-        local_bandwidth = (
-            adaptive_bandwidth_weights(distances, int(self.bandwidth_))
-            if self.adaptive
-            else float(self.bandwidth_)
+        return _gwr_spatial_weights(
+            distances,
+            bandwidth=self.bandwidth_,
+            adaptive=self.adaptive,
+            kernel_func=self.kernel_func_,
         )
-        weights = np.asarray(self.kernel_func_(distances, local_bandwidth), dtype=float)
-        if weights.shape != distances.shape:
-            raise ValueError("The kernel returned an unexpected weight shape.")
-        if not np.all(np.isfinite(weights)) or np.any(weights < 0.0):
-            raise ValueError("The kernel returned invalid weights.")
-        if not np.any(weights > 0.0):
-            raise ValueError("The local kernel contains no positive weights.")
-        return weights
 
     def _iter_distance_rows(self, target_coords: np.ndarray) -> Iterator[np.ndarray]:
         """Yield target-to-training distance rows from the shared bounded backend."""
@@ -350,7 +334,7 @@ class GWR(BaseSpatialRegressor):
             "use the Moore-Penrose minimum-norm WLS solution; coefficient standard "
             "errors and t values are unavailable at rank-deficient locations.",
             RuntimeWarning,
-            stacklevel=3,
+            stacklevel=4,
         )
 
     def _fit_training_locations(
@@ -359,75 +343,18 @@ class GWR(BaseSpatialRegressor):
         *,
         store_hat_matrix: bool,
         compute_inference: bool,
-    ) -> _LocalFitResult:
+    ) -> _GWRLocalFitResult:
         if self.coords_train_ is None or self.y_train_ is None:
             raise RuntimeError("Training data are unavailable.")
-
-        n_samples, n_parameters = X_design.shape
-        params = np.empty((n_samples, n_parameters), dtype=float)
-        fitted = np.empty(n_samples, dtype=float)
-        influence = np.empty(n_samples, dtype=float)
-        local_rank = np.empty(n_samples, dtype=int)
-        local_condition_number = np.empty(n_samples, dtype=float)
-        covariance_factors = (
-            np.empty((n_samples, n_parameters), dtype=float)
-            if compute_inference
-            else None
-        )
-        hat_matrix = (
-            np.empty((n_samples, n_samples), dtype=float) if store_hat_matrix else None
-        )
-        trace_sts = 0.0
-
-        for index, distance_row in enumerate(
-            self._iter_distance_rows(self.coords_train_)
-        ):
-            weights = self._weights_from_distances(distance_row)
-            solve = _weighted_least_squares_details(
-                X_design,
-                self.y_train_,
-                weights,
-            )
-            beta = solve.beta
-            inverse_normal = solve.inverse_normal
-            local_rank[index] = solve.rank
-            local_condition_number[index] = solve.condition_number
-            inverse_xtx_xtw = inverse_normal @ (X_design.T * weights)
-            hat_row = X_design[index] @ inverse_xtx_xtw
-
-            params[index] = beta
-            fitted[index] = float(X_design[index] @ beta)
-            influence[index] = float(hat_row[index])
-            trace_sts += float(np.dot(hat_row, hat_row))
-            if hat_matrix is not None:
-                hat_matrix[index] = hat_row
-            if covariance_factors is not None:
-                if solve.rank < n_parameters:
-                    covariance_factors[index] = np.nan
-                else:
-                    covariance_factors[index] = np.sum(
-                        inverse_xtx_xtw**2,
-                        axis=1,
-                    )
-
-        rank_deficient = local_rank < n_parameters
-        self._warn_rank_deficiency(
-            rank_deficient,
-            context="calibration-location",
-            n_parameters=n_parameters,
-        )
-
-        return _LocalFitResult(
-            params=params,
-            fitted_values=fitted,
-            distances=self._iter_distance_rows(self.coords_train_),
-            influence=influence,
-            trace_S=float(np.sum(influence)),
-            trace_StS=float(trace_sts),
-            covariance_factors=covariance_factors,
-            hat_matrix=hat_matrix,
-            local_rank=local_rank,
-            local_condition_number=local_condition_number,
+        return _fit_gwr_training_locations(
+            X_design,
+            self.y_train_,
+            self.coords_train_,
+            distance_rows=self._iter_distance_rows,
+            weights_from_distances=self._weights_from_distances,
+            rank_policy=self._warn_rank_deficiency,
+            store_hat_matrix=store_hat_matrix,
+            compute_inference=compute_inference,
         )
 
     def _compute_local_r2_from_distance_rows(
@@ -435,25 +362,12 @@ class GWR(BaseSpatialRegressor):
     ) -> np.ndarray:
         if self.y_train_ is None or self.residuals_ is None:
             raise RuntimeError("Fitted values and residuals are unavailable.")
-        local_r2 = np.full(self.y_train_.shape[0], np.nan, dtype=float)
-        residual_sq = self.residuals_**2
-        for index, distance_row in enumerate(distance_rows):
-            weights = self._weights_from_distances(distance_row)
-            weight_sum = float(np.sum(weights))
-            if weight_sum <= np.finfo(float).eps:
-                continue
-            local_mean = float(np.dot(weights, self.y_train_) / weight_sum)
-            local_tss = float(np.dot(weights, (self.y_train_ - local_mean) ** 2))
-            local_rss = float(np.dot(weights, residual_sq))
-            if np.isclose(local_tss, 0.0, rtol=0.0, atol=np.finfo(float).eps):
-                local_r2[index] = (
-                    1.0
-                    if np.isclose(local_rss, 0.0, rtol=0.0, atol=np.finfo(float).eps)
-                    else 0.0
-                )
-            else:
-                local_r2[index] = 1.0 - local_rss / local_tss
-        return local_r2
+        return _compute_gwr_local_r2(
+            self.y_train_,
+            self.residuals_,
+            distance_rows,
+            weights_from_distances=self._weights_from_distances,
+        )
 
     def _compute_local_r2_from_distances(
         self, distances: Iterable[np.ndarray]
@@ -478,64 +392,29 @@ class GWR(BaseSpatialRegressor):
         if self.residuals_ is None or self.coef_ is None or self.intercept_ is None:
             raise RuntimeError("Fitted regression results are unavailable.")
 
-        rss = float(np.dot(self.residuals_, self.residuals_))
-        denominator = (
-            self.n_samples_ - trace_S
-            if self.sigma2_v1
-            else self.n_samples_ - 2.0 * trace_S + trace_StS
+        inference = _collect_gwr_inference(
+            self.residuals_,
+            self.influence_,
+            self.coef_,
+            self.intercept_,
+            covariance_factors,
+            n_samples=self.n_samples_,
+            fit_intercept=self.fit_intercept,
+            sigma2_v1=self.sigma2_v1,
+            trace_S=trace_S,
+            trace_StS=trace_StS,
         )
-        self.sigma2_ = rss / denominator if denominator > 0.0 else np.nan
-        self.influence_ = np.asarray(self.influence_, dtype=float)
-
-        leverage_term = 1.0 - self.influence_
-        self.standardized_residuals_ = np.full(self.n_samples_, np.nan, dtype=float)
-        valid_leverage = leverage_term > np.finfo(float).eps
-        if np.isfinite(self.sigma2_) and self.sigma2_ > np.finfo(float).eps:
-            self.standardized_residuals_[valid_leverage] = self.residuals_[
-                valid_leverage
-            ] / np.sqrt(self.sigma2_ * leverage_term[valid_leverage])
-
-        self.cooks_distance_ = np.full(self.n_samples_, np.nan, dtype=float)
-        if trace_S > np.finfo(float).eps:
-            valid = leverage_term > np.finfo(float).eps
-            self.cooks_distance_[valid] = (
-                self.standardized_residuals_[valid] ** 2
-                * self.influence_[valid]
-                / (trace_S * leverage_term[valid])
-            )
-
-        if covariance_factors is None or not np.isfinite(self.sigma2_):
-            return
-
-        covariance_diagonal = covariance_factors * self.sigma2_
-        covariance_diagonal = np.maximum(covariance_diagonal, 0.0)
-        standard_errors = np.sqrt(covariance_diagonal)
-        full_params = (
-            np.column_stack([self.intercept_, self.coef_])
-            if self.fit_intercept
-            else self.coef_
-        )
-        t_values = np.full_like(full_params, np.nan, dtype=float)
-        np.divide(
-            full_params,
-            standard_errors,
-            out=t_values,
-            where=standard_errors > np.finfo(float).eps,
-        )
-
-        self.parameter_covariance_diagonal_ = covariance_diagonal
-        self.parameter_standard_errors_ = standard_errors
-        self.parameter_t_values_ = t_values
-        if self.fit_intercept:
-            self.intercept_se_ = standard_errors[:, 0]
-            self.coef_se_ = standard_errors[:, 1:]
-            self.intercept_t_ = t_values[:, 0]
-            self.coef_t_ = t_values[:, 1:]
-        else:
-            self.intercept_se_ = np.zeros(self.n_samples_, dtype=float)
-            self.coef_se_ = standard_errors
-            self.intercept_t_ = np.full(self.n_samples_, np.nan, dtype=float)
-            self.coef_t_ = t_values
+        self.influence_ = inference.influence
+        self.sigma2_ = inference.sigma2
+        self.standardized_residuals_ = inference.standardized_residuals
+        self.cooks_distance_ = inference.cooks_distance
+        self.parameter_covariance_diagonal_ = inference.parameter_covariance_diagonal
+        self.parameter_standard_errors_ = inference.parameter_standard_errors
+        self.parameter_t_values_ = inference.parameter_t_values
+        self.intercept_se_ = inference.intercept_se
+        self.coef_se_ = inference.coef_se
+        self.intercept_t_ = inference.intercept_t
+        self.coef_t_ = inference.coef_t
 
     def fit(
         self,
@@ -674,38 +553,17 @@ class GWR(BaseSpatialRegressor):
 
         coords_arr = validate_coords(coords)
         X_design = add_intercept(self.X_train_) if self.fit_intercept else self.X_train_
-        full_params = np.empty((coords_arr.shape[0], X_design.shape[1]), dtype=float)
-        local_rank = np.empty(coords_arr.shape[0], dtype=int)
-        local_condition_number = np.empty(coords_arr.shape[0], dtype=float)
-        covariance_factors = (
-            np.empty_like(full_params) if self.inference_enabled_ else None
+        local_fit = _fit_gwr_prediction_locations(
+            X_design,
+            self.y_train_,
+            coords_arr,
+            distance_rows=self._iter_distance_rows,
+            weights_from_distances=self._weights_from_distances,
+            rank_policy=self._warn_rank_deficiency,
+            compute_inference=self.inference_enabled_,
         )
-        for index, distance_row in enumerate(self._iter_distance_rows(coords_arr)):
-            weights = self._weights_from_distances(distance_row)
-            solve = _weighted_least_squares_details(
-                X_design,
-                self.y_train_,
-                weights,
-            )
-            full_params[index] = solve.beta
-            local_rank[index] = solve.rank
-            local_condition_number[index] = solve.condition_number
-            if covariance_factors is not None:
-                if solve.rank < X_design.shape[1]:
-                    covariance_factors[index] = np.nan
-                else:
-                    inverse_xtx_xtw = solve.inverse_normal @ (X_design.T * weights)
-                    covariance_factors[index] = np.sum(
-                        inverse_xtx_xtw**2,
-                        axis=1,
-                    )
-
-        rank_deficient = local_rank < X_design.shape[1]
-        self._warn_rank_deficiency(
-            rank_deficient,
-            context="prediction-location",
-            n_parameters=X_design.shape[1],
-        )
+        full_params = local_fit.full_params
+        covariance_factors = local_fit.covariance_factors
 
         if self.fit_intercept:
             intercept = full_params[:, 0]
@@ -738,9 +596,9 @@ class GWR(BaseSpatialRegressor):
             "intercept": intercept,
             "standard_errors": standard_errors,
             "t_values": t_values,
-            "local_rank": local_rank,
-            "local_condition_number": local_condition_number,
-            "rank_deficient": rank_deficient,
+            "local_rank": local_fit.local_rank,
+            "local_condition_number": local_fit.local_condition_number,
+            "rank_deficient": local_fit.rank_deficient,
         }
 
     def predict_result(
