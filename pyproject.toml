@@ -167,6 +167,7 @@ files = [
     "src/pygwrx/core/distance.py",
     "src/pygwrx/core/kernels.py",
     "src/pygwrx/core/solver.py",
+    "src/pygwrx/core/time.py",
     "src/pygwrx/core/validation.py",
     "src/pygwrx/diagnostics/_utils.py",
     "src/pygwrx/io/data.py",
