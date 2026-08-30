@@ -1,0 +1,33 @@
+name: C3 Black Format
+
+on:
+  push:
+    branches:
+      - refactor/c3-freeze-gwr-protected-surface
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refactor/c3-freeze-gwr-protected-surface
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Install repository quality tooling
+        run: python -m pip install -e '.[dev]'
+      - name: Format C3 test and remove helper workflow
+        run: |
+          python -m black tests/test_gwr_protected_surface_contract.py
+          rm .github/workflows/c3-black-format.yml
+      - name: Commit final formatting
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tests/test_gwr_protected_surface_contract.py .github/workflows/c3-black-format.yml
+          git commit -m 'style: format C3 protected-surface contract'
+          git push origin HEAD:refactor/c3-freeze-gwr-protected-surface
