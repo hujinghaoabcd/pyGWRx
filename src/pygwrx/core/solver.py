@@ -15,7 +15,8 @@ __author__ = "Jinghao Hu"
 __license__ = "MIT"
 
 import warnings
-from typing import Callable, NamedTuple, Optional, Tuple, Union
+from dataclasses import dataclass
+from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 
@@ -32,14 +33,20 @@ __all__ = [
 _DEFAULT_RIDGE = 0.0
 
 
-class _WeightedLeastSquaresResult(NamedTuple):
-    """Private numerical details from one weighted SVD solve."""
+@dataclass(frozen=True, eq=False)
+class _WeightedLeastSquaresResult:
+    """Canonical private numerical result from one weighted SVD solve."""
 
-    beta: np.ndarray
+    params: np.ndarray
     inverse_normal: np.ndarray
     rank: int
     singular_values: np.ndarray
     condition_number: float
+
+    @property
+    def beta(self) -> np.ndarray:
+        """Compatibility alias for pre-B6 private solver consumers."""
+        return self.params
 
 
 def _validate_nonnegative_scalar(value: float, name: str) -> float:
@@ -248,14 +255,14 @@ def _compute_kernel_weights(
     return weights
 
 
-def _weighted_least_squares_details(
+def _solve_weighted_least_squares(
     X: np.ndarray,
     y: np.ndarray,
     weights: np.ndarray,
     *,
     ridge: float = _DEFAULT_RIDGE,
 ) -> _WeightedLeastSquaresResult:
-    """Solve WLS once by SVD and retain private numerical-rank diagnostics."""
+    """Solve canonical WLS once by SVD and retain numerical-rank details."""
     X_arr = _validate_design_matrix(X)
     y_arr = _validate_response(y, X_arr.shape[0])
     weights_arr = _validate_weights(weights, X_arr.shape[0])
@@ -302,12 +309,17 @@ def _weighted_least_squares_details(
         raise np.linalg.LinAlgError("Weighted SVD solve produced non-finite values.")
 
     return _WeightedLeastSquaresResult(
-        beta=np.asarray(beta, dtype=float),
+        params=np.asarray(beta, dtype=float),
         inverse_normal=inverse_normal,
         rank=rank,
         singular_values=np.asarray(singular_values, dtype=float),
         condition_number=float(condition_number),
     )
+
+
+# Private compatibility alias for pre-B6 internal consumers. New solver code
+# should call the canonical pure-algebra entry point above.
+_weighted_least_squares_details = _solve_weighted_least_squares
 
 
 def weighted_least_squares(
@@ -324,8 +336,8 @@ def weighted_least_squares(
     contract is preserved while one internal SVD provides both coefficients and
     the inverse-normal operator.
     """
-    result = _weighted_least_squares_details(X, y, weights, ridge=ridge)
-    return result.beta, result.inverse_normal
+    result = _solve_weighted_least_squares(X, y, weights, ridge=ridge)
+    return result.params, result.inverse_normal
 
 
 def local_regression(
@@ -436,12 +448,13 @@ def local_regression(
                     stacklevel=2,
                 )
 
-            beta, _ = weighted_least_squares(
+            solve = _solve_weighted_least_squares(
                 X_arr,
                 y_arr,
                 weights,
                 ridge=ridge_value,
             )
+            beta = solve.params
         except (ValueError, TypeError, np.linalg.LinAlgError) as exc:
             raise RuntimeError(
                 f"Local regression failed at target location {i}: {exc}"
@@ -549,12 +562,13 @@ def compute_hat_matrix(
                     stacklevel=2,
                 )
 
-            _, inverse_normal = weighted_least_squares(
+            solve = _solve_weighted_least_squares(
                 X_arr,
                 dummy_y,
                 weights,
                 ridge=ridge_value,
             )
+            inverse_normal = solve.inverse_normal
             XtW = X_arr.T * weights
             hat_row = X_arr[i] @ inverse_normal @ XtW
 
