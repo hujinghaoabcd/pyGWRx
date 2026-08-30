@@ -1264,7 +1264,7 @@ plotting/ 不调用 np.linalg.svd 做模型诊断
 | B1 | private `_protocols.py` | DONE | #42 | `039bceee97a4b62518b7efc686350f3cb1beeaf2` | type/API tests + full CI | 七类 private structural Protocol；mypy gate；不 public export；无 estimator/base/runtime 行为变更 |
 | B2 | validation split | DONE | #44 | `e95e616fc11e2a315890efe9af21262756ec9491` | core + all tests + GWR refs + full CI | canonical `core.validation` + compatibility re-export；无 estimator/base/distance/solver 数值变更 |
 | B3 | distance split + metric spec | DONE | #46 | `24edf6902f1ae180ab29d6b29ce6680b205b9625` | core + GWR refs + full CI | canonical `core.distance` + private-first `DistanceMetricSpec` / metric params；legacy/public distance signatures preserved；bounded streaming / GWR refs unchanged |
-| B4 | time-axis utility | PENDING | — | — | GTWR/SGTWR tests | no ST formula change |
+| B4 | time-axis utility | DONE | #48 | `90cd65bc8342b82538afa9faabb32eb41a58d979` | GTWR/SGTWR tests + full CI | canonical private-first `core.time` / `TimeAxis`；GTWR preserves frozen fitted-state contract；no ST formula change；SGTWR estimator-as-utility cleanup remains D5 |
 | B5 | weights + neighbourhood policies | PENDING | — | — | per-family semantics tests | 不强制一个 adaptive 规则 |
 | B6 | canonical WLS result | PENDING | — | — | solver + GWR refs | pure algebra |
 | B7 | generic search domains | PENDING | — | — | selector/optimizer tests | objective model-owned |
