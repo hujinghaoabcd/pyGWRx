@@ -15,6 +15,7 @@ import pytest
 
 import pygwrx
 import pygwrx.core as core
+from pygwrx import GTWR
 from pygwrx.core import time as time_module
 from pygwrx.core.time import TimeAxis, normalize_prediction_times, normalize_training_times
 
@@ -83,3 +84,27 @@ def test_time_axis_input_shape_and_finite_value_contracts() -> None:
         normalize_training_times(np.array([], dtype=float))
     with pytest.raises(ValueError, match="NaN or infinite"):
         normalize_training_times(np.array([0.0, np.nan]))
+
+
+def test_gtwr_mirrors_canonical_datetime_axis_without_public_state_drift() -> None:
+    """GTWR keeps its frozen fitted-state names while using the canonical axis."""
+    rng = np.random.default_rng(42)
+    coords = np.column_stack([np.arange(8, dtype=float), np.zeros(8)])
+    X = rng.normal(size=(8, 1))
+    y = 1.0 + 0.5 * X[:, 0]
+    datetimes = pd.Timestamp("2026-01-01") + pd.to_timedelta(
+        np.arange(8, dtype=float), unit="h"
+    )
+    model = GTWR(
+        kernel="gaussian",
+        bandwidth=4.0,
+        lambda_st=0.5,
+        causal=False,
+        time_unit="auto",
+    ).fit(X, y, coords, datetimes, compute_local_r2=False, compute_inference=False)
+
+    assert isinstance(model._time_axis, TimeAxis)
+    assert model.time_unit_ == model._time_axis.unit == "hours"
+    assert model.time_origin_ == model._time_axis.origin == pd.Timestamp("2026-01-01")
+    assert model.time_input_kind_ == "datetime"
+    np.testing.assert_allclose(model.times_train_, model._time_axis.values)
