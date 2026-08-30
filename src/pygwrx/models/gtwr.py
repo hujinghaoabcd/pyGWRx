@@ -32,38 +32,16 @@ from pygwrx.core.optimization import (
     OptimizationResult,
 )
 from pygwrx.core.solver import adaptive_bandwidth_weights, weighted_least_squares
+from pygwrx.core.time import (
+    TimeAxis,
+    _TIME_UNIT_ALIASES,
+    auto_time_unit,
+    looks_datetime_like,
+    normalize_prediction_times,
+    normalize_training_times,
+)
 from pygwrx.core.utils import add_intercept, compute_distance_matrix
 
-_TIME_FACTORS_SECONDS = {
-    "seconds": 1.0,
-    "minutes": 60.0,
-    "hours": 3_600.0,
-    "days": 86_400.0,
-    "weeks": 604_800.0,
-}
-_TIME_UNIT_ALIASES = {
-    "s": "seconds",
-    "sec": "seconds",
-    "secs": "seconds",
-    "second": "seconds",
-    "seconds": "seconds",
-    "m": "minutes",
-    "min": "minutes",
-    "mins": "minutes",
-    "minute": "minutes",
-    "minutes": "minutes",
-    "h": "hours",
-    "hr": "hours",
-    "hrs": "hours",
-    "hour": "hours",
-    "hours": "hours",
-    "d": "days",
-    "day": "days",
-    "days": "days",
-    "w": "weeks",
-    "week": "weeks",
-    "weeks": "weeks",
-}
 _FUTURE_DISTANCE = 1.0e50
 
 
@@ -252,6 +230,7 @@ class GTWR(BaseSpatiotemporalRegressor):
         self.time_unit_: Optional[str] = None
         self.time_origin_: Optional[pd.Timestamp] = None
         self.time_input_kind_: Optional[str] = None
+        self._time_axis: Optional[TimeAxis] = None
         self.spatiotemporal_distance_matrix_: Optional[np.ndarray] = None
         self.spatial_distance_matrix_: Optional[np.ndarray] = None
         self.temporal_distance_matrix_: Optional[np.ndarray] = None
@@ -358,94 +337,35 @@ class GTWR(BaseSpatiotemporalRegressor):
 
     @staticmethod
     def _looks_datetime_like(times: object) -> bool:
-        if isinstance(times, (pd.DatetimeIndex, pd.PeriodIndex)):
-            return True
-        if isinstance(times, pd.Series):
-            return bool(
-                pd.api.types.is_datetime64_any_dtype(times.dtype)
-                or pd.api.types.is_period_dtype(times.dtype)
-            )
-        array = np.asarray(times)
-        return bool(
-            np.issubdtype(array.dtype, np.datetime64)
-            or array.dtype.kind in {"O", "U", "S"}
-        )
+        return looks_datetime_like(times)
 
     @staticmethod
     def _auto_time_unit(span_seconds: float) -> str:
-        if span_seconds < 120.0:
-            return "seconds"
-        if span_seconds < 7_200.0:
-            return "minutes"
-        if span_seconds < 172_800.0:
-            return "hours"
-        if span_seconds < 1_209_600.0:
-            return "days"
-        return "weeks"
+        return auto_time_unit(span_seconds)
 
     def _convert_times(self, times: object, *, reset: bool) -> np.ndarray:
-        raw = np.asarray(times)
-        if raw.ndim > 2 or (raw.ndim == 2 and 1 not in raw.shape):
-            raise ValueError("times must be one-dimensional or a single-column vector.")
-        raw = raw.reshape(-1)
-        if raw.size == 0:
-            raise ValueError("times cannot be empty.")
+        if reset:
+            axis = normalize_training_times(times, time_unit=self.time_unit)
+            self._time_axis = axis
+            self.time_origin_ = axis.origin
+            self.time_unit_ = axis.unit
+            self.time_input_kind_ = "datetime" if axis.datetime_like else "numeric"
+            return axis.values.copy()
 
-        if self._looks_datetime_like(times):
-            try:
-                values = pd.to_datetime(raw, errors="raise")
-            except Exception as exc:
-                raise ValueError(
-                    "times could not be parsed as datetime values."
-                ) from exc
-            if values.isna().any():
-                raise ValueError("times contains missing datetime values.")
-
-            if reset:
-                origin = pd.Timestamp(values.min())
-                span_seconds = float((values.max() - values.min()).total_seconds())
-                unit = (
-                    self._auto_time_unit(span_seconds)
-                    if self.time_unit == "auto"
-                    else _TIME_UNIT_ALIASES[self.time_unit]
-                )
-                self.time_origin_ = origin
-                self.time_unit_ = unit
-                self.time_input_kind_ = "datetime"
-            elif self.time_input_kind_ != "datetime" or self.time_origin_ is None:
+        axis = self._time_axis
+        if axis is None:
+            if self.time_unit_ is None or self.time_input_kind_ is None:
                 raise ValueError(
                     "Prediction times must be datetime-like because the model was fitted "
                     "with datetime-like times."
                 )
-
-            unit = self.time_unit_
-            if unit is None:
-                raise RuntimeError("The fitted datetime unit is unavailable.")
-            elapsed_seconds = np.asarray(
-                (values - self.time_origin_).total_seconds(), dtype=float
+            axis = TimeAxis(
+                values=np.empty(0, dtype=float),
+                unit=self.time_unit_,
+                origin=self.time_origin_,
+                datetime_like=self.time_input_kind_ == "datetime",
             )
-            converted = elapsed_seconds / _TIME_FACTORS_SECONDS[unit]
-        else:
-            try:
-                converted = np.asarray(raw, dtype=float)
-            except (TypeError, ValueError) as exc:
-                raise TypeError(
-                    "Numeric times must contain real scalar values."
-                ) from exc
-            if reset:
-                self.time_origin_ = None
-                self.time_unit_ = "numeric"
-                self.time_input_kind_ = "numeric"
-            elif self.time_input_kind_ != "numeric":
-                raise ValueError(
-                    "Prediction times must be datetime-like because the model was fitted "
-                    "with datetime-like times."
-                )
-
-        converted = np.asarray(converted, dtype=float).reshape(-1)
-        if not np.all(np.isfinite(converted)):
-            raise ValueError("times contains NaN or infinite values.")
-        return converted
+        return normalize_prediction_times(times, axis=axis)
 
     def _validate_fit_inputs(
         self,
