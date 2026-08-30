@@ -279,11 +279,14 @@ def test_private_gwr_engine_prediction_matches_frozen_mgwr() -> None:
         rank_policy=rank_policy,
         compute_inference=False,
     )
-    predictions = np.einsum(
-        "ij,ij->i",
-        X_new,
-        local_fit.full_params[:, 1:],
-    ) + local_fit.full_params[:, 0]
+    predictions = (
+        np.einsum(
+            "ij,ij->i",
+            X_new,
+            local_fit.full_params[:, 1:],
+        )
+        + local_fit.full_params[:, 0]
+    )
 
     np.testing.assert_allclose(
         local_fit.full_params,
@@ -304,9 +307,9 @@ def test_c2_required_gwr_gate_inventory_and_reference_floor() -> None:
     for label, (relative_path, token) in _REQUIRED_GATE_TOKENS.items():
         path = REPO_ROOT / relative_path
         assert path.is_file(), f"missing C2 {label} gate: {relative_path}"
-        assert token in path.read_text(encoding="utf-8"), (
-            f"missing C2 {label} contract token {token!r} in {relative_path}"
-        )
+        assert token in path.read_text(
+            encoding="utf-8"
+        ), f"missing C2 {label} contract token {token!r} in {relative_path}"
 
     completed = subprocess.run(
         [sys.executable, "-m", "pytest", "--collect-only", "-q", "-m", "reference"],
