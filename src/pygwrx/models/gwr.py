@@ -408,9 +408,7 @@ class GWR(BaseSpatialRegressor):
         self.sigma2_ = inference.sigma2
         self.standardized_residuals_ = inference.standardized_residuals
         self.cooks_distance_ = inference.cooks_distance
-        self.parameter_covariance_diagonal_ = (
-            inference.parameter_covariance_diagonal
-        )
+        self.parameter_covariance_diagonal_ = inference.parameter_covariance_diagonal
         self.parameter_standard_errors_ = inference.parameter_standard_errors
         self.parameter_t_values_ = inference.parameter_t_values
         self.intercept_se_ = inference.intercept_se
