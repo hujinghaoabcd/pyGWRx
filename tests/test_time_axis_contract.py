@@ -17,7 +17,11 @@ import pygwrx
 import pygwrx.core as core
 from pygwrx import GTWR
 from pygwrx.core import time as time_module
-from pygwrx.core.time import TimeAxis, normalize_prediction_times, normalize_training_times
+from pygwrx.core.time import (
+    TimeAxis,
+    normalize_prediction_times,
+    normalize_training_times,
+)
 
 
 def test_time_axis_is_private_first_and_formula_free() -> None:
