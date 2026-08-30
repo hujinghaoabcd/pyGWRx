@@ -42,7 +42,9 @@ def _load_contract() -> dict[str, object]:
 def _source_declared_protected_methods() -> set[str]:
     tree = ast.parse(GWR_SOURCE_PATH.read_text(encoding="utf-8"))
     gwr_class = next(
-        node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == "GWR"
+        node
+        for node in tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "GWR"
     )
     return {
         node.name
