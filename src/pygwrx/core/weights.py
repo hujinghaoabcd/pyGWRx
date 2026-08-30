@@ -241,7 +241,8 @@ def _adaptive_distance_scale(
 
 
 def _validate_weight_row(
-    weights: np.ndarray, expected_shape: tuple[int, ...]
+    weights: np.ndarray,
+    expected_shape: tuple[int, ...],
 ) -> np.ndarray:
     """Validate one kernel-generated observation-weight row."""
     values = np.asarray(weights, dtype=float)
