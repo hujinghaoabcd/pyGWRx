@@ -1,0 +1,41 @@
+name: D1 Migrate Once
+
+on:
+  push:
+    branches:
+      - refactor/d1-rgwr-remove-gwr-inheritance
+    paths:
+      - .github/workflows/d1-migrate-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refactor/d1-rgwr-remove-gwr-inheritance
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Apply D1 migration
+        run: python .github/d1_migrate.py
+      - name: Install development dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Format D1 files
+        run: |
+          python -m black src/pygwrx/models/rgwr.py tests/test_rgwr_inheritance_contract.py
+          python -m isort src/pygwrx/models/rgwr.py tests/test_rgwr_inheritance_contract.py
+      - name: Validate D1 files
+        run: |
+          python -m ruff check src/pygwrx/models/rgwr.py tests/test_rgwr_inheritance_contract.py
+          python -m pytest -q tests/test_rgwr.py tests/test_rgwr_inheritance_contract.py tests/test_estimator_fitted_state_atomicity.py
+      - name: Commit implementation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/pygwrx/models/rgwr.py tests/test_rgwr_inheritance_contract.py
+          git commit -m 'D1: remove RGWR concrete GWR inheritance'
+          git push origin HEAD:refactor/d1-rgwr-remove-gwr-inheritance
