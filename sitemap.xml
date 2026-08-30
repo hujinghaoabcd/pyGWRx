@@ -2,626 +2,626 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/public-api-inventory/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/core/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/core/bandwidth/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/core/base/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/core/kernels/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/core/metrics/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/core/optimization/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/core/solver/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/core/utils/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/diagnostics/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/diagnostics/collinearity/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/diagnostics/inference/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/diagnostics/model/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/diagnostics/regimes/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/diagnostics/residuals/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/diagnostics/temporal/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/diagnostics/weights/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/io/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/io/data/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/io/datasets/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/bootstrap-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/gr-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/gtwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/gw-lasso/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/gwda/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/gwglm/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/gwpca/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/gwss/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/lcr-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/lg-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/mgtwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/mgwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/mixed-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/rgwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/scalable-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/sgtwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/sgwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/models/stwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/array-maps/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/bandwidth/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/bootstrap/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/comparison/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/decomposition/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/diagnostics/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/geometry/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/multivariate/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/regimes/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/regularization/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/robust/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/scalable/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/surfaces/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/api/plotting/temporal/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/assets/figures/FIGURE_MANIFEST/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/development/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/development/contributing/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/development/documentation/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/development/examples-and-api-contract/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/development/release/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/development/security/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/development/testing/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/development/typing/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/examples/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/examples/core/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/examples/diagnostics/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/examples/io/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/examples/models/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/examples/plotting/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/examples/workflows/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/getting-started/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/getting-started/choosing-a-model/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/getting-started/concepts/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/getting-started/data-and-inputs/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/getting-started/installation/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/getting-started/quickstart/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/core-numerics/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/datasets/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/diagnostics/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/geospatial-io/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/kernels-and-bandwidths/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/performance-and-reproducibility/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/prediction-and-results/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/spatiotemporal-data/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/troubleshooting/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/guides/visualization/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/bootstrap-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/gr-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/gtwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/gw-lasso/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/gwda/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/gwglm/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/gwpca/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/gwss/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/lcr-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/lg-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/mgtwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/mgwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/mixed-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/rgwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/scalable-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/sgtwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/sgwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/models/stwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/project/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/project/api-stability/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/project/archived-material/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/project/changelog/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/project/citation/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/project/license/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/project/status-and-scope/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/theory/gr-gwr-monograph.zh/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/theory/lg-gwr-monograph.zh/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/theory/model-encyclopedia.zh/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/theory/references/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/tutorials/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/tutorials/compare-models/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/tutorials/end-to-end-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/tutorials/original-models/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/tutorials/spatiotemporal-workflow/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/guides/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/guides/api-and-examples/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/guides/data-and-inputs/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/guides/diagnostics/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/guides/kernels-and-bandwidths/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/guides/model-selection/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/guides/prediction-and-results/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/guides/visualization/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/bootstrap-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/gr-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/gtwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/gw-lasso/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/gwda/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/gwglm/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/gwpca/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/gwss/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/lcr-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/lg-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/mgtwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/mgwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/mixed-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/rgwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/scalable-gwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/sgtwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/sgwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/models/stwr/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
     <url>
          <loc>https://hujinghaoabcd.github.io/pyGWRx/zh/project/release-and-security/</loc>
-         <lastmod>2026-08-29</lastmod>
+         <lastmod>2026-08-30</lastmod>
     </url>
 </urlset>
