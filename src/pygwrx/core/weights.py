@@ -104,9 +104,7 @@ class FixedBandwidth:
     value: float
 
     def __post_init__(self) -> None:
-        if isinstance(self.value, (bool, np.bool_)) or not isinstance(
-            self.value, Real
-        ):
+        if isinstance(self.value, (bool, np.bool_)) or not isinstance(self.value, Real):
             raise TypeError("Fixed bandwidth must be a positive real scalar.")
         value = float(self.value)
         if not np.isfinite(value) or value <= 0.0:
@@ -180,9 +178,7 @@ def normalize_bandwidth(
             )
         return AdaptiveBandwidth(int(numeric), neighbourhood_policy)
     if neighbourhood_policy is not None:
-        raise ValueError(
-            "neighbourhood_policy applies only to adaptive bandwidths."
-        )
+        raise ValueError("neighbourhood_policy applies only to adaptive bandwidths.")
     return FixedBandwidth(bandwidth)
 
 
