@@ -1266,7 +1266,7 @@ plotting/ 不调用 np.linalg.svd 做模型诊断
 | B3 | distance split + metric spec | DONE | #46 | `24edf6902f1ae180ab29d6b29ce6680b205b9625` | core + GWR refs + full CI | canonical `core.distance` + private-first `DistanceMetricSpec` / metric params；legacy/public distance signatures preserved；bounded streaming / GWR refs unchanged |
 | B4 | time-axis utility | DONE | #48 | `90cd65bc8342b82538afa9faabb32eb41a58d979` | GTWR/SGTWR tests + full CI | canonical private-first `core.time` / `TimeAxis`；GTWR preserves frozen fitted-state contract；no ST formula change；SGTWR estimator-as-utility cleanup remains D5 |
 | B5 | weights + neighbourhood policies | DONE | #50 | `cdb2bfed50a107d1bed2b19380eff7ab8dea1763` | per-family semantics tests + GWR refs + full CI | private-first `core.weights` + `FixedBandwidth` / `AdaptiveBandwidth` / `NeighbourhoodPolicy`; GWR/MGWR distance-threshold inclusive (`nextafter`) 与 GWPCA/GWDA/GWSS stable-rank/exact-boundary 语义分别冻结；未迁移 estimator execution path、未改 solver/search/kernel/statistics |
-| B6 | canonical WLS result | PENDING | — | — | solver + GWR refs | pure algebra |
+| B6 | canonical WLS result | DONE | #52 | `318caa5b17416ae2fa01ccef5f4142a35db76713` | solver + GWR refs + full CI | canonical private frozen WLS result + `_solve_weighted_least_squares`；public tuple API preserved；legacy private details exact alias preserved；no SVD/rank/ridge/minimum-norm/inverse-normal numerical change |
 | B7 | generic search domains | PENDING | — | — | selector/optimizer tests | objective model-owned |
 | B8 | Gaussian diagnostics split | PENDING | — | — | GWR refs | wrappers keep compatibility |
 | C1 | GWR private engine extraction | PENDING | — | — | full GWR freeze | golden architecture sample |
