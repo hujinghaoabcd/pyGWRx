@@ -46,8 +46,7 @@ def test_gwr_production_module_does_not_own_bandwidth_objective() -> None:
     imported_from_core_bandwidth = [
         node
         for node in ast.walk(tree)
-        if isinstance(node, ast.ImportFrom)
-        and node.module == "pygwrx.core.bandwidth"
+        if isinstance(node, ast.ImportFrom) and node.module == "pygwrx.core.bandwidth"
     ]
     assert imported_from_core_bandwidth == []
 

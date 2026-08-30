@@ -12,6 +12,9 @@ The engine does not define a new estimator base class.  Distance generation,
 weight construction and rank policy are injected by the owning estimator so
 that robust, temporal or other model-specific semantics are not silently
 folded into standard GWR.
+
+Author:
+    Jinghao Hu
 """
 
 from __future__ import annotations
@@ -126,9 +129,7 @@ class _GWRBandwidthSelector(_BaseSelector):
             raise TypeError("criterion must be a string.")
         normalized = criterion.strip().lower()
         if normalized not in self._VALID_CRITERIA:
-            raise ValueError(
-                "criterion must be one of 'cv', 'aic', 'aicc', or 'bic'."
-            )
+            raise ValueError("criterion must be one of 'cv', 'aic', 'aicc', or 'bic'.")
         super().__init__(
             n_intervals=n_intervals,
             optimization_method=optimization_method,
@@ -417,9 +418,7 @@ def _collect_gwr_inference(
     """Collect standard Gaussian GWR residual and coefficient inference arrays."""
     rss = float(np.dot(residuals, residuals))
     denominator = (
-        n_samples - trace_S
-        if sigma2_v1
-        else n_samples - 2.0 * trace_S + trace_StS
+        n_samples - trace_S if sigma2_v1 else n_samples - 2.0 * trace_S + trace_StS
     )
     sigma2 = rss / denominator if denominator > 0.0 else np.nan
     influence_arr = np.asarray(influence, dtype=float)
