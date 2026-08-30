@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Jinghao Hu
 # SPDX-License-Identifier: MIT
 
-"""C3 contract tests for the non-growing protected GWR surface."""
+"""C3 contract tests for the removal-safe, non-growing protected GWR surface."""
 
 from __future__ import annotations
 
