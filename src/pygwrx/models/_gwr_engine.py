@@ -16,6 +16,9 @@ folded into standard GWR.
 
 from __future__ import annotations
 
+__author__ = "Jinghao Hu"
+__license__ = "MIT"
+
 from dataclasses import dataclass
 from typing import Callable, Iterable, Iterator, Optional, Protocol
 
