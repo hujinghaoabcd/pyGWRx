@@ -1,0 +1,99 @@
+name: C3 Bookkeeping Update
+
+on:
+  push:
+    branches:
+      - docs/c3-protected-surface-bookkeeping
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: docs/c3-protected-surface-bookkeeping
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Update C3 bookkeeping documents
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # 1) Cross-window handoff ledger.
+          path = Path("00_REFACTOR_HANDOFF.md")
+          text = path.read_text(encoding="utf-8")
+          old_next = "- 下一项固定为：**C3 — 禁止新增新的 protected ‘给子类用’ GWR 方法**。"
+          new_next = (
+              "- C3 — freeze GWR protected subclass surface：**DONE**，PR #64，merge SHA "
+              "`8f32a8246806d15129a7f48a9fcfb67123f0aa2c`。新增 machine-readable "
+              "`architecture_contracts/gwr_protected_surface.json` 与 AST/runtime 双重 contract tests，"
+              "把 C3 时点 GWR 自身声明的 12 个单下划线 protected 方法冻结为最大允许集合：后续阶段可删除旧兼容 hook，"
+              "但不得新增替代性的 GWR protected implementation method；新增实现辅助逻辑必须进入 private engine 或模型自有模块。"
+              "`gwr.py` runtime 未修改，RGWR/LCRGWR/GWGLM concrete inheritance cleanup 继续严格留给 D1/D2/D3。"
+              "56 个 blocking references、Quality、coverage、minimum dependencies、build/install、Ubuntu/macOS/Windows × "
+              "Python 3.11–3.14、Documentation 与 Security/SBOM 全部通过；未修改 estimator API、统计公式、数值结果、"
+              "search semantics、reference fixture 或 tolerance。\n"
+              "- 下一项固定为：**D1 — RGWR remove concrete GWR inheritance**。"
+          )
+          assert text.count(old_next) == 1
+          text = text.replace(old_next, new_next)
+
+          old_safety = (
+              "A1/A2/A3/A4/A5、B1/B2/B3/B4/B5/B6/B7/B8、C1 与 C2 共同构成进入 C3 的安全冻结："
+              "Public API / capability、failed-refit atomicity、迁移风险、性能/内存现状、用户可观察契约、"
+              "private capability spine、canonical validation/distance/time/weights/WLS/search-domain/"
+              "Gaussian-diagnostics 边界、standard-GWR private engine ownership，以及 56 个 blocking reference "
+              "tests 所形成的 engine numerical lock 必须同时守住。A4 的 timing/RSS 仅作为 observational baseline，"
+              "不设置 noisy wall-time CI gate；live structural memory guards 继续阻止 streamed GWR 意外引入 retained "
+              "`n × n` buffer，并保留 `compute_hat_matrix=True` 的显式 dense S 行为。C3 只允许锁定 GWR 不再新增供"
+              "子类依赖的 protected implementation surface，并明确 GWR 不再作为其他 estimator 的 implementation "
+              "framework；不得改变 estimator API、统计公式、数值结果、search semantics、reference fixture 或 tolerance，"
+              "不得提前执行 D1 concrete-inheritance removal、base rewrite 或性能算法重写。"
+          )
+          new_safety = (
+              "A1/A2/A3/A4/A5、B1/B2/B3/B4/B5/B6/B7/B8、C1、C2 与 C3 共同构成进入 D1 的安全冻结："
+              "Public API / capability、failed-refit atomicity、迁移风险、性能/内存现状、用户可观察契约、"
+              "private capability spine、canonical validation/distance/time/weights/WLS/search-domain/"
+              "Gaussian-diagnostics 边界、standard-GWR private engine ownership、56 个 blocking reference tests 的 numerical lock，"
+              "以及 GWR protected implementation surface 的 non-growing contract 必须同时守住。A4 的 timing/RSS 仅作为 "
+              "observational baseline，不设置 noisy wall-time CI gate；live structural memory guards 继续阻止 streamed GWR "
+              "意外引入 retained `n × n` buffer，并保留 `compute_hat_matrix=True` 的显式 dense S 行为。D1 只允许移除 "
+              "RGWR 对 concrete `GWR` estimator 的继承依赖并改为 composition/capability reuse，同时保持 RGWR public API、"
+              "fitted-state atomicity、robust weighting/statistical behavior、prediction/inference/result semantics 与 numerical evidence；"
+              "不得修改 reference fixture/tolerance，不得顺手处理 LCRGWR/GWGLM、base rewrite 或无关性能算法。"
+          )
+          assert text.count(old_safety) == 1
+          text = text.replace(old_safety, new_safety)
+          path.write_text(text, encoding="utf-8")
+
+          # 2) Final architecture phase ledger.
+          path = Path("ARCHITECTURE_FINAL_DECISION.md")
+          text = path.read_text(encoding="utf-8")
+          old_row = (
+              "| C3 | freeze GWR protected subclass surface | PENDING | — | — | architecture + GWR freeze | "
+              "no new protected subclass implementation hooks; GWR ceases to be an estimator implementation framework |"
+          )
+          new_row = (
+              "| C3 | freeze GWR protected subclass surface | DONE | #64 | "
+              "`8f32a8246806d15129a7f48a9fcfb67123f0aa2c` | protected-surface contract + 56 refs + full CI | "
+              "machine-readable 12-method maximum + AST/runtime non-growing gate; removals allowed, additions forbidden; "
+              "no `gwr.py` runtime/numerical/API change; D1/D2/D3 inheritance cleanup remains staged |"
+          )
+          assert text.count(old_row) == 1
+          text = text.replace(old_row, new_row)
+          path.write_text(text, encoding="utf-8")
+          PY
+      - name: Commit bookkeeping and remove helper workflow
+        shell: bash
+        run: |
+          rm .github/workflows/c3-bookkeeping-update.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 00_REFACTOR_HANDOFF.md ARCHITECTURE_FINAL_DECISION.md .github/workflows/c3-bookkeeping-update.yml
+          git commit -m 'Record C3 protected-surface freeze completion'
+          git push origin HEAD:docs/c3-protected-surface-bookkeeping
