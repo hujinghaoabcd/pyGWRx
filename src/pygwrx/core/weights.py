@@ -4,7 +4,7 @@
 """Private-first bandwidth and neighbourhood semantics for pyGWRx.
 
 This module separates the mathematical meaning of fixed/adaptive bandwidths
-from model execution strategy.  It deliberately represents neighbourhood
+from model execution strategy. It deliberately represents neighbourhood
 boundary, duplicate-distance, tie, focal-observation, and leave-one-out rules
 explicitly so future model migrations cannot silently substitute one model
 family's adaptive semantics for another's.
@@ -67,7 +67,7 @@ class NeighbourhoodPolicy:
             the focal observation.
 
     Notes:
-        The policy is descriptive as well as executable.  In particular,
+        The policy is descriptive as well as executable. In particular,
         ``focal_observation_counts`` records an important model-family contract;
         callers remain responsible for supplying the distance candidates implied
         by that contract when constructing non-standard focal-excluding policies.
@@ -104,7 +104,9 @@ class FixedBandwidth:
     value: float
 
     def __post_init__(self) -> None:
-        if isinstance(self.value, (bool, np.bool_)) or not isinstance(self.value, Real):
+        if isinstance(self.value, (bool, np.bool_)) or not isinstance(
+            self.value, Real
+        ):
             raise TypeError("Fixed bandwidth must be a positive real scalar.")
         value = float(self.value)
         if not np.isfinite(value) or value <= 0.0:
@@ -144,7 +146,7 @@ DISTANCE_THRESHOLD_INCLUSIVE_POLICY = NeighbourhoodPolicy(
 )
 
 # GWmodel-compatible stable-rank semantics currently used by GWPCA, GWDA, and
-# GWSS.  Compact kernels receive the exact k-th distance, while boxcar and a
+# GWSS. Compact kernels receive the exact k-th distance, while boxcar and a
 # zero-distance k-th rank use an exact stable top-k membership mask.
 STABLE_RANK_KERNEL_BOUNDARY_POLICY = NeighbourhoodPolicy(
     focal_observation_counts=True,
@@ -169,7 +171,14 @@ def normalize_bandwidth(
             raise ValueError(
                 "Adaptive bandwidths require an explicit neighbourhood_policy."
             )
-        return AdaptiveBandwidth(bandwidth, neighbourhood_policy)
+        if isinstance(bandwidth, (bool, np.bool_)):
+            raise TypeError("Adaptive bandwidth must be an integer neighbour count.")
+        numeric = float(bandwidth)
+        if not np.isfinite(numeric) or not numeric.is_integer():
+            raise ValueError(
+                "Adaptive bandwidth must be a finite integer neighbour count."
+            )
+        return AdaptiveBandwidth(int(numeric), neighbourhood_policy)
     if neighbourhood_policy is not None:
         raise ValueError(
             "neighbourhood_policy applies only to adaptive bandwidths."
@@ -235,7 +244,9 @@ def _adaptive_distance_scale(
     return selected
 
 
-def _validate_weight_row(weights: np.ndarray, expected_shape: tuple[int, ...]) -> np.ndarray:
+def _validate_weight_row(
+    weights: np.ndarray, expected_shape: tuple[int, ...]
+) -> np.ndarray:
     """Validate one kernel-generated observation-weight row."""
     values = np.asarray(weights, dtype=float)
     if values.shape != expected_shape:
@@ -258,7 +269,7 @@ def weights_from_distances(
     """Construct one weight row under an explicit bandwidth/neighbourhood policy.
 
     This function does not calculate distances, store dense weight matrices, perform
-    leave-one-out exclusion, or choose a bandwidth.  Those responsibilities remain
+    leave-one-out exclusion, or choose a bandwidth. Those responsibilities remain
     separate from neighbourhood semantics.
     """
     values = _validate_distance_row(distances)
@@ -302,7 +313,9 @@ def exclude_focal_for_loocv(
     values = np.asarray(weights, dtype=float)
     if values.ndim != 1:
         raise ValueError("weights must be one-dimensional.")
-    if not isinstance(focal_index, Integral) or isinstance(focal_index, (bool, np.bool_)):
+    if not isinstance(focal_index, Integral) or isinstance(
+        focal_index, (bool, np.bool_)
+    ):
         raise TypeError("focal_index must be an integer.")
     index = int(focal_index)
     if index < 0 or index >= values.size:
