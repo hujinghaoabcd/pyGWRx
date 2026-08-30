@@ -33,8 +33,8 @@ from pygwrx.core.optimization import (
 )
 from pygwrx.core.solver import adaptive_bandwidth_weights, weighted_least_squares
 from pygwrx.core.time import (
-    TimeAxis,
     _TIME_UNIT_ALIASES,
+    TimeAxis,
     auto_time_unit,
     looks_datetime_like,
     normalize_prediction_times,
