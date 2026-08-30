@@ -173,6 +173,7 @@ files = [
     "src/pygwrx/diagnostics/_utils.py",
     "src/pygwrx/io/data.py",
     "src/pygwrx/io/datasets.py",
+    "src/pygwrx/models/_gwr_engine.py",
     "src/pygwrx/models/mgtwr.py",
     "src/pygwrx/plotting/_validation.py",
 ]
