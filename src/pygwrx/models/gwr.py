@@ -28,13 +28,13 @@ from pygwrx.core.solver import _weighted_least_squares_details
 from pygwrx.core.utils import _iter_distance_rows as _iter_core_distance_rows
 from pygwrx.core.utils import add_intercept, validate_coords
 from pygwrx.models._gwr_engine import (
-    _GWRLocalFitResult,
     _collect_gwr_inference,
     _compute_gwr_local_r2,
     _fit_gwr_prediction_locations,
     _fit_gwr_training_locations,
     _get_gwr_bandwidth_selector,
     _gwr_spatial_weights,
+    _GWRLocalFitResult,
 )
 
 
