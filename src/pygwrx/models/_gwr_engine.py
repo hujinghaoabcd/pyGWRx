@@ -151,11 +151,12 @@ class _GWRBandwidthSelector(_BaseSelector):
             bandwidth_range,
             distance_metric,
         )
+        objective_function: Callable[[Bandwidth], float]
 
         if self.criterion == "cv":
             self._print_header("Cross-Validation Bandwidth Selection", lower, upper)
 
-            def objective(bandwidth: Bandwidth) -> float:
+            def cv_objective(bandwidth: Bandwidth) -> float:
                 squared_error = 0.0
                 for i, dists in enumerate(
                     _iter_distance_rows(coords_arr, distance_metric=distance_metric)
@@ -172,13 +173,14 @@ class _GWRBandwidthSelector(_BaseSelector):
                     squared_error += residual * residual
                 return squared_error
 
+            objective_function = cv_objective
             label = "CV"
         elif self.criterion in {"aic", "aicc"}:
             corrected = self.criterion == "aicc"
             label = "AICc" if corrected else "AIC"
             self._print_header(f"{label} Bandwidth Selection", lower, upper)
 
-            def objective(bandwidth: Bandwidth) -> float:
+            def information_objective(bandwidth: Bandwidth) -> float:
                 n_samples = y_arr.size
                 fitted = np.empty(n_samples, dtype=float)
                 trace_s = 0.0
@@ -206,11 +208,12 @@ class _GWRBandwidthSelector(_BaseSelector):
                     return float(compute_aicc(y_arr, fitted, trace_s))
                 return float(compute_aic(y_arr, fitted, trace_s))
 
+            objective_function = information_objective
         else:
             label = "BIC"
             self._print_header("BIC Bandwidth Selection", lower, upper)
 
-            def objective(bandwidth: Bandwidth) -> float:
+            def bic_objective(bandwidth: Bandwidth) -> float:
                 n_samples = y_arr.size
                 fitted = np.empty(n_samples, dtype=float)
                 trace_s = 0.0
@@ -236,7 +239,13 @@ class _GWRBandwidthSelector(_BaseSelector):
 
                 return float(compute_bic(y_arr, fitted, trace_s))
 
-        best_bandwidth, best_score = self._search(objective, lower, upper)
+            objective_function = bic_objective
+
+        best_bandwidth, best_score = self._search(
+            objective_function,
+            lower,
+            upper,
+        )
         if self.verbose:
             bandwidth_label = "Optimal k" if self.adaptive else "Optimal bandwidth"
             print(f"\n{bandwidth_label}: {best_bandwidth}")
