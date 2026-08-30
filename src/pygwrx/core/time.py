@@ -77,8 +77,7 @@ def looks_datetime_like(times: object) -> bool:
         )
     array = np.asarray(times)
     return bool(
-        np.issubdtype(array.dtype, np.datetime64)
-        or array.dtype.kind in {"O", "U", "S"}
+        np.issubdtype(array.dtype, np.datetime64) or array.dtype.kind in {"O", "U", "S"}
     )
 
 
