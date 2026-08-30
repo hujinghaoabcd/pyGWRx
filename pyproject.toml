@@ -169,6 +169,7 @@ files = [
     "src/pygwrx/core/solver.py",
     "src/pygwrx/core/time.py",
     "src/pygwrx/core/validation.py",
+    "src/pygwrx/core/weights.py",
     "src/pygwrx/diagnostics/_utils.py",
     "src/pygwrx/io/data.py",
     "src/pygwrx/io/datasets.py",
