@@ -16,7 +16,6 @@ Author:
     Jinghao Hu
 """
 
-
 from __future__ import annotations
 
 __author__ = "Jinghao Hu"
@@ -94,8 +93,7 @@ class NeighbourhoodPolicy:
             raise ValueError(f"Unsupported tie_rule: {self.tie_rule!r}.")
         if self.loocv_focal_exclusion not in _ALLOWED_LOOCV_RULES:
             raise ValueError(
-                "Unsupported loocv_focal_exclusion: "
-                f"{self.loocv_focal_exclusion!r}."
+                "Unsupported loocv_focal_exclusion: " f"{self.loocv_focal_exclusion!r}."
             )
 
 
