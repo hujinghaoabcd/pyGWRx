@@ -21,7 +21,7 @@ The evidence is separated into independent generation, frozen reference data, py
 | External generation | Produce outputs with independently maintained software | `tools/reference/gwr/generate_mgwr.py`, `generate_r_references.R`, Columbus generator scripts |
 | Frozen reference | Preserve external numerical outputs used by CI | `tests/reference_data/gwr/*.json`, `tests/reference_data/gwr/real_columbus/frozen/` |
 | Machine comparison | Quantify absolute/relative differences and preserve semantic labels | `validation_results/gwr/comparison.csv/json`, bandwidth and Columbus comparison tables |
-| Blocking reference CI | Fail if aligned quantities drift outside tolerance | `tests/test_gwr_external_references.py`, `tests/test_gwr_mgwr_deep_diagnostics_reference.py`, Columbus reference tests |
+| Blocking reference CI | Fail if aligned quantities drift outside tolerance | `tests/test_gwr_external_references.py`, `tests/test_gwr_mgwr_deep_diagnostics_reference.py`, `tests/test_gwr_engine_numerical_lock.py`, Columbus reference tests |
 
 Normal CI consumes frozen outputs and therefore does not need an R installation. Regeneration remains independently reproducible from the scripts above.
 
@@ -178,10 +178,11 @@ These exclusions are part of the validation design. They prevent false claims of
 
 ## 7. Blocking CI coverage after this evidence completion
 
-The GWR external-reference suite contains **50 tests marked `reference`** after adding the five deep-diagnostic mgwr cases. It runs as a dedicated blocking CI job in addition to the normal regression, platform, minimum-dependency, build, coverage, documentation, quality, and security checks.
+The GWR external-reference suite contains **56 tests marked `reference`** after C2 adds six direct private-engine reference cases on top of the existing 50-test external/public-GWR suite. It runs as a dedicated blocking CI job in addition to the normal regression, platform, minimum-dependency, build, coverage, documentation, quality, and security checks.
 
 The external-reference layer now blocks regressions in:
 
+- direct C1 private-engine calibration, inference, smoother/influence and independent-location prediction paths;
 - local parameter estimation;
 - fitted values and residuals;
 - local R-squared where definitions match;
@@ -216,6 +217,7 @@ For audit or paper preparation, use the following sources rather than copying nu
 - `validation_results/gwr/bandwidth_curve_report.md` — controlled bandwidth interpretation;
 - `validation_results/gwr/real_columbus/comparison.csv` and `.json` — real-data comparisons;
 - `validation_results/gwr/real_columbus/gwr_columbus_validation_report.md` — real-data narrative;
+- `tests/test_gwr_engine_numerical_lock.py` — C2 direct private-engine blocking reference lock;
 - `tests/reference_data/gwr/` — frozen external outputs consumed by CI;
 - `tools/reference/gwr/` — independent reference-generation and comparison scripts.
 
