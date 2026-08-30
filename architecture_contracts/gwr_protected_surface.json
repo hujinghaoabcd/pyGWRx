@@ -1,0 +1,37 @@
+{
+  "contract_version": 1,
+  "phase": "C3",
+  "target": "pygwrx.models.gwr.GWR",
+  "policy": {
+    "protected_method_additions_allowed": false,
+    "protected_method_removals_allowed": true,
+    "inherited_methods_in_scope": false,
+    "dunder_methods_in_scope": false,
+    "preferred_implementation_owner": "pygwrx.models._gwr_engine"
+  },
+  "frozen_maximum_protected_methods": [
+    "_compute_local_r2",
+    "_compute_local_r2_from_distance_rows",
+    "_compute_local_r2_from_distances",
+    "_fit_training_locations",
+    "_iter_distance_rows",
+    "_prediction_parameters",
+    "_reset_fit_state",
+    "_reset_inference_state",
+    "_resolve_bandwidth",
+    "_set_inference_results",
+    "_warn_rank_deficiency",
+    "_weights_from_distances"
+  ],
+  "deferred_concrete_inheritance_removal": {
+    "RGWR": "D1",
+    "LCRGWR": "D2",
+    "GWGLM": "D3"
+  },
+  "notes": [
+    "The frozen list is a maximum surface, not a required permanent surface.",
+    "Later architecture phases may remove entries without replacing them on GWR.",
+    "New model implementation helpers belong in private engines or model-owned modules, not as new protected GWR methods.",
+    "This contract does not authorize the listed methods as public or long-term subclass APIs."
+  ]
+}
