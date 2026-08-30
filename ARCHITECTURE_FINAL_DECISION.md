@@ -1271,7 +1271,7 @@ plotting/ 不调用 np.linalg.svd 做模型诊断
 | B8 | Gaussian diagnostics split | DONE | #56 | `d8ec00378b01ad1d9b1d3692f6c149bf3f4637ae` | diagnostics contracts + GWR refs + full CI | canonical `core.gaussian_diagnostics`；`core.metrics` 保留 exact compatibility re-exports；AIC/AICc/BIC、trace/ENP/EDF、public result semantics、model numerics、reference/tolerance 均未改变 |
 | C1 | GWR private engine extraction | DONE | #59 | `69d2f441a29cf02976bc1b1502193da70c2b23e8` | full GWR freeze + full CI | private `_gwr_engine.py`; public GWR API/numerics preserved; no D1 cleanup |
 | C2 | GWR engine numerical lock | DONE | #62 | `0fd763dc8df7a4185f532e35b48c320d8a0e5215` | 56 external/private-engine refs + full CI | direct `_gwr_engine` locks against frozen mgwr 2.2.1 artifacts; deep diagnostics/rank/prediction/streaming/bandwidth provenance/failed-refit gates retained; no runtime/formula/reference/tolerance change |
-| C3 | freeze GWR protected subclass surface | PENDING | — | — | architecture + GWR freeze | no new protected subclass implementation hooks; GWR ceases to be an estimator implementation framework |
+| C3 | freeze GWR protected subclass surface | DONE | #64 | `8f32a8246806d15129a7f48a9fcfb67123f0aa2c` | protected-surface contract + 56 refs + full CI | machine-readable 12-method maximum + AST/runtime non-growing gate; removals allowed, additions forbidden; no `gwr.py` runtime/numerical/API change; D1/D2/D3 inheritance cleanup remains staged |
 | D1 | RGWR remove concrete GWR inheritance | PENDING | — | — | RGWR freeze | composition |
 | D2 | LCRGWR remove concrete GWR inheritance | PENDING | — | — | LCR freeze | specialized solver |
 | D3 | GWGLM remove concrete GWR inheritance | PENDING | — | — | family refs | audit IWLS/ridge first |
