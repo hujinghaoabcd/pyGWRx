@@ -30,6 +30,8 @@ from pygwrx.core.optimization import (
     BrentSearch,
     GoldenSectionSearch,
     OptimizationResult,
+    _ContinuousSearchDomain,
+    _IntegerSearchDomain,
 )
 from pygwrx.core.solver import adaptive_bandwidth_weights, weighted_least_squares
 from pygwrx.core.time import (
@@ -701,12 +703,12 @@ class GTWR(BaseSpatiotemporalRegressor):
                     max_iter=self.search_max_iter,
                     verbose=self.verbose,
                 )
-                result = optimizer.minimize(
-                    objective,
-                    lower,
-                    upper,
-                    adaptive=self.adaptive,
+                domain = (
+                    _IntegerSearchDomain.from_bounds(lower, upper)
+                    if self.adaptive
+                    else _ContinuousSearchDomain.from_bounds(lower, upper)
                 )
+                result = optimizer._minimize_on_domain(objective, domain)
             else:
                 optimizer = BrentSearch(
                     tol=self.search_tol,

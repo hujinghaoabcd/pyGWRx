@@ -58,6 +58,35 @@ class OptimizationResult:
     message: str = ""
 
 
+@dataclass(frozen=True)
+class _ContinuousSearchDomain:
+    """Validated closed interval for continuous one-dimensional search."""
+
+    lower: float
+    upper: float
+
+    @classmethod
+    def from_bounds(cls, lower: object, upper: object) -> "_ContinuousSearchDomain":
+        lower_value, upper_value = _validate_bounds(lower, upper)
+        return cls(lower=lower_value, upper=upper_value)
+
+
+@dataclass(frozen=True)
+class _IntegerSearchDomain:
+    """Validated closed interval whose admissible candidates are integers."""
+
+    lower: float
+    upper: float
+
+    @classmethod
+    def from_bounds(cls, lower: object, upper: object) -> "_IntegerSearchDomain":
+        lower_value, upper_value = _validate_bounds(lower, upper)
+        return cls(lower=lower_value, upper=upper_value)
+
+
+_SearchDomain = Union[_ContinuousSearchDomain, _IntegerSearchDomain]
+
+
 def _validate_bool(value: object, name: str) -> bool:
     if not isinstance(value, (bool, np.bool_)):
         raise TypeError(f"{name} must be a boolean value.")
@@ -224,19 +253,24 @@ class GoldenSectionSearch:
         """
         objective = _validate_objective(func)
         adaptive_value = _validate_bool(adaptive, "adaptive")
-        lower_value, upper_value = _validate_bounds(lower, upper)
-
+        domain: _SearchDomain
         if adaptive_value:
-            return self._minimize_integer(
-                objective,
-                lower_value,
-                upper_value,
-            )
-        return self._minimize_continuous(
-            objective,
-            lower_value,
-            upper_value,
-        )
+            domain = _IntegerSearchDomain.from_bounds(lower, upper)
+        else:
+            domain = _ContinuousSearchDomain.from_bounds(lower, upper)
+        return self._minimize_on_domain(objective, domain)
+
+    def _minimize_on_domain(
+        self,
+        func: Objective,
+        domain: _SearchDomain,
+    ) -> OptimizationResult:
+        """Minimize an already classified generic search domain."""
+        if isinstance(domain, _IntegerSearchDomain):
+            return self._minimize_integer(func, domain.lower, domain.upper)
+        if isinstance(domain, _ContinuousSearchDomain):
+            return self._minimize_continuous(func, domain.lower, domain.upper)
+        raise TypeError("domain must be a continuous or integer search domain.")
 
     def _minimize_continuous(
         self,
