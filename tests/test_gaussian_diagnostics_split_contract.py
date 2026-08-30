@@ -61,9 +61,7 @@ def test_trace_edf_enp_conventions_and_diagnostic_keys_are_frozen() -> None:
     expected_edf_v2 = y_true.size - expected_enp_v2
 
     trace_stats = gaussian_diagnostics.compute_trace_statistics(hat_matrix)
-    assert trace_stats == pytest.approx(
-        {"trace_S": trace_s, "trace_StS": trace_sts}
-    )
+    assert trace_stats == pytest.approx({"trace_S": trace_s, "trace_StS": trace_sts})
     assert gaussian_diagnostics.compute_enp(trace_s, trace_sts) == pytest.approx(
         expected_enp_v2
     )
